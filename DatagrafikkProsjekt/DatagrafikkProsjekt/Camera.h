@@ -1,0 +1,148 @@
+#pragma once
+#include <vector>
+#define GLEW_STATIC
+#include <GL/glew.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+
+// Definerer alle mulige veier som kamera skal bevege seg. Bruker disse for å kunne forholde meg til navn isteden for tall
+enum Camera_Movement
+{
+    FORWARD,
+    BACKWARD,
+    LEFT,
+    RIGHT
+};
+
+// Forhåndsdefinerte kameraverdier.
+const GLfloat YAW        = -100.0f;  // Retning kamera skal peke
+const GLfloat PITCH      =  0.0f;   // Vinkel
+const GLfloat SPEED      =  6.0f;   // Hvor fort kameraet skal bevege seg
+const GLfloat SENSITIVTY =  0.25f;  // Hvor sensitiv bevegelsene skal være
+const GLfloat ZOOM       =  45.0f;  // Hvor inn-zoomet kamera skal starte
+
+
+// Oppretter en kamera-klasse som skal motta input og regne ut vinkler, vectorer og matriser som skal rukes i OpenGL
+class Camera
+{
+public:
+    // Konstruktør for vektor-verdier (Retning og hastighet)
+    Camera( glm::vec3 position = glm::vec3( 0.0f, 0.0f, 0.0f ), glm::vec3 up = glm::vec3( 0.0f, 1.0f, 0.0f ), GLfloat yaw = YAW, GLfloat pitch = PITCH ) : front( glm::vec3( 0.0f, 0.0f, -1.0f ) ), movementSpeed( SPEED ), mouseSensitivity( SENSITIVTY ), zoom( ZOOM )
+    {
+        this->position = position;
+        this->worldUp = up;
+        this->yaw = yaw;
+        this->pitch = pitch;
+        this->updateCameraVectors( );
+    }
+    
+    // Konstruktør for scalar-verdier (Mer informasjon om vektorene - hastighet osv)
+    Camera( GLfloat posX, GLfloat posY, GLfloat posZ, GLfloat upX, GLfloat upY, GLfloat upZ, GLfloat yaw, GLfloat pitch ) : front( glm::vec3( 0.0f, 0.0f, -1.0f ) ), movementSpeed( SPEED ), mouseSensitivity( SENSITIVTY ), zoom( ZOOM )
+    {
+        this->position = glm::vec3( posX, posY, posZ );
+        this->worldUp = glm::vec3( upX, upY, upZ );
+        this->yaw = yaw;
+        this->pitch = pitch;
+        this->updateCameraVectors( );
+    }
+    
+    // Returnerer matrise utregnet
+    glm::mat4 GetViewMatrix( )
+    {
+        return glm::lookAt( this->position, this->position + this->front, this->up );
+    }
+    
+    // Prosesserer input den mottar fra tastatur: (deltaTime brukes for å sørge for en jevn bevegelse)
+    void ProcessKeyboard( Camera_Movement direction, GLfloat deltaTime )
+    {
+        GLfloat velocity = this->movementSpeed * deltaTime;
+        
+        if ( direction == FORWARD )
+        {
+            this->position += this->front * velocity;
+        }
+        
+        if ( direction == BACKWARD )
+        {
+            this->position -= this->front * velocity;
+        }
+        
+        if ( direction == LEFT )
+        {
+            this->position -= this->right * velocity;
+        }
+        
+        if ( direction == RIGHT )
+        {
+            this->position += this->right * velocity;
+        }
+    }
+    
+    // Prosesserer input den mottar fra mus. (Setter y og x-posisjon)
+    void ProcessMouseMovement( GLfloat xOffset, GLfloat yOffset, GLboolean constrainPitch = true )
+    {
+        xOffset *= this->mouseSensitivity;
+        yOffset *= this->mouseSensitivity;
+        
+        this->yaw   += xOffset;
+        this->pitch += yOffset;
+        
+        // Sørger for at universet ikke "snus" om man går utenfor grensene til skjermen (Skal snurre rundt)
+        if ( constrainPitch )
+        {
+            if ( this->pitch > 89.0f )
+            {
+                this->pitch = 89.0f;
+            }
+            
+            if ( this->pitch < -89.0f )
+            {
+                this->pitch = -89.0f;
+            }
+        }
+        
+        // oppdaterer vektorene
+        this->updateCameraVectors( );
+    }
+    
+    GLfloat GetZoom( )
+    {
+        return this->zoom;
+    }
+    
+    glm::vec3 GetPosition()
+    {
+        return this->position;
+    }
+    
+private:
+    // Camera Attributes
+    glm::vec3 position;
+    glm::vec3 front;
+    glm::vec3 up;
+    glm::vec3 right;
+    glm::vec3 worldUp;
+    
+    // Eular Angles
+    GLfloat yaw;
+    GLfloat pitch;
+    
+    // Camera options
+    GLfloat movementSpeed;
+    GLfloat mouseSensitivity;
+    GLfloat zoom;
+    
+    // Kalkulerer front-vektoren fra kameraets (nye) vinkel.
+    void updateCameraVectors( )
+    {
+        // Calculate the new Front vector
+        glm::vec3 front;
+        front.x = cos( glm::radians( this->yaw ) ) * cos( glm::radians( this->pitch ) );
+        front.y = sin( glm::radians( this->pitch ) );
+        front.z = sin( glm::radians( this->yaw ) ) * cos( glm::radians( this->pitch ) );
+        this->front = glm::normalize( front );
+        
+        this->right = glm::normalize( glm::cross( this->front, this->worldUp ) );
+        this->up = glm::normalize( glm::cross( this->right, this->front ) );
+    }
+};

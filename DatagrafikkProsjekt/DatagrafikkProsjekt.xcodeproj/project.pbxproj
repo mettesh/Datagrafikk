@@ -7,12 +7,13 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		094ED68223572460007A9B65 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 094ED68123572460007A9B65 /* main.cpp */; };
 		094ED68A235724E1007A9B65 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 094ED689235724E1007A9B65 /* OpenGL.framework */; };
 		094ED68C23572507007A9B65 /* libGLEW.2.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 094ED68B23572507007A9B65 /* libGLEW.2.1.0.dylib */; };
 		094ED68E2357251B007A9B65 /* libglfw.3.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 094ED68D2357251B007A9B65 /* libglfw.3.3.dylib */; };
 		094ED69023572534007A9B65 /* libgio-2.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 094ED68F23572534007A9B65 /* libgio-2.0.0.dylib */; };
 		094ED80E23572575007A9B65 /* glm.hpp in Frameworks */ = {isa = PBXBuildFile; fileRef = 094ED72723572560007A9B65 /* glm.hpp */; };
+		094ED81123572B75007A9B65 /* resources in CopyFiles */ = {isa = PBXBuildFile; fileRef = 094ED80F23572B56007A9B65 /* resources */; };
+		094ED818235738F1007A9B65 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 094ED816235738F1007A9B65 /* main.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,11 +26,20 @@
 			);
 			runOnlyForDeploymentPostprocessing = 1;
 		};
+		094ED81023572B6E007A9B65 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 7;
+			files = (
+				094ED81123572B75007A9B65 /* resources in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		094ED67E23572460007A9B65 /* DatagrafikkProsjekt */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = DatagrafikkProsjekt; sourceTree = BUILT_PRODUCTS_DIR; };
-		094ED68123572460007A9B65 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		094ED689235724E1007A9B65 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		094ED68B23572507007A9B65 /* libGLEW.2.1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libGLEW.2.1.0.dylib; path = ../../../../../../../usr/local/Cellar/glew/2.1.0/lib/libGLEW.2.1.0.dylib; sourceTree = "<group>"; };
 		094ED68D2357251B007A9B65 /* libglfw.3.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libglfw.3.3.dylib; path = ../../../../../../../usr/local/Cellar/glfw/3.3/lib/libglfw.3.3.dylib; sourceTree = "<group>"; };
@@ -409,6 +419,10 @@
 		094ED80B23572560007A9B65 /* rotate_normalized_axis.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = rotate_normalized_axis.hpp; sourceTree = "<group>"; };
 		094ED80C23572560007A9B65 /* projection.inl */ = {isa = PBXFileReference; lastKnownFileType = text; path = projection.inl; sourceTree = "<group>"; };
 		094ED80D23572560007A9B65 /* type_aligned.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = type_aligned.hpp; sourceTree = "<group>"; };
+		094ED80F23572B56007A9B65 /* resources */ = {isa = PBXFileReference; lastKnownFileType = folder; path = resources; sourceTree = "<group>"; };
+		094ED812235735E2007A9B65 /* Camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Camera.h; sourceTree = "<group>"; };
+		094ED813235735E3007A9B65 /* shader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = shader.h; sourceTree = "<group>"; };
+		094ED816235738F1007A9B65 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -447,7 +461,10 @@
 		094ED68023572460007A9B65 /* DatagrafikkProsjekt */ = {
 			isa = PBXGroup;
 			children = (
-				094ED68123572460007A9B65 /* main.cpp */,
+				094ED80F23572B56007A9B65 /* resources */,
+				094ED812235735E2007A9B65 /* Camera.h */,
+				094ED813235735E3007A9B65 /* shader.h */,
+				094ED816235738F1007A9B65 /* main.cpp */,
 			);
 			path = DatagrafikkProsjekt;
 			sourceTree = "<group>";
@@ -897,6 +914,7 @@
 				094ED67A23572460007A9B65 /* Sources */,
 				094ED67B23572460007A9B65 /* Frameworks */,
 				094ED67C23572460007A9B65 /* CopyFiles */,
+				094ED81023572B6E007A9B65 /* CopyFiles */,
 			);
 			buildRules = (
 			);
@@ -944,7 +962,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				094ED68223572460007A9B65 /* main.cpp in Sources */,
+				094ED818235738F1007A9B65 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

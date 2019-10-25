@@ -14,6 +14,10 @@
 		094ED80E23572575007A9B65 /* glm.hpp in Frameworks */ = {isa = PBXBuildFile; fileRef = 094ED72723572560007A9B65 /* glm.hpp */; };
 		094ED81123572B75007A9B65 /* resources in CopyFiles */ = {isa = PBXBuildFile; fileRef = 094ED80F23572B56007A9B65 /* resources */; };
 		094ED818235738F1007A9B65 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 094ED816235738F1007A9B65 /* main.cpp */; };
+		09E4D85623630CF800415536 /* image_helper.c in Sources */ = {isa = PBXBuildFile; fileRef = 09E4D84123630CF800415536 /* image_helper.c */; };
+		09E4D85723630CF800415536 /* image_DXT.c in Sources */ = {isa = PBXBuildFile; fileRef = 09E4D84423630CF800415536 /* image_DXT.c */; };
+		09E4D85823630CF800415536 /* SOIL2.c in Sources */ = {isa = PBXBuildFile; fileRef = 09E4D84723630CF800415536 /* SOIL2.c */; };
+		09E4D85923630CF800415536 /* etc1_utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 09E4D85123630CF800415536 /* etc1_utils.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -423,6 +427,27 @@
 		094ED812235735E2007A9B65 /* Camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Camera.h; sourceTree = "<group>"; };
 		094ED813235735E3007A9B65 /* shader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = shader.h; sourceTree = "<group>"; };
 		094ED816235738F1007A9B65 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		09E4D84123630CF800415536 /* image_helper.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = image_helper.c; sourceTree = "<group>"; };
+		09E4D84223630CF800415536 /* stbi_pkm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stbi_pkm.h; sourceTree = "<group>"; };
+		09E4D84323630CF800415536 /* jo_jpeg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jo_jpeg.h; sourceTree = "<group>"; };
+		09E4D84423630CF800415536 /* image_DXT.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = image_DXT.c; sourceTree = "<group>"; };
+		09E4D84523630CF800415536 /* etc1_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = etc1_utils.h; sourceTree = "<group>"; };
+		09E4D84623630CF800415536 /* stb_image_write.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image_write.h; sourceTree = "<group>"; };
+		09E4D84723630CF800415536 /* SOIL2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = SOIL2.c; sourceTree = "<group>"; };
+		09E4D84823630CF800415536 /* pkm_helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pkm_helper.h; sourceTree = "<group>"; };
+		09E4D84923630CF800415536 /* stbi_DDS_c.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stbi_DDS_c.h; sourceTree = "<group>"; };
+		09E4D84A23630CF800415536 /* stbi_pvr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stbi_pvr.h; sourceTree = "<group>"; };
+		09E4D84B23630CF800415536 /* stbi_ext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stbi_ext.h; sourceTree = "<group>"; };
+		09E4D84C23630CF800415536 /* stb_image.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image.h; sourceTree = "<group>"; };
+		09E4D84D23630CF800415536 /* stbi_pvr_c.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stbi_pvr_c.h; sourceTree = "<group>"; };
+		09E4D84E23630CF800415536 /* stbi_ext_c.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stbi_ext_c.h; sourceTree = "<group>"; };
+		09E4D84F23630CF800415536 /* image_helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = image_helper.h; sourceTree = "<group>"; };
+		09E4D85023630CF800415536 /* SOIL2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SOIL2.h; sourceTree = "<group>"; };
+		09E4D85123630CF800415536 /* etc1_utils.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = etc1_utils.c; sourceTree = "<group>"; };
+		09E4D85223630CF800415536 /* image_DXT.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = image_DXT.h; sourceTree = "<group>"; };
+		09E4D85323630CF800415536 /* stbi_pkm_c.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stbi_pkm_c.h; sourceTree = "<group>"; };
+		09E4D85423630CF800415536 /* stbi_DDS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stbi_DDS.h; sourceTree = "<group>"; };
+		09E4D85523630CF800415536 /* pvr_helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pvr_helper.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -472,6 +497,7 @@
 		094ED688235724E1007A9B65 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				09E4D84023630CF800415536 /* SOIL2 */,
 				094ED69123572560007A9B65 /* glm */,
 				094ED68F23572534007A9B65 /* libgio-2.0.0.dylib */,
 				094ED68D2357251B007A9B65 /* libglfw.3.3.dylib */,
@@ -904,6 +930,34 @@
 			path = gtx;
 			sourceTree = "<group>";
 		};
+		09E4D84023630CF800415536 /* SOIL2 */ = {
+			isa = PBXGroup;
+			children = (
+				09E4D84123630CF800415536 /* image_helper.c */,
+				09E4D84223630CF800415536 /* stbi_pkm.h */,
+				09E4D84323630CF800415536 /* jo_jpeg.h */,
+				09E4D84423630CF800415536 /* image_DXT.c */,
+				09E4D84523630CF800415536 /* etc1_utils.h */,
+				09E4D84623630CF800415536 /* stb_image_write.h */,
+				09E4D84723630CF800415536 /* SOIL2.c */,
+				09E4D84823630CF800415536 /* pkm_helper.h */,
+				09E4D84923630CF800415536 /* stbi_DDS_c.h */,
+				09E4D84A23630CF800415536 /* stbi_pvr.h */,
+				09E4D84B23630CF800415536 /* stbi_ext.h */,
+				09E4D84C23630CF800415536 /* stb_image.h */,
+				09E4D84D23630CF800415536 /* stbi_pvr_c.h */,
+				09E4D84E23630CF800415536 /* stbi_ext_c.h */,
+				09E4D84F23630CF800415536 /* image_helper.h */,
+				09E4D85023630CF800415536 /* SOIL2.h */,
+				09E4D85123630CF800415536 /* etc1_utils.c */,
+				09E4D85223630CF800415536 /* image_DXT.h */,
+				09E4D85323630CF800415536 /* stbi_pkm_c.h */,
+				09E4D85423630CF800415536 /* stbi_DDS.h */,
+				09E4D85523630CF800415536 /* pvr_helper.h */,
+			);
+			path = SOIL2;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -962,7 +1016,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				09E4D85923630CF800415536 /* etc1_utils.c in Sources */,
 				094ED818235738F1007A9B65 /* main.cpp in Sources */,
+				09E4D85823630CF800415536 /* SOIL2.c in Sources */,
+				09E4D85623630CF800415536 /* image_helper.c in Sources */,
+				09E4D85723630CF800415536 /* image_DXT.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

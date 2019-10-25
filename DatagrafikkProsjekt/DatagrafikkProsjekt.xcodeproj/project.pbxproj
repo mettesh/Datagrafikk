@@ -18,6 +18,8 @@
 		09E4D85723630CF800415536 /* image_DXT.c in Sources */ = {isa = PBXBuildFile; fileRef = 09E4D84423630CF800415536 /* image_DXT.c */; };
 		09E4D85823630CF800415536 /* SOIL2.c in Sources */ = {isa = PBXBuildFile; fileRef = 09E4D84723630CF800415536 /* SOIL2.c */; };
 		09E4D85923630CF800415536 /* etc1_utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 09E4D85123630CF800415536 /* etc1_utils.c */; };
+		09E4D85D23632A9100415536 /* libassimp.4.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 09E4D85C23632A9100415536 /* libassimp.4.1.0.dylib */; };
+		09E4D85E23632A9100415536 /* libassimp.4.1.0.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 09E4D85C23632A9100415536 /* libassimp.4.1.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -38,6 +40,17 @@
 			files = (
 				094ED81123572B75007A9B65 /* resources in CopyFiles */,
 			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		09E4D85F23632A9100415536 /* Embed Libraries */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				09E4D85E23632A9100415536 /* libassimp.4.1.0.dylib in Embed Libraries */,
+			);
+			name = "Embed Libraries";
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXCopyFilesBuildPhase section */
@@ -448,6 +461,10 @@
 		09E4D85323630CF800415536 /* stbi_pkm_c.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stbi_pkm_c.h; sourceTree = "<group>"; };
 		09E4D85423630CF800415536 /* stbi_DDS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stbi_DDS.h; sourceTree = "<group>"; };
 		09E4D85523630CF800415536 /* pvr_helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pvr_helper.h; sourceTree = "<group>"; };
+		09E4D85A23631E2A00415536 /* Texture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Texture.h; sourceTree = "<group>"; };
+		09E4D85B2363299100415536 /* Model.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Model.h; sourceTree = "<group>"; };
+		09E4D85C23632A9100415536 /* libassimp.4.1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libassimp.4.1.0.dylib; path = ../../../../../../../usr/local/Cellar/assimp/4.1.0/lib/libassimp.4.1.0.dylib; sourceTree = "<group>"; };
+		09E4D86023632AC200415536 /* Mesh.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Mesh.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -457,6 +474,7 @@
 			files = (
 				094ED80E23572575007A9B65 /* glm.hpp in Frameworks */,
 				094ED69023572534007A9B65 /* libgio-2.0.0.dylib in Frameworks */,
+				09E4D85D23632A9100415536 /* libassimp.4.1.0.dylib in Frameworks */,
 				094ED68E2357251B007A9B65 /* libglfw.3.3.dylib in Frameworks */,
 				094ED68C23572507007A9B65 /* libGLEW.2.1.0.dylib in Frameworks */,
 				094ED68A235724E1007A9B65 /* OpenGL.framework in Frameworks */,
@@ -490,6 +508,9 @@
 				094ED812235735E2007A9B65 /* Camera.h */,
 				094ED813235735E3007A9B65 /* shader.h */,
 				094ED816235738F1007A9B65 /* main.cpp */,
+				09E4D85A23631E2A00415536 /* Texture.h */,
+				09E4D85B2363299100415536 /* Model.h */,
+				09E4D86023632AC200415536 /* Mesh.h */,
 			);
 			path = DatagrafikkProsjekt;
 			sourceTree = "<group>";
@@ -497,6 +518,7 @@
 		094ED688235724E1007A9B65 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				09E4D85C23632A9100415536 /* libassimp.4.1.0.dylib */,
 				09E4D84023630CF800415536 /* SOIL2 */,
 				094ED69123572560007A9B65 /* glm */,
 				094ED68F23572534007A9B65 /* libgio-2.0.0.dylib */,
@@ -969,6 +991,7 @@
 				094ED67B23572460007A9B65 /* Frameworks */,
 				094ED67C23572460007A9B65 /* CopyFiles */,
 				094ED81023572B6E007A9B65 /* CopyFiles */,
+				09E4D85F23632A9100415536 /* Embed Libraries */,
 			);
 			buildRules = (
 			);
@@ -1146,6 +1169,7 @@
 					/usr/local/Cellar/glew/2.1.0/lib,
 					/usr/local/Cellar/glfw/3.3/lib,
 					/usr/local/Cellar/glib/2.58.3/lib,
+					/usr/local/Cellar/assimp/4.1.0/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -1161,6 +1185,7 @@
 					/usr/local/Cellar/glew/2.1.0/lib,
 					/usr/local/Cellar/glfw/3.3/lib,
 					/usr/local/Cellar/glib/2.58.3/lib,
+					/usr/local/Cellar/assimp/4.1.0/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

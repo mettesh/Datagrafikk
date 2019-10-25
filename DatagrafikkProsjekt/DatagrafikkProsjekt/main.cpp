@@ -11,13 +11,14 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include "SOIL2/SOIL2.h"
+#include "SOIL2.h"
 
 // Egne includes
 #include "shader.h"
 #include "Camera.h"
-#include "Texture.h"
 #include "Model.h"
+
+#include "Texture.h"
 
 // Dimensjonene til vinduet
 const GLuint WIDTH = 800, HEIGHT = 600;
@@ -61,6 +62,7 @@ int main(){
     glfwWindowHint( GLFW_RESIZABLE, GL_TRUE );
     glfwWindowHint( GLFW_RESIZABLE, GL_FALSE );
        
+
     // Opprette et GLFW-vindu som vi kan benytte til funksjonene
     GLFWwindow *window = glfwCreateWindow( WIDTH, HEIGHT, "Datagrafikkprosjekt - Mette Strand Hornnes", nullptr, nullptr );
     
@@ -110,8 +112,8 @@ int main(){
     
     
     // Setup and compile our shaders
-    Shader shader( "res/shaders/cube.vert", "res/shaders/cube.frag" );
-    Shader skyboxShader( "res/shaders/skybox.vert", "res/shaders/skybox.frag" );
+    Shader shader( "resources/shaders/cube.vert", "resources/shaders/cube.frag" );
+    Shader skyboxShader( "resources/shaders/skybox.vert", "resources/shaders/skybox.frag" );
 
 // SPESIFISERER KUBEN:
 
@@ -232,7 +234,7 @@ int main(){
     GLuint skyboxVAO, skyboxVBO;
     glGenVertexArrays( 1, &skyboxVAO );
     glGenBuffers( 1, &skyboxVBO );
-    glBindVertexArray( skyboxVAO )
+    glBindVertexArray( skyboxVAO );
     glBindBuffer( GL_ARRAY_BUFFER, skyboxVBO );
     
     // Posisjon attribute
@@ -243,20 +245,20 @@ int main(){
     
 
     //Laste inn texture til kuben:
-    GLuint cubeTexture = TextureLoading::LoadTexture( "resources/img/cube/texture.png" )
+    GLuint cubeTexture = TextureLoading::LoadTexture( "resources/img/cube/texture.png" );
     
     //Laste inn texture til skyboxen:
     vector<const GLchar*> faces;
-    faces.push_back( "resources/img/skybox/vendetta-cove_rt.tga" );
-    faces.push_back( "resources/img/skybox/vendetta-cove_lf.tga" );
-    faces.push_back( "resources/img/skybox/vendetta-cove_up.tga" );
-    faces.push_back( "resources/img/skybox/vendetta-cove_dn.tga" );
-    faces.push_back( "resources/img/skybox/vendetta-cove_bk.tga" );
-    faces.push_back( "resources/img/skybox/vendetta-cove_ft.tga" );
+    faces.push_back( "resources/img/skybox/sep_lf.tga" );
+    faces.push_back( "resources/img/skybox/sep_rt.tga" );
+    faces.push_back( "resources/img/skybox/sep_up.tga" );
+    faces.push_back( "resources/img/skybox/sep_dn.tga" );
+    faces.push_back( "resources/img/skybox/sep_ft.tga" );
+    faces.push_back( "resources/img/skybox/sep_bk.tga" );
     GLuint cubemapTexture = TextureLoading::LoadCubemap( faces );
     
+    glm::mat4 projection = glm::perspective( camera.GetZoom(), ( float )SCREEN_WIDTH / ( float )SCREEN_HEIGHT, 0.1f, 1000.0f );
     
-    glm::mat4 projection = glm::perspective( camera.GetZoom(), ( float )SCREEN_WIDTH / ( float )SCREEN_HEIGHT ), 0.1f, 1000.0f );
     
     // The Loop
     while ( !glfwWindowShouldClose( window ) )

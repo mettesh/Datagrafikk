@@ -46,10 +46,16 @@ public:
         
         glBindTexture( GL_TEXTURE_CUBE_MAP, textureID );
         
+        // For hver av de 6 bildene må det gjøres følgende:
         for ( GLuint i = 0; i < faces.size( ); i++ )
         {
+            // Hente inn bilde og sette bredde og høyde
             image = SOIL_load_image( faces[i], &imageWidth, &imageHeight, 0, SOIL_LOAD_RGB );
+            
+            // Spesifiserer bildet:
             glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, imageWidth, imageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, image );
+            
+            // Frigjør minnet
             SOIL_free_image_data( image );
         }
         glTexParameteri( GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR );

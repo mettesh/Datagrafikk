@@ -40,7 +40,7 @@ GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
 
 // Lysets posisjon i universet:
-//glm::vec3 lightPos( 1.2f, 1.0f, 2.0f );
+glm::vec3 lightPos( 1.2f, 1.0f, 2.0f );
 
 int main(){
     
@@ -52,6 +52,7 @@ int main(){
         fprintf(stderr, "GLWF failed to initialise.");
         return -1;
     }
+
     
     // GLFW benytter noe kalt windowHint. Disse forteller/spør GLFW om å sette visse versjoner
     // av OpenGL + andre instillinger. - Dette er valgfritt, men Mac trenger noen!
@@ -103,65 +104,59 @@ int main(){
     glEnable( GL_DEPTH_TEST );
     
     
-    
-    
-//FOR TEXTURE!
-    // Enables alpha-support. Kan nå loade JPEGs.
-    // glEnable( GL_BLEND );
-    // glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    
-    
     // Setup and compile our shaders
     Shader shader( "resources/shaders/cube.vert", "resources/shaders/cube.frag" );
     Shader skyboxShader( "resources/shaders/skybox.vert", "resources/shaders/skybox.frag" );
+    
 
 // SPESIFISERER KUBEN:
 
     GLfloat cubeVertices[] =
      {
          // Posisjoner        // Texture Coords
-         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+             -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+             0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+             -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+             -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+             
+             -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+             0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+             -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+             -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+             
+             -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+             -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+             -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+             -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+             -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+             -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+             
+             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+             0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+             0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+             0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+             
+             -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+             0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+             0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+             0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+             -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+             -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+             
+             -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+             0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+             0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+             -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+             -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+         };
          
-         -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-         -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-         -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         
-         -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         
-         -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         
-         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
-     };
     
     GLfloat skyboxVertices[] = {
          // Posisjoner
@@ -210,27 +205,29 @@ int main(){
     
     
     
-// Oppretter Vertex-array og buffer -object for Cube
+// Oppretter Vertex-array og buffer -object for kuben
     GLuint cubeVAO, cubeVBO;
     glGenVertexArrays( 1, &cubeVAO ); //Antall man ønsker å opprette, arrayen som skal benyttes.
     glGenBuffers( 1, &cubeVBO );
+    //Forteller OpenGL hvilken vertex-array som skal brukes.
     glBindVertexArray( cubeVAO );
+    //Forteller OpenGL at dette er current bufferen som skal brukes (Skal bufferen modifiseres senere er det denne som skal endres)
     glBindBuffer( GL_ARRAY_BUFFER, cubeVBO );
+    //Fyller bufferen med data: Bufferen som skal brukes, størrelsen den på holde av, de vertices som skal lagres, og info at det skal tegnes.
     glBufferData( GL_ARRAY_BUFFER, sizeof( cubeVertices ), &cubeVertices, GL_STATIC_DRAW );
     
     // Posisjon attribute
     glEnableVertexAttribArray( 0 );
     glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof( GLfloat ), ( GLvoid * ) 0 );
     
-    glEnableVertexAttribArray( 1 );
     // Texture attribute
-    glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof( GLfloat ), ( GLvoid * )( 3 * sizeof( GLfloat ) ) );
     glEnableVertexAttribArray( 1 );
+    glVertexAttribPointer( 1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof( GLfloat ), ( GLvoid * )( 3 * sizeof( GLfloat ) ) );
    
     glBindVertexArray( 0 );
     
     
-// Oppretter Vertex-array og buffer -object for skybox
+// Oppretter Vertex-array og buffer -object for skyboxen
     GLuint skyboxVAO, skyboxVBO;
     glGenVertexArrays( 1, &skyboxVAO );
     glGenBuffers( 1, &skyboxVBO );
@@ -245,18 +242,18 @@ int main(){
     
 
     //Laste inn texture til kuben:
-    GLuint cubeTexture = TextureLoading::LoadTexture( "resources/img/cube/texture.png" );
-    
+    GLuint cubeTexture = TextureLoading::LoadTexture("resources/img/cube/texture.png");
+
     //Laste inn texture til skyboxen:
     vector<const GLchar*> faces;
-    faces.push_back( "resources/img/skybox/sep_lf.tga" );
-    faces.push_back( "resources/img/skybox/sep_rt.tga" );
-    faces.push_back( "resources/img/skybox/sep_up.tga" );
-    faces.push_back( "resources/img/skybox/sep_dn.tga" );
-    faces.push_back( "resources/img/skybox/sep_ft.tga" );
-    faces.push_back( "resources/img/skybox/sep_bk.tga" );
+    faces.push_back( "resources/img/skybox/iceflats_lf.tga" );
+    faces.push_back( "resources/img/skybox/iceflats_rt.tga" );
+    faces.push_back( "resources/img/skybox/iceflats_up.tga" );
+    faces.push_back( "resources/img/skybox/iceflats_dn.tga" );
+    faces.push_back( "resources/img/skybox/iceflats_ft.tga" );
+    faces.push_back( "resources/img/skybox/iceflats_bk.tga" );
     GLuint cubemapTexture = TextureLoading::LoadCubemap( faces );
-    
+
     glm::mat4 projection = glm::perspective( camera.GetZoom(), ( float )SCREEN_WIDTH / ( float )SCREEN_HEIGHT, 0.1f, 1000.0f );
     
     
@@ -277,7 +274,8 @@ int main(){
         glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
         glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        glm::mat4 model;
+        // Hvorfor må det skrives (1)?
+        glm::mat4 model(1);
         glm::mat4 view = camera.GetViewMatrix();
         
         // Tegner den første triangelen:
@@ -320,6 +318,7 @@ int main(){
         glUniformMatrix4fv( glGetUniformLocation( skyboxShader.Program, "projection" ), 1, GL_FALSE, glm::value_ptr( projection ) );
         
         // skybox-kuben
+        
         glBindVertexArray( skyboxVAO );
         glBindTexture( GL_TEXTURE_CUBE_MAP, cubemapTexture );
         glDrawArrays( GL_TRIANGLES, 0, 36 );

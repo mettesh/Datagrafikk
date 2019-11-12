@@ -38,7 +38,7 @@ public:
     vector<Texture> textures;
     
     /*  Functions  */
-    // Constructor
+    // Konstruktør
     Mesh( vector<Vertex> vertices, vector<GLuint> indices, vector<Texture> textures )
     {
         this->vertices = vertices;

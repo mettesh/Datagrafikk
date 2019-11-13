@@ -19,7 +19,6 @@
 // Egne includes
 #include "shader.h"
 #include "Camera.h"
-#include "Model.h"
 #include "Texture.h"
 
 #define DEFAULT_WIDTH 1024
@@ -245,7 +244,7 @@ int initGL() {
     GLuint cubeTexture = TextureLoading::LoadTexture("resources/img/cube/texture.png");
     
     //Laste inn texture til skyboxen:
-    vector<const GLchar*> faces;
+    std::vector<const GLchar*> faces;
     faces.push_back( "resources/img/skybox/iceflats_lf.tga" );
     faces.push_back( "resources/img/skybox/iceflats_rt.tga" );
     faces.push_back( "resources/img/skybox/iceflats_up.tga" );

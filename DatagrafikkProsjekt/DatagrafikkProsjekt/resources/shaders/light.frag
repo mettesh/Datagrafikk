@@ -1,14 +1,7 @@
-#version 330 core
-in vec3 ourColor;
-in vec2 TexCoord;
+#version 330
 
-
-//out vec4 color;
-
-// Texture samplers
-uniform sampler2D texture1;
-
-
+// Incoming variables.
+in vec3 interpolatedColor;
 in vec3 N;
 in vec3 worldVertex;
 
@@ -36,11 +29,9 @@ vec4 diffuse;
 vec4 specular;
 
 
-
 void main()
 {
-    // Linearly interpolate between both textures (second texture is only slightly combined)
-    color = texture(texture1, TexCoord);
+    color = vec4(interpolatedColor, 1);
     
     // Normalize the interpolated normal to ensure unit length
     NN = normalize(N);

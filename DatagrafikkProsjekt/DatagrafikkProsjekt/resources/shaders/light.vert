@@ -1,26 +1,28 @@
-#version 330 core
+#version 330
+
+// Incoming vertex position, Model Space.
 layout (location = 0) in vec3 position;
-layout (location = 1) in vec2 texCoord;
+
+// Incoming vertex color.
+layout (location = 1) in vec3 color;
 
 // Incoming normal
 layout (location = 2) in vec3 normal;
 
-out vec2 TexCoord;
-
-uniform mat4 model;
+// Projection, view and model matrices.
+uniform mat4 proj;
 uniform mat4 view;
-uniform mat4 projection;
+uniform mat4 model;
 
 // Output variables
 out vec3 interpolatedColor;
 out vec3 N;
 out vec3 worldVertex;
 
-void main()
-{
-    gl_Position = projection * view * model * vec4(position, 1.0f);
-    TexCoord = vec2(texCoord.x, 1.0 - texCoord.y);
+void main() {
     
+    // Normally gl_Position is in Clip Space and we calculate it by multiplying together all the matrices
+    gl_Position = proj * (view * (model * vec4(position, 1)));
     
     // Set the world vertex for calculating the light direction in the fragment shader
     worldVertex = vec3(model * vec4(position, 1));
@@ -30,4 +32,5 @@ void main()
     
     // We assign the color to the outgoing variable.
     interpolatedColor = color;
+    
 }

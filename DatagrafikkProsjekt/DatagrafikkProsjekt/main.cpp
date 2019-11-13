@@ -160,7 +160,7 @@ GLfloat materialShininessColor[] { 1.0f, 1.0f, 1.0f,  1.0f };
 GLfloat materialShininess = 32.0f;
 GLfloat cameraPosition[] { 0.0f, 0.0f, 4.0f };
 
-// Uniform locations
+// Cube Uniform locations
 GLint modelLoc;
 GLint viewLoc;
 GLint projLoc;
@@ -173,55 +173,16 @@ GLint materialShininessColorPos;
 GLint materialShininessPos;
 GLint cameraPositionPos;
 
-
-
+// Skybox Uniform locations
+GLint projLocSkybox;
+GLint viewLocSkybox;
 
 GLuint cubeVAO;
 GLuint skyboxVAO;
 
-//GLuint vertexBufferNames[1];
-
 GLuint cubemapTexture;
-
 GLuint cubeTexture;
 
-
-
-
-
-/*
- * Read shader source file from disk
- */
-/*
-char *readSourceFile(const char *filename, int *size) {
-    
-    // Open the file as read only
-    FILE *file = fopen(filename, "r");
-    
-    // Find the end of the file to determine the file size
-    fseek(file, 0, SEEK_END);
-    long fileSize = ftell(file);
-    
-    // Rewind
-    fseek(file, 0, SEEK_SET);
-    
-    // Allocate memory for the source and initialize it to 0
-    char *source = (char *)malloc(fileSize + 1);
-    for (int i = 0; i <= fileSize; i++) source[i] = 0;
-    
-    // Read the source
-    fread(source, fileSize, 1, file);
-    
-    // Close the file
-    fclose(file);
-    
-    // Store the size of the file in the output variable
-    *size = fileSize-1;
-    
-    // Return the shader source
-    return source;
-}
- */
 
 /*
  * Initialize OpenGL
@@ -240,11 +201,9 @@ int initGL() {
     glBufferData( GL_ARRAY_BUFFER, sizeof( cubeVertices ), &cubeVertices, GL_STATIC_DRAW );
     
     // Posisjon attribute
-    // glEnableVertexAttribArray( 0 );
     glVertexAttribPointer( POSITION, 3, GL_FLOAT, GL_FALSE, 5 * sizeof( GLfloat ), ( GLvoid * ) 0 );
     
     // Texture attribute
-    // glEnableVertexAttribArray( 1 );
     glVertexAttribPointer( COLOR, 2, GL_FLOAT, GL_FALSE, 5 * sizeof( GLfloat ), ( GLvoid * )( 3 * sizeof( GLfloat ) ) );
    
     glEnableVertexAttribArray(POSITION);
@@ -253,7 +212,6 @@ int initGL() {
    // Disable the vertexArrayen
     glBindVertexArray( 0 );
 
-    
     
 // Oppretter Vertex-array og buffer -object for skyboxen
     GLuint skyboxVAO, skyboxVBO;
@@ -265,6 +223,7 @@ int initGL() {
     // Posisjon attribute
     glBufferData( GL_ARRAY_BUFFER, sizeof( skyboxVertices ), &skyboxVertices, GL_STATIC_DRAW );
     glVertexAttribPointer( POSITION, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( GLfloat ), ( GLvoid * ) 0 );
+    
     glEnableVertexAttribArray(POSITION);
 
     // Disable the vertexArrayen
@@ -272,7 +231,7 @@ int initGL() {
     
     
     // Setup and compile our shaders
-    Shader shader( "resources/shaders/cube.vert", "resources/shaders/cube.frag" );
+    Shader cubeShader( "resources/shaders/cube.vert", "resources/shaders/cube.frag" );
     Shader skyboxShader( "resources/shaders/skybox.vert", "resources/shaders/skybox.frag" );
 
     //Laste inn texture til kuben:
@@ -289,73 +248,22 @@ int initGL() {
     GLuint cubemapTexture = TextureLoading::LoadCubemap( faces );
 
 
-
-
-/*
-    // Load and compile vertex shader
-    GLuint vertexName = glCreateShader(GL_VERTEX_SHADER); // 2.0
-    int vertexLength = 0;
-    char *vertexSource = readSourceFile("resources/shaders/simple_lighting33.vert", &vertexLength);
-    glShaderSource(vertexName, 1, (const char * const *)&vertexSource, &vertexLength); // 2.0
-    GLint compileStatus;
-    glCompileShader(vertexName); // 2.0
-    glGetShaderiv(vertexName, GL_COMPILE_STATUS, &compileStatus); // 2.0
-    if (!compileStatus) {
-        GLint logSize = 0;
-        glGetShaderiv(vertexName, GL_INFO_LOG_LENGTH, &logSize);
-        char *errorLog = (char *)malloc(sizeof(char) * logSize);
-        glGetShaderInfoLog(vertexName, logSize, &logSize, errorLog); // 2.0
-        glDeleteShader(vertexName); // 2.0
-        printf("VERTEX ERROR %s\n", errorLog);
-        return 0;
-    }
-    free(vertexSource);
-    
-    // Load and compile fragment shader
-    GLuint fragmentName = glCreateShader(GL_FRAGMENT_SHADER);
-    int fragmentLength = 0;
-    char *fragmentSource = readSourceFile("resources/shaders/simple_lighting33.frag", &fragmentLength);
-    glShaderSource(fragmentName, 1, (const char * const *)&fragmentSource, &fragmentLength);
-    glCompileShader(fragmentName);
-    glGetShaderiv(fragmentName, GL_COMPILE_STATUS, &compileStatus);
-    if (!compileStatus) {
-        GLint logSize = 0;
-        glGetShaderiv(fragmentName, GL_INFO_LOG_LENGTH, &logSize);
-        char *errorLog = (char *)malloc(sizeof(char) * logSize);
-        glGetShaderInfoLog(fragmentName, logSize, &logSize, errorLog);
-        glDeleteShader(fragmentName);
-        
-        printf("FRAGMENT ERROR %s\n", errorLog);
-        return 0;
-    }
-    free(fragmentSource);
-    
-    // Create and link vertex program
-    programName = glCreateProgram(); // 2.0
-    glAttachShader(programName, vertexName); // 2.0
-    glAttachShader(programName, fragmentName);
-    glLinkProgram(programName); // 2.0
-    GLint linkStatus;
-    glGetProgramiv(programName, GL_LINK_STATUS, &linkStatus); // 2.0
-    if (!linkStatus) {
-        GLint logSize = 0;
-        glGetProgramiv(programName, GL_INFO_LOG_LENGTH, &logSize);
-        char *errorLog = (char *)malloc(sizeof(char) * logSize);
-        glGetProgramInfoLog(programName, logSize, &logSize, errorLog); // 2.0
-        
-        printf("LINK ERROR %s\n", errorLog);
-        return 0;
-    }
-  */
     // Get uniform locations
 
-    lightPositionPos = glGetUniformLocation(shader.Program, "lightPosition");
-    lightAmbientPos = glGetUniformLocation(shader.Program, "lightAmbient");
-    lightDiffusePos = glGetUniformLocation(shader.Program, "lightDiffuse");
-    lightSpecularPos = glGetUniformLocation(shader.Program, "lightSpecular");
-    materialShininessColorPos = glGetUniformLocation(shader.Program, "shininessColor");
-    materialShininessPos = glGetUniformLocation(shader.Program, "shininess");
-    cameraPositionPos = glGetUniformLocation(shader.Program, "cameraPosition");
+    GLint viewLoc = glGetUniformLocation( cubeShader.Program, "view" );
+    GLint projLoc = glGetUniformLocation( cubeShader.Program, "projection" );
+    GLint modelLoc = glGetUniformLocation( cubeShader.Program, "model" );
+    
+    lightPositionPos = glGetUniformLocation(cubeShader.Program, "lightPosition");
+    lightAmbientPos = glGetUniformLocation(cubeShader.Program, "lightAmbient");
+    lightDiffusePos = glGetUniformLocation(cubeShader.Program, "lightDiffuse");
+    lightSpecularPos = glGetUniformLocation(cubeShader.Program, "lightSpecular");
+    materialShininessColorPos = glGetUniformLocation(cubeShader.Program, "shininessColor");
+    materialShininessPos = glGetUniformLocation(cubeShader.Program, "shininess");
+    cameraPositionPos = glGetUniformLocation(cubeShader.Program, "cameraPosition");
+    
+    GLint projLocSkybox = glGetUniformLocation( skyboxShader.Program, "projection" );
+    GLint viewLocSkybox = glGetUniformLocation( skyboxShader.Program, "view" );
     
     // Implementerer Depth i applikasjonen ?????
     glEnable(GL_DEPTH_TEST);
@@ -370,7 +278,7 @@ int initGL() {
  */
 void drawGLScene() {
     
-    Shader shader( "resources/shaders/cube.vert", "resources/shaders/cube.frag" );
+    Shader cubeShader( "resources/shaders/cube.vert", "resources/shaders/cube.frag" );
     Shader skyboxShader( "resources/shaders/skybox.vert", "resources/shaders/skybox.frag" );
     
 
@@ -378,40 +286,40 @@ void drawGLScene() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
     // Aktiverer programmet
-    glUseProgram(shader.Program);
+    glUseProgram(cubeShader.Program);
     
        
-// Tegner kuben og lys
-    shader.Use();
+/* * * * * * *
+ *
+ * Tegner kuben og lys
+ *
+ * * * * * * */
+    cubeShader.Use();
         
     // Binder Textures ved å bruke texture units:
     glActiveTexture( GL_TEXTURE0 );
     glBindTexture( GL_TEXTURE_2D, cubeTexture );
-    glUniform1i( glGetUniformLocation( shader.Program, "texture1" ), 0 );
+    glUniform1i( glGetUniformLocation( cubeShader.Program, "texture1" ), 0 );
 
 
+    // TODO: --> Projection settes i resizeGL <---
+    
+    
     // Setter view matrisen
     glm::mat4 view = camera.GetViewMatrix();
     // Henter inn uniform location
-    GLint viewLoc = glGetUniformLocation( shader.Program, "view" );
+    //GLint viewLoc = glGetUniformLocation( shader.Program, "view" );
     // Sender matrisene til shaderen:
     glUniformMatrix4fv( viewLoc, 1, GL_FALSE, glm::value_ptr( view ) );
 
 
     // Setter model matrisen
-    glm::mat4 model(1);
+    glm::mat4 model = glm::mat4(1.0);
+    //model = glm::rotate(model, /*(float)glfwGetTime() **/0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
     // Henter inn uniform location
-    GLint modelLoc = glGetUniformLocation( shader.Program, "model" );
+    // GLint modelLoc = glGetUniformLocation( shader.Program, "model" );
     // Kalkulerer modelmatrisen for hvert objekt og sender den til shaderen
     glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( model ) );
-
-    
-    // Sette projection matrisen:
-    glm::mat4 projection = glm::perspective( camera.GetZoom(), ( float )SCREEN_WIDTH / ( float )SCREEN_HEIGHT, 0.1f, 1000.0f );
-    // Henter inn uniform location:
-    GLint projLoc = glGetUniformLocation( shader.Program, "projection" );
-    // Sender matrisen til shaderen:
-    glUniformMatrix4fv( projLoc, 1, GL_FALSE, glm::value_ptr( projection ) );
 
     
     // Sette lysets posisjon:
@@ -427,7 +335,6 @@ void drawGLScene() {
     
     // Draw the vertex array
     //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertexBufferNames[INDICES]);
-    
     //glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, 0);
     
     
@@ -441,22 +348,31 @@ void drawGLScene() {
     
     glBindVertexArray(0);
 
-
-// Tegner skyboxen:
+    
+/* * * * * * *
+*
+* Tegner skyboxen:
+*
+* * * * * * */
 
     glUseProgram(skyboxShader.Program);
+    skyboxShader.Use();
     
     // Change depth function so depth test passes when values are equal to depth buffer's content
     glDepthFunc( GL_LEQUAL );
-    skyboxShader.Use();
-
-
-    // Remove any translation component of the view matrix
-    view = glm::mat4( glm::mat3( camera.GetViewMatrix( ) ) );
-
-    glUniformMatrix4fv( glGetUniformLocation( skyboxShader.Program, "view" ), 1, GL_FALSE, glm::value_ptr( view ) );
     
-    glUniformMatrix4fv( glGetUniformLocation( skyboxShader.Program, "projection" ), 1, GL_FALSE, glm::value_ptr( projection ) );
+
+    glm::mat4 viewSkybox = camera.GetViewMatrix();
+    // GLint viewLocSkybox = glGetUniformLocation( skyboxShader.Program, "view" );
+    // Sender matrisen til shaderen:
+    glUniformMatrix4fv( viewLocSkybox, 1, GL_FALSE, glm::value_ptr( viewSkybox ) );
+    
+    
+    glm::mat4 projectionSkybox = glm::perspective( camera.GetZoom(), ( float )SCREEN_WIDTH / ( float )SCREEN_HEIGHT, 0.1f, 1000.0f );
+    // Henter inn uniform location:
+    // GLint projLocSkybox = glGetUniformLocation( skyboxShader.Program, "projection" );
+    // Sender matrisen til shaderen:
+    glUniformMatrix4fv( projLocSkybox, 1, GL_FALSE, glm::value_ptr( projectionSkybox ) );
 
     // Aktiverer vertex-arrayen for skyBox:
     glBindVertexArray( skyboxVAO );
@@ -473,14 +389,18 @@ void drawGLScene() {
 
 void resizeGL(int width, int height) {
     
+    Shader shader( "resources/shaders/cube.vert", "resources/shaders/cube.frag" );
+    glUseProgram(shader.Program);
+    
     // Prevent division by zero
     if (height == 0)
         height = 1;
     
     // Change the projection matrix
-    glm::mat4 proj = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 100.0f);
-    // glUseProgram(skyboxShader.Program);
-    glUniformMatrix4fv(projLoc, 1, GL_FALSE, &proj[0][0]);
+    glm::mat4 projection = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 100.0f);
+    glUniformMatrix4fv( projLoc, 1, GL_FALSE, glm::value_ptr( projection ) );
+    
+    
     glUseProgram(0);
     
     // Definerer viewport-dimensjonene
@@ -608,6 +528,11 @@ int main(void) {
     
     // Run a loop until the window is closed
     while (!glfwWindowShouldClose(window)) {
+        
+        // Setter frame time (For å sikre smoothe bevegesler)
+        GLfloat currentFrame = glfwGetTime( );
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
         
         // Draw OpenGL screne
         drawGLScene();

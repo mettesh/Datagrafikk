@@ -1,3 +1,9 @@
+// Forsøkt å sette sammen simpleLighting og Skybox-kode --> På vei?
+// Hva er feilmeldingen
+// Hvordan gjøre shader-variablene globale?
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -230,6 +236,7 @@ int initGL() {
     glBindVertexArray(0);
     
     
+    // TODO: Hvordan gjøre disse globale??
     // Setup and compile our shaders
     Shader cubeShader( "resources/shaders/cube.vert", "resources/shaders/cube.frag" );
     Shader skyboxShader( "resources/shaders/skybox.vert", "resources/shaders/skybox.frag" );

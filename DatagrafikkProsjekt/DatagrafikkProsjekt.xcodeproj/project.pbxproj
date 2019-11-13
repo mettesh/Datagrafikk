@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		094ED68A235724E1007A9B65 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 094ED689235724E1007A9B65 /* OpenGL.framework */; };
-		094ED68C23572507007A9B65 /* libGLEW.2.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 094ED68B23572507007A9B65 /* libGLEW.2.1.0.dylib */; };
 		094ED68E2357251B007A9B65 /* libglfw.3.3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 094ED68D2357251B007A9B65 /* libglfw.3.3.dylib */; };
 		094ED69023572534007A9B65 /* libgio-2.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 094ED68F23572534007A9B65 /* libgio-2.0.0.dylib */; };
 		094ED80E23572575007A9B65 /* glm.hpp in Frameworks */ = {isa = PBXBuildFile; fileRef = 094ED72723572560007A9B65 /* glm.hpp */; };
@@ -20,6 +19,8 @@
 		09E4D85923630CF800415536 /* etc1_utils.c in Sources */ = {isa = PBXBuildFile; fileRef = 09E4D85123630CF800415536 /* etc1_utils.c */; };
 		09E4D85D23632A9100415536 /* libassimp.4.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 09E4D85C23632A9100415536 /* libassimp.4.1.0.dylib */; };
 		09E4D85E23632A9100415536 /* libassimp.4.1.0.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 09E4D85C23632A9100415536 /* libassimp.4.1.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
+		09F75F61237C3842007E8916 /* libGLEW.2.1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 09F75F60237C3842007E8916 /* libGLEW.2.1.0.dylib */; };
+		09F75F62237C3842007E8916 /* libGLEW.2.1.0.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 09F75F60237C3842007E8916 /* libGLEW.2.1.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -48,6 +49,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				09F75F62237C3842007E8916 /* libGLEW.2.1.0.dylib in Embed Libraries */,
 				09E4D85E23632A9100415536 /* libassimp.4.1.0.dylib in Embed Libraries */,
 			);
 			name = "Embed Libraries";
@@ -58,7 +60,6 @@
 /* Begin PBXFileReference section */
 		094ED67E23572460007A9B65 /* DatagrafikkProsjekt */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = DatagrafikkProsjekt; sourceTree = BUILT_PRODUCTS_DIR; };
 		094ED689235724E1007A9B65 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
-		094ED68B23572507007A9B65 /* libGLEW.2.1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libGLEW.2.1.0.dylib; path = ../../../../../../../usr/local/Cellar/glew/2.1.0/lib/libGLEW.2.1.0.dylib; sourceTree = "<group>"; };
 		094ED68D2357251B007A9B65 /* libglfw.3.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libglfw.3.3.dylib; path = ../../../../../../../usr/local/Cellar/glfw/3.3/lib/libglfw.3.3.dylib; sourceTree = "<group>"; };
 		094ED68F23572534007A9B65 /* libgio-2.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libgio-2.0.0.dylib"; path = "../../../../../../../usr/local/Cellar/glib/2.58.3/lib/libgio-2.0.0.dylib"; sourceTree = "<group>"; };
 		094ED69223572560007A9B65 /* vec4.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = vec4.hpp; sourceTree = "<group>"; };
@@ -465,6 +466,7 @@
 		09E4D85B2363299100415536 /* Model.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Model.h; sourceTree = "<group>"; };
 		09E4D85C23632A9100415536 /* libassimp.4.1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libassimp.4.1.0.dylib; path = ../../../../../../../usr/local/Cellar/assimp/4.1.0/lib/libassimp.4.1.0.dylib; sourceTree = "<group>"; };
 		09E4D86023632AC200415536 /* Mesh.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Mesh.h; sourceTree = "<group>"; };
+		09F75F60237C3842007E8916 /* libGLEW.2.1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libGLEW.2.1.0.dylib; path = ../../../../../../../usr/local/Cellar/glew/2.1.0/lib/libGLEW.2.1.0.dylib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -472,11 +474,11 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				09F75F61237C3842007E8916 /* libGLEW.2.1.0.dylib in Frameworks */,
 				094ED80E23572575007A9B65 /* glm.hpp in Frameworks */,
 				094ED69023572534007A9B65 /* libgio-2.0.0.dylib in Frameworks */,
 				09E4D85D23632A9100415536 /* libassimp.4.1.0.dylib in Frameworks */,
 				094ED68E2357251B007A9B65 /* libglfw.3.3.dylib in Frameworks */,
-				094ED68C23572507007A9B65 /* libGLEW.2.1.0.dylib in Frameworks */,
 				094ED68A235724E1007A9B65 /* OpenGL.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -518,12 +520,12 @@
 		094ED688235724E1007A9B65 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				09F75F60237C3842007E8916 /* libGLEW.2.1.0.dylib */,
 				09E4D85C23632A9100415536 /* libassimp.4.1.0.dylib */,
 				09E4D84023630CF800415536 /* SOIL2 */,
 				094ED69123572560007A9B65 /* glm */,
 				094ED68F23572534007A9B65 /* libgio-2.0.0.dylib */,
 				094ED68D2357251B007A9B65 /* libglfw.3.3.dylib */,
-				094ED68B23572507007A9B65 /* libGLEW.2.1.0.dylib */,
 				094ED689235724E1007A9B65 /* OpenGL.framework */,
 			);
 			name = Frameworks;

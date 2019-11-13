@@ -29,5 +29,5 @@ void main()
     N = mat3(model) * normal;
     
     // We assign the color to the outgoing variable.
-    interpolatedColor = color;
+    //interpolatedColor = texCoord;
 }

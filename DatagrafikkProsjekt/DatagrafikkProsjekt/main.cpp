@@ -129,7 +129,7 @@ GLfloat skyboxVertices[] = {
  };
 
 // Dimensjonene til vinduet
-const GLuint WIDTH = 800, HEIGHT = 600;
+// const GLuint WIDTH = 800, HEIGHT = 600;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 // For tastatur- og musebevegelser
@@ -139,8 +139,8 @@ void DoMovement( );
 
 // Kamera
 Camera camera( glm::vec3( 0.0f, 0.0f, 3.0f ) );
-GLfloat lastX = WIDTH / 2.0f;
-GLfloat lastY = WIDTH / 2.0f;
+GLfloat lastX = SCREEN_WIDTH / 2.0f;
+GLfloat lastY = SCREEN_WIDTH / 2.0f;
 bool keys[1024];
 bool firstMouse = true;
 
@@ -150,7 +150,9 @@ GLfloat lastFrame = 0.0f;
 
 
 // Uniforms values
-GLfloat lightPosition[] { 0.0f, 0.0f, 4.0f };
+//GLfloat lightPosition[] { 0.0f, 0.0f, 4.0f };
+glm::vec3 lightPosition( 2.2f, 1.0f, 2.0f );
+
 GLfloat lightAmbient[] { 0.1f, 0.1f, 0.2f };
 GLfloat lightDiffuse[] { 0.5f, 0.5f, 0.5f };
 GLfloat lightSpecular[] { 0.6f, 0.6f, 0.6f };
@@ -172,9 +174,7 @@ GLint materialShininessPos;
 GLint cameraPositionPos;
 
 
-// Setup and compile our shaders
-Shader shader( "resources/shaders/cube.vert", "resources/shaders/cube.frag" );
-Shader skyboxShader( "resources/shaders/skybox.vert", "resources/shaders/skybox.frag" );
+
 
 GLuint cubeVAO;
 GLuint skyboxVAO;
@@ -270,6 +270,10 @@ int initGL() {
     // Disable the vertexArrayen
     glBindVertexArray(0);
     
+    
+    // Setup and compile our shaders
+    Shader shader( "resources/shaders/cube.vert", "resources/shaders/cube.frag" );
+    Shader skyboxShader( "resources/shaders/skybox.vert", "resources/shaders/skybox.frag" );
 
     //Laste inn texture til kuben:
     GLuint cubeTexture = TextureLoading::LoadTexture("resources/img/cube/texture.png");
@@ -345,13 +349,13 @@ int initGL() {
   */
     // Get uniform locations
 
-    lightPositionPos = glGetUniformLocation(skyboxShader.Program, "lightPosition");
-    lightAmbientPos = glGetUniformLocation(skyboxShader.Program, "lightAmbient");
-    lightDiffusePos = glGetUniformLocation(skyboxShader.Program, "lightDiffuse");
-    lightSpecularPos = glGetUniformLocation(skyboxShader.Program, "lightSpecular");
-    materialShininessColorPos = glGetUniformLocation(skyboxShader.Program, "shininessColor");
-    materialShininessPos = glGetUniformLocation(skyboxShader.Program, "shininess");
-    cameraPositionPos = glGetUniformLocation(skyboxShader.Program, "cameraPosition");
+    lightPositionPos = glGetUniformLocation(shader.Program, "lightPosition");
+    lightAmbientPos = glGetUniformLocation(shader.Program, "lightAmbient");
+    lightDiffusePos = glGetUniformLocation(shader.Program, "lightDiffuse");
+    lightSpecularPos = glGetUniformLocation(shader.Program, "lightSpecular");
+    materialShininessColorPos = glGetUniformLocation(shader.Program, "shininessColor");
+    materialShininessPos = glGetUniformLocation(shader.Program, "shininess");
+    cameraPositionPos = glGetUniformLocation(shader.Program, "cameraPosition");
     
     // Implementerer Depth i applikasjonen ?????
     glEnable(GL_DEPTH_TEST);
@@ -366,6 +370,10 @@ int initGL() {
  */
 void drawGLScene() {
     
+    Shader shader( "resources/shaders/cube.vert", "resources/shaders/cube.frag" );
+    Shader skyboxShader( "resources/shaders/skybox.vert", "resources/shaders/skybox.frag" );
+    
+
     // Setter clear-farge og dybdebuffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
@@ -373,7 +381,7 @@ void drawGLScene() {
     glUseProgram(shader.Program);
     
        
-// Tegner kuben
+// Tegner kuben og lys
     shader.Use();
         
     // Binder Textures ved å bruke texture units:
@@ -447,6 +455,7 @@ void drawGLScene() {
     view = glm::mat4( glm::mat3( camera.GetViewMatrix( ) ) );
 
     glUniformMatrix4fv( glGetUniformLocation( skyboxShader.Program, "view" ), 1, GL_FALSE, glm::value_ptr( view ) );
+    
     glUniformMatrix4fv( glGetUniformLocation( skyboxShader.Program, "projection" ), 1, GL_FALSE, glm::value_ptr( projection ) );
 
     // Aktiverer vertex-arrayen for skyBox:

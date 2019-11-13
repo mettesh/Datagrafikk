@@ -3,4 +3,22 @@
    uuid = "DB85AC96-2C3F-4F32-AB54-DB6C56E92C20"
    type = "1"
    version = "2.0">
+   <Breakpoints>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "D2D1350A-81AA-4531-A518-FBA6CB5FA8C9"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "../../../../../../../usr/local/Cellar/glm/0.9.9.5/include/glm/ext/matrix_clip_space.inl"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "241"
+            endingLineNumber = "241"
+            landmarkName = "perspectiveRH_NO(fovy, aspect, zNear, zFar)"
+            landmarkType = "9">
+         </BreakpointContent>
+      </BreakpointProxy>
+   </Breakpoints>
 </Bucket>

@@ -12,7 +12,7 @@ uniform mat4 view;
 uniform mat4 projection;
 
 // Output variables
-out vec3 interpolatedColor;
+// out vec3 interpolatedColor;
 out vec3 N;
 out vec3 worldVertex;
 

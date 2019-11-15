@@ -14,6 +14,7 @@ class Shader
 public:
     GLuint Program;
     // Genererer shadere. Parametre sendt med : "resources/shaders/shader.vert", "resources/shaders/shader.frag"
+    Shader() {}
     Shader( const GLchar *vertexPath, const GLchar *fragmentPath )
     {
 // 1. Hente inn kildekoden fra begge shaderne fra filstien

@@ -2,8 +2,6 @@
 // Hva er feilmeldingen
 // Hvordan gjøre shader-variablene globale?
 
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -198,12 +196,17 @@ int initGL() {
     
 // Oppretter Vertex-array og buffer -object for kuben
     GLuint cubeVAO, cubeVBO;
-    glGenVertexArrays( 1, &cubeVAO ); //Antall man ønsker å opprette, arrayen som skal benyttes.
-    glGenBuffers( 1, &cubeVBO );
+    
+    //Antall man ønsker å opprette, arrayen som skal benyttes.
+    glGenVertexArrays( 1, &cubeVAO );
     //Forteller OpenGL hvilken vertex-array som skal brukes.
     glBindVertexArray( cubeVAO );
+    
+    //Antall man ønsker å opprette, arrayen som skal benyttes.
+    glGenBuffers( 1, &cubeVBO );
     //Forteller OpenGL at dette er current bufferen som skal brukes (Skal bufferen modifiseres senere er det denne som skal endres)
     glBindBuffer( GL_ARRAY_BUFFER, cubeVBO );
+    
     //Fyller bufferen med data: Bufferen som skal brukes, størrelsen den på holde av, de vertices som skal lagres, og info at det skal tegnes.
     glBufferData( GL_ARRAY_BUFFER, 180 * sizeof( GL_FLOAT ), cubeVertices, GL_STATIC_DRAW );
     
@@ -227,8 +230,10 @@ int initGL() {
     glBindVertexArray( skyboxVAO );
     glBindBuffer( GL_ARRAY_BUFFER, skyboxVBO );
     
+    //Fyller bufferen med data: Bufferen som skal brukes, størrelsen den på holde av, de vertices som skal lagres, og info at det skal tegnes.
+    glBufferData( GL_ARRAY_BUFFER, 108 * sizeof( GL_FLOAT ), skyboxVertices, GL_STATIC_DRAW );
+    
     // Posisjon attribute
-    glBufferData( GL_ARRAY_BUFFER, sizeof( skyboxVertices ), &skyboxVertices, GL_STATIC_DRAW );
     glVertexAttribPointer( POSITION, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( GLfloat ), ( GLvoid * ) 0 );
     
     glEnableVertexAttribArray(POSITION);
@@ -236,7 +241,7 @@ int initGL() {
     // Disable the vertexArrayen
     glBindVertexArray(0);
     
-    // TODO: Hvordan gjøre disse globale??
+    
     // Setup and compile our shaders
     cubeShader = Shader( "resources/shaders/cube.vert", "resources/shaders/cube.frag" );
     skyboxShader = Shader( "resources/shaders/skybox.vert", "resources/shaders/skybox.frag" );
@@ -260,7 +265,6 @@ int initGL() {
     viewLoc = glGetUniformLocation( cubeShader.Program, "view" );
     projLoc = glGetUniformLocation( cubeShader.Program, "projection" );
     modelLoc = glGetUniformLocation( cubeShader.Program, "model" );
-    
     lightPositionPos = glGetUniformLocation(cubeShader.Program, "lightPosition");
     lightAmbientPos = glGetUniformLocation(cubeShader.Program, "lightAmbient");
     lightDiffusePos = glGetUniformLocation(cubeShader.Program, "lightDiffuse");
@@ -278,7 +282,6 @@ int initGL() {
     glEnable(GL_DEPTH_TEST);
     
     return 1;
-    
 }
 
 
@@ -290,15 +293,13 @@ void drawGLScene() {
     // Setter clear-farge og dybdebuffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
-    // Aktiverer programmet
-    //glUseProgram(cubeShader.Program);
-    
-       
 /* * * * * * *
  *
  * Tegner kuben og lys
  *
  * * * * * * */
+    
+    // Aktiverer programmet
     cubeShader.Use();
         
     // Binder Textures ved å bruke texture units:
@@ -306,24 +307,18 @@ void drawGLScene() {
     glBindTexture( GL_TEXTURE_2D, cubeTexture );
     glUniform1i( glGetUniformLocation( cubeShader.Program, "texture1" ), 0 );
 
-
     // Setter view matrisen
     glm::mat4 view = camera.GetViewMatrix();
-    // Henter inn uniform location
-    //GLint viewLoc = glGetUniformLocation( shader.Program, "view" );
-    // Sender matrisene til shaderen:
+    // Sender view-matrise til cube-shaderen:
     glUniformMatrix4fv( viewLoc, 1, GL_FALSE, glm::value_ptr( view ) );
 
-
-    // Setter model matrisen
+    // Sender model-matrise til cube-shaderen:
     glm::mat4 model = glm::mat4(1.0);
     //model = glm::rotate(model, /*(float)glfwGetTime() **/0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
-    // Henter inn uniform location
-    // GLint modelLoc = glGetUniformLocation( shader.Program, "model" );
     // Kalkulerer modelmatrisen for hvert objekt og sender den til shaderen
     glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( model ) );
 
-    
+
     // Sette lysets posisjon:
     glm::vec3 lightPosition(sinf(glfwGetTime() * 1.0f), cosf(glfwGetTime() * 2.0f), 0.8f);
     glUniform3f(lightPositionPos, lightPosition.x, lightPosition.y, lightPosition.z);
@@ -347,9 +342,6 @@ void drawGLScene() {
     //glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, 0);
     
     
-    // Set the remaining uniforms
-    
-    
     glBindVertexArray(0);
 
     
@@ -363,15 +355,10 @@ void drawGLScene() {
     
     // Change depth function so depth test passes when values are equal to depth buffer's content
     glDepthFunc( GL_LEQUAL );
-    
 
     glm::mat4 viewSkybox = camera.GetViewMatrix();
-    // GLint viewLocSkybox = glGetUniformLocation( skyboxShader.Program, "view" );
-    // Sender matrisen til shaderen:
+    // Sender view-matrisen til skybox-shaderen:
     glUniformMatrix4fv( viewLocSkybox, 1, GL_FALSE, glm::value_ptr( viewSkybox ) );
-    
-    
-    
 
     // Aktiverer vertex-arrayen for skyBox:
     glBindVertexArray( skyboxVAO );
@@ -388,24 +375,17 @@ void drawGLScene() {
 
 void resizeGL(int width, int height) {
     
-    
-    cubeShader.Use();
-    
-    // Prevent division by zero
+    // Feilhåndtering for å hindre at det blir deling på 0
     if (height == 0)
         height = 1;
     
-    // Change the projection matrix
+    cubeShader.Use();
     glm::mat4 projection = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 100.0f);
     glUniformMatrix4fv( projLoc, 1, GL_FALSE, glm::value_ptr( projection ) );
     
     
     skyboxShader.Use();
-    
-    glm::mat4 projectionSkybox = glm::perspective( camera.GetZoom(), ( float )width / ( float )height, 0.1f, 1000.0f );
-    // Henter inn uniform location:
-    // GLint projLocSkybox = glGetUniformLocation( skyboxShader.Program, "projection" );
-    // Sender matrisen til shaderen:
+    glm::mat4 projectionSkybox = glm::perspective(camera.GetZoom(), (float)width/height, 0.1f, 1000.0f );
     glUniformMatrix4fv( projLocSkybox, 1, GL_FALSE, glm::value_ptr( projectionSkybox ) );
     
     // Definerer viewport-dimensjonene

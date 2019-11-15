@@ -1,4 +1,5 @@
 #version 330 core
+
 // Henter data med attributten 0 og legger dette i variabelen position.
 layout (location = 0) in vec3 position;
 
@@ -7,6 +8,7 @@ out vec3 TexCoords;
 
 // Mottar informasjon om hvordan vise det 2-dimenesjonale bildet som 3D
 uniform mat4 projection;
+
 //Mottar informasjon om hvordan verden skal være I forhold til kameraet
 uniform mat4 view;
 

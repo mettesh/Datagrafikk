@@ -1,12 +1,18 @@
 #version 330 core
+
+
+// TODO: Fra git
 in vec3 ourColor;
 in vec2 TexCoord;
 
-
-//out vec4 color;
+out vec4 color;
 
 // Texture samplers
 uniform sampler2D texture1;
+
+
+
+
 
 
 in vec3 N;
@@ -39,8 +45,15 @@ vec4 specular;
 
 void main()
 {
+    // TODO: Git
     // Linearly interpolate between both textures (second texture is only slightly combined)
     color = texture(texture1, TexCoord);
+    
+    
+    
+    
+    
+    
     
     // Normalize the interpolated normal to ensure unit length
     NN = normalize(N);

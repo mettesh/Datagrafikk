@@ -424,7 +424,7 @@ void drawGLScene() {
     // Change depth function so depth test passes when values are equal to depth buffer's content
     glDepthFunc( GL_LEQUAL );
 
-    glm::mat4 viewSkybox = camera.GetViewMatrix();
+    glm::mat4 viewSkybox = glm::mat4( glm::mat3( camera.GetViewMatrix( ) ) );
     // Sender view-matrisen til skybox-shaderen:
     glUniformMatrix4fv( viewLocSkybox, 1, GL_FALSE, glm::value_ptr( viewSkybox ) );
 

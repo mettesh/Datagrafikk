@@ -16,8 +16,8 @@
 
 // Egne includes
 #include "shader.h"
-#include "Camera.h"
-#include "Texture.h"
+#include "camera.h"
+#include "texture.h"
 
 #define DEFAULT_WIDTH 1024
 #define DEFAULT_HEIGHT 768
@@ -157,7 +157,6 @@ bool firstMouse = true;
 
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
-
 
 
 // Uniforms values
@@ -424,6 +423,7 @@ void drawGLScene() {
     // Change depth function so depth test passes when values are equal to depth buffer's content
     glDepthFunc( GL_LEQUAL );
 
+    // TODO: Tidligere. Hva gjør denne:  glm::mat4 viewSkybox = camera.GetViewMatrix();
     glm::mat4 viewSkybox = glm::mat4( glm::mat3( camera.GetViewMatrix( ) ) );
     // Sender view-matrisen til skybox-shaderen:
     glUniformMatrix4fv( viewLocSkybox, 1, GL_FALSE, glm::value_ptr( viewSkybox ) );

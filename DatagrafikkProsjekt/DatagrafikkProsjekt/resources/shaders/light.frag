@@ -6,7 +6,7 @@
 in vec3 interpolatedColor;
 
 // Får inn. . .
-in vec3 N;
+in vec3 Normal;
 in vec3 worldVertex;
 
 /* Kode som kommer inn fra main.cpp
@@ -24,10 +24,9 @@ uniform vec3 lightPosition;
 uniform vec3 lightAmbient;
 uniform vec3 lightDiffuse;
 uniform vec3 lightSpecular;
-// shininessColor
-uniform vec4 materialShininessColor;
-// shininess
-uniform float materialShininess;
+
+uniform vec4 shininessColor;
+uniform float shininess;
 uniform vec3 cameraPosition;
 
 // Endelig farge på lys sendes ut
@@ -49,10 +48,10 @@ vec4 specular;
 void main()
 {
     // Settr lightColor til å være farg man har fått sendt inn
-    lightColor = vec4(interpolatedColor, 1);
+    //lightColor = vec4(interpolatedColor, 1);
     
     // Normalize the interpolated normal to ensure unit length
-    NN = normalize(N);
+    NN = normalize(Normal);
     
     // Find the unit length normal giving the direction from the vertex to the light
     L = normalize(lightPosition - worldVertex);
@@ -70,7 +69,7 @@ void main()
     diffuse = vec4(max(dot(L, NN), 0.0) * lightDiffuse, 1) * lightColor;
     
     // Calculate the specular component
-    specular = vec4(pow(max(dot(R, V), 0.0), materialShininess) * lightSpecular, 1) * materialShininessColor;
+    specular = vec4(pow(max(dot(R, V), 0.0), shininess) * lightSpecular, 1) * shininessColor;
     
     // Put it all together
     outputLightColor = ambient + diffuse + specular;

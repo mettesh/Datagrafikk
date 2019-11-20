@@ -28,7 +28,7 @@
 // Vertex Array attributes
 #define POSITION 0
 #define COLOR 1
-//#define NORMAL 2
+#define NORMAL 2
 
 
 // GLSL Uniform indices
@@ -39,51 +39,90 @@
 #define CAMERA 4
 
 // KUBE:
+
+/*
 GLfloat cubeVertices[] =
 {
 // Posisjoner        // Texture Coords
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-    0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-    0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-             
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-             
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-    0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-    0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-    0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+    // Front
+    -1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+    -1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+    1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+    1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+    // Back
+    1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+    1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+    -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+    -1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+    // Left
+    -1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+    -1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+    -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+    -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+    // Right
+    1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+    1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+    1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+    1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+    // Top
+    -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+    -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+    1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+    1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+    // Bottom
+    -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+    -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+    1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+    1.0f, -1.0f, 1.0f,  0.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f
 };
+*/
+
+ GLfloat cubeVertices[] =
+ {
+ // Posisjoner        // Texture Coords
+     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+              
+     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+     -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+              
+     -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+ };
+ 
          
 // SKYBOX
 GLfloat skyboxVertices[] = {
@@ -154,6 +193,7 @@ GLfloat lastY = SCREEN_WIDTH / 2.0f;
 
 bool keys[1024];
 bool firstMouse = true;
+void DoMovement();
 
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
@@ -201,40 +241,6 @@ GLuint cubemapTexture;
 GLuint cubeTexture;
 
 /*
- * Read shader source file from disk
- */
-char *readSourceFile(const char *filename, int *size) {
-    
-    // Open the file as read only
-    FILE *file = fopen(filename, "r");
-    
-    // Find the end of the file to determine the file size
-    fseek(file, 0, SEEK_END);
-    long fileSize = ftell(file);
-    
-    // Rewind
-    fseek(file, 0, SEEK_SET);
-    
-    // Allocate memory for the source and initialize it to 0
-    char *source = (char *)malloc(fileSize + 1);
-    for (int i = 0; i <= fileSize; i++) source[i] = 0;
-    
-    // Read the source
-    fread(source, fileSize, 1, file);
-    
-    // Close the file
-    fclose(file);
-    
-    // Store the size of the file in the output variable
-    *size = fileSize-1;
-    
-    // Return the shader source
-    return source;
-    
-}
-
-
-/*
  * Initialize OpenGL
  */
 int initGL() {
@@ -253,17 +259,26 @@ int initGL() {
     glBindBuffer( GL_ARRAY_BUFFER, cubeVBO );
     
     
-    //Fyller bufferen med data: Bufferen som skal brukes, størrelsen den på holde av, de vertices som skal lagres, og info at det skal tegnes.
-    glBufferData( GL_ARRAY_BUFFER, 180 * sizeof( GL_FLOAT ), cubeVertices, GL_STATIC_DRAW );
+    //Fyller bufferen med data: Bufferen som skal brukes, størrelsen den må holde av, de vertices som skal lagres, og info at det skal tegnes.
+    glBufferData( GL_ARRAY_BUFFER, 6 * 4 * 5 * sizeof( GL_FLOAT ), cubeVertices, GL_STATIC_DRAW );
     
     // Posisjon attribute
-    glVertexAttribPointer( POSITION, 3, GL_FLOAT, GL_FALSE, 5 * sizeof( GLfloat ), ( GLvoid * ) 0 );
+    glVertexAttribPointer( POSITION, 3, GL_FLOAT, GL_FALSE, 5 * sizeof( GL_FLOAT ), ( GLvoid * ) 0 );
     // Texture attribute
-    glVertexAttribPointer( COLOR, 2, GL_FLOAT, GL_FALSE, 5 * sizeof( GLfloat ), ( GLvoid * )( 3 * sizeof( GLfloat ) ) );
+    glVertexAttribPointer( COLOR, 2, GL_FLOAT, GL_FALSE, 5 * sizeof( GL_FLOAT ), ( GLvoid * )( 3 * sizeof( GLfloat ) ) );
+    
+    /*
+     glBufferData( GL_ARRAY_BUFFER, 6 * 4 * 9 * sizeof( GL_FLOAT ), cubeVertices, GL_STATIC_DRAW );
+     glVertexAttribPointer( POSITION, 3, GL_FLOAT, GL_FALSE, 9 * sizeof( GL_FLOAT ), ( GLvoid * ) 0 );
+     glVertexAttribPointer( COLOR, 3, GL_FLOAT, GL_FALSE, 9 * sizeof( GL_FLOAT ), ( GLvoid * )( 3 * sizeof( GLfloat ) ) );
+     glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GL_FLOAT), (const void *)(6 * sizeof(GLfloat)));
+     */
+
    
     // Aktivere attributtene
     glEnableVertexAttribArray(POSITION);
     glEnableVertexAttribArray(COLOR);
+    //glEnableVertexAttribArray(NORMAL);
 
    // Deaktiverer vertexarrayen
     glBindVertexArray(0);
@@ -346,6 +361,10 @@ void drawGLScene() {
     // Setter clear-farge og dybdebuffer
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     
+    DoMovement();
+    
+    float time = glfwGetTime();
+    
 /* * * * * * *
  *
  * Tegner kuben
@@ -367,7 +386,7 @@ void drawGLScene() {
 
     // Sender model-matrise til cube-shaderen:
     glm::mat4 model = glm::mat4(1.0);
-    //model = glm::rotate(model, /*(float)glfwGetTime() **/0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
+    model = glm::rotate(model, time * 0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
     // Kalkulerer modelmatrisen for hvert objekt og sender den til shaderen
     glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( model ) );
 
@@ -376,10 +395,6 @@ void drawGLScene() {
        
     // Deretter tegnes trianglene:
     glDrawArrays( GL_TRIANGLES, 0, 36 );
-    
-    // Draw the vertex array
-    //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertexBufferNames[INDICES]);
-    //glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, 0);
     
     // Deaktiverer shaderprogram som brukes og vertexarray
     glUseProgram(0);
@@ -400,8 +415,11 @@ void drawGLScene() {
     glUniformMatrix4fv( modelLocLight, 1, GL_FALSE, glm::value_ptr( modelLight ) );
     
     // Sette lysets posisjon:
-    glm::vec3 lightPosition(sinf(glfwGetTime() * 1.0f), cosf(glfwGetTime() * 2.0f), 0.8f);
+    glm::vec3 lightPosition(sinf(time * 1.0f), cosf(time * 2.0f), 0.8f);
     glUniform3f(lightPositionPos, lightPosition.x, lightPosition.y, lightPosition.z);
+    
+    //glUniform3fv(lightPositionPos, 1, lightPosition);
+    
     
     glUniform3f(lightAmbientPos, lightAmbient[0], lightAmbient[1], lightAmbient[2]);
     glUniform3fv(lightDiffusePos, 1, lightDiffuse);
@@ -425,7 +443,6 @@ void drawGLScene() {
 
     // TODO: Tidligere. Hva gjør denne:  glm::mat4 viewSkybox = camera.GetViewMatrix();
     glm::mat4 viewSkybox = glm::mat4( glm::mat3( camera.GetViewMatrix( ) ) );
-    // Sender view-matrisen til skybox-shaderen:
     glUniformMatrix4fv( viewLocSkybox, 1, GL_FALSE, glm::value_ptr( viewSkybox ) );
 
     // Aktiverer vertex-arrayen for skyBox:
@@ -508,6 +525,29 @@ void MouseCallback( GLFWwindow *window, double xPos, double yPos )
     lastY = yPos;
     
     camera.ProcessMouseMovement( xOffset, yOffset );
+}
+
+void DoMovement( )
+{
+    if ( keys[GLFW_KEY_W] || keys[GLFW_KEY_UP] )
+    {
+        camera.ProcessKeyboard( FORWARD, deltaTime );
+    }
+    
+    if ( keys[GLFW_KEY_S] || keys[GLFW_KEY_DOWN] )
+    {
+        camera.ProcessKeyboard( BACKWARD, deltaTime );
+    }
+    
+    if ( keys[GLFW_KEY_A] || keys[GLFW_KEY_LEFT] )
+    {
+        camera.ProcessKeyboard( LEFT, deltaTime );
+    }
+    
+    if ( keys[GLFW_KEY_D] || keys[GLFW_KEY_RIGHT] )
+    {
+        camera.ProcessKeyboard( RIGHT, deltaTime );
+    }
 }
 
 /*

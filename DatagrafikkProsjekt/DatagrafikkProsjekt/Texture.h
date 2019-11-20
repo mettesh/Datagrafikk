@@ -36,7 +36,7 @@ public:
         return textureID;
     }
     
-    static GLuint LoadCubemap( std::vector<const GLchar * > faces)
+    static GLuint LoadCubemap( std::vector<const GLchar * > skyBoxTextureFaces)
     {
         GLuint textureID;
         glGenTextures( 1, &textureID );
@@ -46,11 +46,11 @@ public:
         
         glBindTexture( GL_TEXTURE_CUBE_MAP, textureID );
         
-        // For hver av de 6 bildene må det gjøres følgende:
-        for ( GLuint i = 0; i < faces.size( ); i++ )
+        // Lopper igjennom alle sidene (texturene) sendt med som parameter
+        for ( GLuint i = 0; i < skyBoxTextureFaces.size( ); i++ )
         {
             // Hente inn bilde og sette bredde og høyde
-            image = SOIL_load_image( faces[i], &imageWidth, &imageHeight, 0, SOIL_LOAD_RGB );
+            image = SOIL_load_image( skyBoxTextureFaces[i], &imageWidth, &imageHeight, 0, SOIL_LOAD_RGB );
             
             // Spesifiserer bildet:
             glTexImage2D( GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, imageWidth, imageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, image );

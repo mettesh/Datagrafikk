@@ -6,10 +6,10 @@ in vec3 TexCoords;
 out vec4 color;
 
 // Henter inn data fra koden (samplerCube brukes til skyboxes)
-uniform samplerCube skybox;
+uniform samplerCube cubemapTexture;
 
 void main()
 {
     // Finner color utifra verdiene som ligger i skybox og TexCoords
-    color = texture(skybox, TexCoords);
+    color = texture(cubemapTexture, TexCoords);
 }

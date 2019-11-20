@@ -1,6 +1,6 @@
 #version 330 core
 
-// Henter data med attributten 0 og legger dette i variabelen position.
+// Henter inn vec fra skyboxVertices
 layout (location = 0) in vec3 position;
 
 // Variabel som skal sendes videre til neste til neste steg i pipeline (Til fragment shaderen)

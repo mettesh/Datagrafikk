@@ -170,6 +170,7 @@ GLfloat cameraPosition[] { 0.0f, 0.0f, 4.0f };
 GLint modelLoc;
 GLint viewLoc;
 GLint projLoc;
+
 GLint lightPositionPos;
 GLint lightAmbientPos;
 GLint lightDiffusePos;
@@ -182,11 +183,46 @@ GLint cameraPositionPos;
 GLint projLocSkybox;
 GLint viewLocSkybox;
 
-GLuint cubeVAO;
-GLuint skyboxVAO;
+// Oppretter Vertex-array og buffer -object for KUBE
+GLuint cubeVAO, cubeVBO;
+// Oppretter Vertex-array og buffer -object for SKYBOX
+GLuint skyboxVAO, skyboxVBO;
 
 GLuint cubemapTexture;
 GLuint cubeTexture;
+
+/*
+ * Read shader source file from disk
+ */
+char *readSourceFile(const char *filename, int *size) {
+    
+    // Open the file as read only
+    FILE *file = fopen(filename, "r");
+    
+    // Find the end of the file to determine the file size
+    fseek(file, 0, SEEK_END);
+    long fileSize = ftell(file);
+    
+    // Rewind
+    fseek(file, 0, SEEK_SET);
+    
+    // Allocate memory for the source and initialize it to 0
+    char *source = (char *)malloc(fileSize + 1);
+    for (int i = 0; i <= fileSize; i++) source[i] = 0;
+    
+    // Read the source
+    fread(source, fileSize, 1, file);
+    
+    // Close the file
+    fclose(file);
+    
+    // Store the size of the file in the output variable
+    *size = fileSize-1;
+    
+    // Return the shader source
+    return source;
+    
+}
 
 
 /*
@@ -194,8 +230,8 @@ GLuint cubeTexture;
  */
 int initGL() {
     
-// Oppretter Vertex-array og buffer -object for kuben
-    GLuint cubeVAO, cubeVBO;
+
+// CUBE
     
     //Antall man ønsker å opprette, arrayen som skal benyttes.
     glGenVertexArrays( 1, &cubeVAO );
@@ -207,24 +243,24 @@ int initGL() {
     //Forteller OpenGL at dette er current bufferen som skal brukes (Skal bufferen modifiseres senere er det denne som skal endres)
     glBindBuffer( GL_ARRAY_BUFFER, cubeVBO );
     
+    
     //Fyller bufferen med data: Bufferen som skal brukes, størrelsen den på holde av, de vertices som skal lagres, og info at det skal tegnes.
-    glBufferData( GL_ARRAY_BUFFER, 180 * sizeof( GL_FLOAT ), cubeVertices, GL_STATIC_DRAW );
+    glBufferData( GL_ARRAY_BUFFER, 180 * sizeof( GLfloat ), cubeVertices, GL_STATIC_DRAW );
     
     // Posisjon attribute
     glVertexAttribPointer( POSITION, 3, GL_FLOAT, GL_FALSE, 5 * sizeof( GLfloat ), ( GLvoid * ) 0 );
-    
     // Texture attribute
     glVertexAttribPointer( COLOR, 2, GL_FLOAT, GL_FALSE, 5 * sizeof( GLfloat ), ( GLvoid * )( 3 * sizeof( GLfloat ) ) );
    
+    // Aktivere attributtene
     glEnableVertexAttribArray(POSITION);
     glEnableVertexAttribArray(COLOR);
 
-   // Disable the vertexArrayen
-    glBindVertexArray( 0 );
+   // Deaktiverer vertexarrayen
+    glBindVertexArray(0);
 
     
-// Oppretter Vertex-array og buffer -object for skyboxen
-    GLuint skyboxVAO, skyboxVBO;
+// SKYBOX
     glGenVertexArrays( 1, &skyboxVAO );
     glGenBuffers( 1, &skyboxVBO );
     glBindVertexArray( skyboxVAO );
@@ -236,9 +272,10 @@ int initGL() {
     // Posisjon attribute
     glVertexAttribPointer( POSITION, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( GLfloat ), ( GLvoid * ) 0 );
     
+    // Aktivere attributten
     glEnableVertexAttribArray(POSITION);
 
-    // Disable the vertexArrayen
+    // Deaktiverer vertexarrayen
     glBindVertexArray(0);
     
     
@@ -332,8 +369,7 @@ void drawGLScene() {
     
     // Aktiverer vertex-arrayen for kuben:
     glBindVertexArray( cubeVAO );
-
-    
+       
     // Deretter tegnes trianglene:
     glDrawArrays( GL_TRIANGLES, 0, 36 );
     
@@ -341,7 +377,8 @@ void drawGLScene() {
     //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vertexBufferNames[INDICES]);
     //glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_SHORT, 0);
     
-    
+    // Deaktiverer shaderprogram som brukes og vertexarray
+    glUseProgram(0);
     glBindVertexArray(0);
 
     
@@ -367,7 +404,6 @@ void drawGLScene() {
     glDrawArrays( GL_TRIANGLES, 0, 36 );
     glDepthFunc( GL_LESS ); // Setter dybdefunksjonen tilbake til default
     
-    // Disable
     glUseProgram(0);
     glBindVertexArray(0);
     
@@ -406,7 +442,7 @@ void KeyCallback( GLFWwindow *window, int key, int scancode, int action, int mod
 {
     if ( GLFW_KEY_ESCAPE == key && GLFW_PRESS == action )
     {
-        glfwSetWindowShouldClose(window, GL_TRUE);
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
     
     if ( key >= 0 && key <= 1024 )
@@ -454,7 +490,7 @@ void glfwWindowSizeCallback(GLFWwindow* window, int width, int height) {
  */
 int main(void) {
     
-    // Set error callback
+    // Set error callback TODO: Fjerne???
     glfwSetErrorCallback(glfwErrorCallback);
     
     // Initialiserer GLWF og sjekker at det gikk OK
@@ -472,7 +508,7 @@ int main(void) {
     glfwWindowHint( GLFW_RESIZABLE, GL_TRUE );
 
     // Opprette et GLFW-vindu + sjekker at det gikk ok
-    GLFWwindow* window = glfwCreateWindow(DEFAULT_WIDTH, DEFAULT_HEIGHT, "Minimal", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(DEFAULT_WIDTH, DEFAULT_HEIGHT, "Datagrafikk 2019 - Prosjekt - Mette Strand Hornnes", NULL, NULL);
     if (!window) {
         printf("Failed to create GLFW window\n");
         glfwTerminate();
@@ -483,11 +519,20 @@ int main(void) {
     glfwSetKeyCallback( window, KeyCallback );
     glfwSetCursorPosCallback( window, MouseCallback );
     
+    // TODO: Trengs denne?
+    // glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
+    
+    // TODO: Trengs denne?
+    // glfwGetFramebufferSize( window, &SCREEN_WIDTH, &SCREEN_HEIGHT );
+    
     // Setter endringer av vinduestørrelse
     glfwSetWindowSizeCallback(window, glfwWindowSizeCallback);
     
     // Velger at det er dette vinduet OpenGL skal jobbe i
     glfwMakeContextCurrent(window);
+    
+    // TODO: Trengs denne?
+    // glewExperimental = GL_TRUE;
     
     // Initialiserer GLEW og sjekker at det gikk ok
     if (glewInit() != GLEW_OK) {

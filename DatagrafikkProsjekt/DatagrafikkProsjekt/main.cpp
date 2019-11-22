@@ -199,46 +199,24 @@ GLfloat lastFrame = 0.0f;
 
 
 // Uniforms values
-GLfloat lightPosition[] { 0.0f, 0.0f, 4.0f };
-/*
-glm::vec3 lightPosition( 2.2f, 1.0f, 2.0f );
-GLfloat lightAmbient[] { 0.1f, 0.1f, 0.2f };
-GLfloat lightDiffuse[] { 0.5f, 0.5f, 0.5f };
-GLfloat lightSpecular[] { 0.6f, 0.6f, 0.6f };
-GLfloat materialShininessColor[] { 1.0f, 1.0f, 1.0f,  1.0f };
-GLfloat materialShininess = 32.0f;
- */
-GLfloat cameraPosition[] { 0.0f, 0.0f, 4.0f };
-
-//glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
-GLfloat ObjektColor[] = {1.0f, 0.5f, 0.31f};
-GLfloat lightColor[] = {1.0f, 1.0f, 1.0f};
 
 
 
-
-
-
-
-// Cube Uniform locations
+// Cube & light  Uniform locations
 GLint modelLoc;
 GLint viewLoc;
 GLint projLoc;
 
-// Light Uniform Locations
-/*
-GLint lightPositionPos;
-GLint lightAmbientPos;
-GLint lightDiffusePos;
-GLint lightSpecularPos;
-GLint materialShininessColorPos;
-GLint materialShininessPos;
-GLint cameraPositionPos;
- */
-GLint ObjektColorPos;
-GLint lightColorPos;
-GLint lightPositionPos;
-GLint viewPositionPos;
+
+
+GLint lightColorLoc;
+GLint lightPositionLoc;
+GLint viewPositionLoc;
+
+
+GLfloat lightPositionValue[] { 0.0f, 0.0f, 4.0f };
+GLfloat cameraPositionValue[] { 1.0f, 0.0f, 4.0f };
+GLfloat lightColorValue[] = {1.0f, 0.5f, 0.31f};
 
 
 
@@ -351,10 +329,10 @@ int initGL() {
     //lightShader.Use();
     
     
-    ObjektColorPos = glGetUniformLocation(cubeShader.Program, "objectColor");
-    lightColorPos = glGetUniformLocation(cubeShader.Program, "lightColor");
-    lightPositionPos = glGetUniformLocation(cubeShader.Program, "lightPos");
-    viewPositionPos = glGetUniformLocation(cubeShader.Program, "viewPos");
+    //ObjektColorPos = glGetUniformLocation(cubeShader.Program, "objectColor");
+    lightColorLoc = glGetUniformLocation(cubeShader.Program, "lightColor");
+    lightPositionLoc = glGetUniformLocation(cubeShader.Program, "lightPos");
+    viewPositionLoc = glGetUniformLocation(cubeShader.Program, "viewPos");
     
     
     /*
@@ -410,25 +388,25 @@ void drawGLScene() {
     glUniform1i( glGetUniformLocation( cubeShader.Program, "cubeTexture" ), 0 );
 
     // Setter view matrisen
-    glm::mat4 view = camera.GetViewMatrix();
+    glm::mat4 viewValue = camera.GetViewMatrix();
     // Sender view-matrise til cube-shaderen:
-    glUniformMatrix4fv( viewLoc, 1, GL_FALSE, glm::value_ptr( view ) );
+    glUniformMatrix4fv( viewLoc, 1, GL_FALSE, glm::value_ptr( viewValue ) );
 
     // Sender model-matrise til cube-shaderen:
-    glm::mat4 model = glm::mat4(1.0);
-    model = glm::rotate(model, time * 0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
+    glm::mat4 modelValue = glm::mat4(1.0);
+    //model = glm::rotate(model, time * 0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
     // Kalkulerer modelmatrisen for hvert objekt og sender den til shaderen
-    glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( model ) );
+    glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( modelValue ) );
     
 
     // Sette lysets posisjon:
-    //glm::vec3 lightPosition(sinf(time * 1.0f), cosf(time * 2.0f), 0.8f);
-    //glUniform3f(lightPositionPos, lightPosition.x, lightPosition.y, lightPosition.z);
+    //glm::vec3 lightPositionLoc(sinf(time * 1.0f), cosf(time * 2.0f), 0.8f);
+    //glUniform3f(lightPositionLoc, lightPositionValue.x, lightPositionValue.y, lightPositionValue.z);
     
-    glUniform3fv(ObjektColorPos, 1, ObjektColor);
-    glUniform3fv(lightColorPos, 1, lightColor);
-    glUniform3fv(lightPositionPos, 1, lightPosition);
-    glUniform3fv(viewPositionPos, 1, cameraPosition);
+    //glUniform3fv(ObjektColorPos, 1, ObjektColor);
+    glUniform3fv(lightColorLoc, 1, lightColorValue);
+    glUniform3fv(lightPositionLoc, 1, lightPositionValue);
+    glUniform3fv(viewPositionLoc, 1, cameraPositionValue);
     
 
     /*
@@ -452,20 +430,6 @@ void drawGLScene() {
     glUseProgram(0);
     glBindVertexArray(0);
     
-/* * * * * * *
-*
-* Tegner lys
-*
-* * * * * * */
-    //lightShader.Use();
-    
-    //glm::mat4 viewLight = camera.GetViewMatrix();
-    //glUniformMatrix4fv( viewLocLight, 1, GL_FALSE, glm::value_ptr( viewLight ) );
-
-    //glm::mat4 modelLight = glm::mat4(1.0);
-    //glUniformMatrix4fv( modelLocLight, 1, GL_FALSE, glm::value_ptr( modelLight ) );
-    
-
     
 /* * * * * * *
 *
@@ -479,8 +443,8 @@ void drawGLScene() {
     glDepthFunc( GL_LEQUAL );
 
     // TODO: Tidligere. Hva gjør denne:  glm::mat4 viewSkybox = camera.GetViewMatrix();
-    glm::mat4 viewSkybox = glm::mat4( glm::mat3( camera.GetViewMatrix( ) ) );
-    glUniformMatrix4fv( viewLocSkybox, 1, GL_FALSE, glm::value_ptr( viewSkybox ) );
+    glm::mat4 viewSkyboxValue = glm::mat4( glm::mat3( camera.GetViewMatrix( ) ) );
+    glUniformMatrix4fv( viewLocSkybox, 1, GL_FALSE, glm::value_ptr( viewSkyboxValue ) );
 
     // Aktiverer vertex-arrayen for skyBox:
     glBindVertexArray( skyboxVAO );
@@ -501,16 +465,12 @@ void resizeGL(int width, int height) {
         height = 1;
     
     cubeShader.Use();
-    glm::mat4 projection = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 100.0f);
-    glUniformMatrix4fv( projLoc, 1, GL_FALSE, glm::value_ptr( projection ) );
-    
-    //lightShader.Use();
-    //glm::mat4 projectionLight = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 100.0f);
-    //glUniformMatrix4fv( projLocLight, 1, GL_FALSE, glm::value_ptr( projectionLight ) );
+    glm::mat4 projectionCubeValue = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 100.0f);
+    glUniformMatrix4fv( projLoc, 1, GL_FALSE, glm::value_ptr( projectionCubeValue ) );
     
     skyboxShader.Use();
-    glm::mat4 projectionSkybox = glm::perspective(camera.GetZoom(), (float)width/height, 0.1f, 1000.0f );
-    glUniformMatrix4fv( projLocSkybox, 1, GL_FALSE, glm::value_ptr( projectionSkybox ) );
+    glm::mat4 projectionSkyboxValue = glm::perspective(camera.GetZoom(), (float)width/height, 0.1f, 1000.0f );
+    glUniformMatrix4fv( projLocSkybox, 1, GL_FALSE, glm::value_ptr( projectionSkyboxValue ) );
     
     // Definerer viewport-dimensjonene
     // Denne blir kalt hver gang vinduet starter.

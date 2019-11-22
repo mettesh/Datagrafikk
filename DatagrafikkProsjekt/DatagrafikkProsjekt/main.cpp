@@ -79,48 +79,48 @@ GLfloat cubeVertices[] =
 
  GLfloat cubeVertices[] =
  {
- // Posisjoner        // Texture Coords
-     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+ // Posisjoner        // Texture Coords     // Normal
+     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 0.0f, 0.0f, 0.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f, 0.0f, 1.0f,
+     -0.5f, -0.5f, -0.5f,  0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
               
-     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-     -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f, 0.0f, -1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 1.0f, 0.0f, 0.0f, -1.0f,
+     -0.5f,  0.5f,  0.5f,  0.0f, 1.0f, 0.0f, 0.0f, -1.0f,
+     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
               
-     -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+     -0.5f,  0.5f, -0.5f,  1.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, -1.0f, 0.0f, 0.0f,
+     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, -1.0f, 0.0f, 0.0f,
+     -0.5f,  0.5f,  0.5f,  1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
 
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 1.0f, 0.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
 
-     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+     0.5f, -0.5f, -0.5f,  1.0f, 1.0f, 0.0f, 1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+     0.5f, -0.5f,  0.5f,  1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+     -0.5f, -0.5f,  0.5f,  0.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+     -0.5f, -0.5f, -0.5f,  0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
 
-     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-     -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+     0.5f,  0.5f, -0.5f,  1.0f, 1.0f, 0.0f, -1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+     0.5f,  0.5f,  0.5f,  1.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+     -0.5f,  0.5f,  0.5f,  0.0f, 0.0f, 0.0f, -1.0f, 0.0f,
+     -0.5f,  0.5f, -0.5f,  0.0f, 1.0f, 0.0f, -1.0f, 0.0f
  };
  
          
@@ -260,25 +260,23 @@ int initGL() {
     
     
     //Fyller bufferen med data: Bufferen som skal brukes, størrelsen den må holde av, de vertices som skal lagres, og info at det skal tegnes.
-    glBufferData( GL_ARRAY_BUFFER, 6 * 4 * 5 * sizeof( GL_FLOAT ), cubeVertices, GL_STATIC_DRAW );
+    //glBufferData( GL_ARRAY_BUFFER, 6 * 4 * 5 * sizeof( GL_FLOAT ), cubeVertices, GL_STATIC_DRAW );
     
     // Posisjon attribute
-    glVertexAttribPointer( POSITION, 3, GL_FLOAT, GL_FALSE, 5 * sizeof( GL_FLOAT ), ( GLvoid * ) 0 );
+    //glVertexAttribPointer( POSITION, 3, GL_FLOAT, GL_FALSE, 5 * sizeof( GL_FLOAT ), ( GLvoid * ) 0 );
     // Texture attribute
-    glVertexAttribPointer( COLOR, 2, GL_FLOAT, GL_FALSE, 5 * sizeof( GL_FLOAT ), ( GLvoid * )( 3 * sizeof( GLfloat ) ) );
+    //glVertexAttribPointer( COLOR, 2, GL_FLOAT, GL_FALSE, 5 * sizeof( GL_FLOAT ), ( GLvoid * )( 3 * sizeof( GLfloat ) ) );
     
-    /*
-     glBufferData( GL_ARRAY_BUFFER, 6 * 4 * 9 * sizeof( GL_FLOAT ), cubeVertices, GL_STATIC_DRAW );
-     glVertexAttribPointer( POSITION, 3, GL_FLOAT, GL_FALSE, 9 * sizeof( GL_FLOAT ), ( GLvoid * ) 0 );
-     glVertexAttribPointer( COLOR, 3, GL_FLOAT, GL_FALSE, 9 * sizeof( GL_FLOAT ), ( GLvoid * )( 3 * sizeof( GLfloat ) ) );
-     glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, 9 * sizeof(GL_FLOAT), (const void *)(6 * sizeof(GLfloat)));
-     */
-
-   
+    
+     glBufferData( GL_ARRAY_BUFFER, 6 * 6 * 8 * sizeof( GL_FLOAT ), cubeVertices, GL_STATIC_DRAW );
+     glVertexAttribPointer( POSITION, 3, GL_FLOAT, GL_FALSE, 8 * sizeof( GL_FLOAT ), ( GLvoid * ) 0 );
+     glVertexAttribPointer( COLOR, 3, GL_FLOAT, GL_FALSE, 8 * sizeof( GL_FLOAT ), ( GLvoid * )( 3 * sizeof( GLfloat ) ) );
+     glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (const void *)(5 * sizeof(GLfloat)));
+     
     // Aktivere attributtene
     glEnableVertexAttribArray(POSITION);
     glEnableVertexAttribArray(COLOR);
-    //glEnableVertexAttribArray(NORMAL);
+    glEnableVertexAttribArray(NORMAL);
 
    // Deaktiverer vertexarrayen
     glBindVertexArray(0);
@@ -329,17 +327,17 @@ int initGL() {
     modelLoc = glGetUniformLocation( cubeShader.Program, "model" );
     
     // Henter inn unfirm-locations fra light-shadere
-    lightShader.Use();
-    lightPositionPos = glGetUniformLocation(lightShader.Program, "lightPosition");
-    lightAmbientPos = glGetUniformLocation(lightShader.Program, "lightAmbient");
-    lightDiffusePos = glGetUniformLocation(lightShader.Program, "lightDiffuse");
+    //lightShader.Use();
+    lightPositionPos = glGetUniformLocation(cubeShader.Program, "lightPosition");
+    lightAmbientPos = glGetUniformLocation(cubeShader.Program, "lightAmbient");
+    lightDiffusePos = glGetUniformLocation(cubeShader.Program, "lightDiffuse");
     lightSpecularPos = glGetUniformLocation(cubeShader.Program, "lightSpecular");
-    materialShininessColorPos = glGetUniformLocation(lightShader.Program, "shininessColor");
-    materialShininessPos = glGetUniformLocation(lightShader.Program, "shininess");
-    cameraPositionPos = glGetUniformLocation(lightShader.Program, "cameraPosition");
-    viewLocLight = glGetUniformLocation( lightShader.Program, "view" );
-    projLocLight = glGetUniformLocation( lightShader.Program, "projection" );
-    modelLocLight = glGetUniformLocation( lightShader.Program, "model" );
+    materialShininessColorPos = glGetUniformLocation(cubeShader.Program, "shininessColor");
+    materialShininessPos = glGetUniformLocation(cubeShader.Program, "shininess");
+    cameraPositionPos = glGetUniformLocation(cubeShader.Program, "cameraPosition");
+    viewLocLight = glGetUniformLocation( cubeShader.Program, "view" );
+    projLocLight = glGetUniformLocation( cubeShader.Program, "projection" );
+    modelLocLight = glGetUniformLocation( cubeShader.Program, "model" );
     
     // Henter inn uniform-loactions fra skybox-shadere
     skyboxShader.Use();
@@ -389,6 +387,23 @@ void drawGLScene() {
     model = glm::rotate(model, time * 0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
     // Kalkulerer modelmatrisen for hvert objekt og sender den til shaderen
     glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( model ) );
+    
+    // Sette lysets posisjon:
+    glm::vec3 lightPosition(sinf(time * 1.0f), cosf(time * 2.0f), 0.8f);
+    glUniform3f(lightPositionPos, lightPosition.x, lightPosition.y, lightPosition.z);
+    
+    //glUniform3fv(lightPositionPos, 1, lightPosition);
+    
+    
+    glUniform3f(lightAmbientPos, lightAmbient[0], lightAmbient[1], lightAmbient[2]);
+    glUniform3fv(lightDiffusePos, 1, lightDiffuse);
+    glUniform3fv(lightSpecularPos, 1, lightSpecular);
+    glUniform4fv(materialShininessColorPos, 1, materialShininessColor);
+    glUniform1f(materialShininessPos, materialShininess);
+    glUniform3fv(cameraPositionPos, 1, cameraPosition);
+
+    
+    
 
     // Aktiverer vertex-arrayen for kuben:
     glBindVertexArray( cubeVAO );
@@ -406,29 +421,15 @@ void drawGLScene() {
 * Tegner lys
 *
 * * * * * * */
-    lightShader.Use();
+    //lightShader.Use();
     
-    glm::mat4 viewLight = camera.GetViewMatrix();
-    glUniformMatrix4fv( viewLocLight, 1, GL_FALSE, glm::value_ptr( viewLight ) );
+    //glm::mat4 viewLight = camera.GetViewMatrix();
+    //glUniformMatrix4fv( viewLocLight, 1, GL_FALSE, glm::value_ptr( viewLight ) );
 
-    glm::mat4 modelLight = glm::mat4(1.0);
-    glUniformMatrix4fv( modelLocLight, 1, GL_FALSE, glm::value_ptr( modelLight ) );
+    //glm::mat4 modelLight = glm::mat4(1.0);
+    //glUniformMatrix4fv( modelLocLight, 1, GL_FALSE, glm::value_ptr( modelLight ) );
     
-    // Sette lysets posisjon:
-    glm::vec3 lightPosition(sinf(time * 1.0f), cosf(time * 2.0f), 0.8f);
-    glUniform3f(lightPositionPos, lightPosition.x, lightPosition.y, lightPosition.z);
-    
-    //glUniform3fv(lightPositionPos, 1, lightPosition);
-    
-    
-    glUniform3f(lightAmbientPos, lightAmbient[0], lightAmbient[1], lightAmbient[2]);
-    glUniform3fv(lightDiffusePos, 1, lightDiffuse);
-    glUniform3fv(lightSpecularPos, 1, lightSpecular);
-    glUniform4fv(materialShininessColorPos, 1, materialShininessColor);
-    glUniform1f(materialShininessPos, materialShininess);
-    glUniform3fv(cameraPositionPos, 1, cameraPosition);
 
-    glUseProgram(0);
     
 /* * * * * * *
 *
@@ -467,9 +468,9 @@ void resizeGL(int width, int height) {
     glm::mat4 projection = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 100.0f);
     glUniformMatrix4fv( projLoc, 1, GL_FALSE, glm::value_ptr( projection ) );
     
-    lightShader.Use();
-    glm::mat4 projectionLight = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 100.0f);
-    glUniformMatrix4fv( projLocLight, 1, GL_FALSE, glm::value_ptr( projectionLight ) );
+    //lightShader.Use();
+    //glm::mat4 projectionLight = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 100.0f);
+    //glUniformMatrix4fv( projLocLight, 1, GL_FALSE, glm::value_ptr( projectionLight ) );
     
     skyboxShader.Use();
     glm::mat4 projectionSkybox = glm::perspective(camera.GetZoom(), (float)width/height, 0.1f, 1000.0f );

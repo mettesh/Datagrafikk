@@ -1,7 +1,3 @@
-// Forsøkt å sette sammen simpleLighting og Skybox-kode --> På vei?
-// Hva er feilmeldingen
-// Hvordan gjøre shader-variablene globale?
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -39,43 +35,6 @@
 #define CAMERA 4
 
 // KUBE:
-
-/*
-GLfloat cubeVertices[] =
-{
-// Posisjoner        // Texture Coords
-    // Front
-    -1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-    -1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-    1.0f, -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-    1.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f,
-    // Back
-    1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
-    1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
-    -1.0f, -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
-    -1.0f, 1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, -1.0f,
-    // Left
-    -1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-    -1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-    -1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-    -1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f, 0.0f,
-    // Right
-    1.0f, 1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-    1.0f, -1.0f, 1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-    1.0f, -1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-    1.0f, 1.0f, -1.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
-    // Top
-    -1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-    -1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-    1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-    1.0f, 1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f,
-    // Bottom
-    -1.0f, -1.0f, 1.0f, 0.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-    -1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-    1.0f, -1.0f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f,
-    1.0f, -1.0f, 1.0f,  0.0f, 0.0f, 1.0f, 0.0f, -1.0f, 0.0f
-};
-*/
 
  GLfloat cubeVertices[] =
  {
@@ -178,14 +137,8 @@ void KeyCallback( GLFWwindow *window, int key, int scancode, int action, int mod
 void MouseCallback( GLFWwindow *window, double xPos, double yPos );
 void DoMovement( );
 
-Shader cubeShader;
-Shader lightShader;
-Shader skyboxShader;
-
-
 // Setter startposisjon til kamera
 Camera camera( glm::vec3( 1.0f, 0.0f, 3.0f ) );
-
 
 GLfloat lastX = SCREEN_WIDTH / 2.0f;
 GLfloat lastY = SCREEN_WIDTH / 2.0f;
@@ -197,44 +150,35 @@ void DoMovement();
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
 
+// Vertex-array og buffer -object for KUBE og SKYBOX
+GLuint cubeVAO, cubeVBO;
+GLuint skyboxVAO, skyboxVBO;
 
-// Uniforms values
+// Shadere
+Shader cubeShader;
+Shader skyboxShader;
 
-
+// Textures
+GLuint cubemapTextureValue;
+GLuint cubeTextureValue;
 
 // Cube & light  Uniform locations
 GLint modelLoc;
 GLint viewLoc;
 GLint projLoc;
-
-
-
+GLint cubeTextureLoc;
 GLint lightColorLoc;
 GLint lightPositionLoc;
 GLint viewPositionLoc;
-
-
-GLfloat lightPositionValue[] { 0.0f, 0.0f, 4.0f };
-GLfloat cameraPositionValue[] { 1.0f, 0.0f, 4.0f };
-GLfloat lightColorValue[] = {1.0f, 0.5f, 0.31f};
-
-
-
-GLint viewLocLight;
-GLint projLocLight;
-GLint modelLocLight;
 
 // Skybox Uniform locations
 GLint projLocSkybox;
 GLint viewLocSkybox;
 
-// Oppretter Vertex-array og buffer -object for KUBE
-GLuint cubeVAO, cubeVBO;
-// Oppretter Vertex-array og buffer -object for SKYBOX
-GLuint skyboxVAO, skyboxVBO;
-
-GLuint cubemapTexture;
-GLuint cubeTexture;
+// Uniforms values
+GLfloat lightPositionValue[] { 0.0f, 0.0f, 4.0f };
+GLfloat cameraPositionValue[] { 1.0f, 0.0f, 4.0f };
+GLfloat lightColorValue[] = {1.0f, 0.5f, 0.31f};
 
 /*
  * Initialize OpenGL
@@ -299,11 +243,10 @@ int initGL() {
     
     // Setup and compile our shaders
     cubeShader = Shader( "resources/shaders/cube.vert", "resources/shaders/cube.frag" );
-    lightShader = Shader( "resources/shaders/light.vert", "resources/shaders/light.frag" );
     skyboxShader = Shader( "resources/shaders/skybox.vert", "resources/shaders/skybox.frag" );
 
     //Laste inn texture til kuben:
-    cubeTexture = TextureLoading::LoadTexture("resources/img/cube/texture.png");
+    cubeTextureValue = TextureLoading::LoadTexture("resources/img/cube/texture.png");
     
     //Laste inn texture til skyboxen:
     std::vector<const GLchar*> skyBoxTextureFaces;
@@ -313,7 +256,7 @@ int initGL() {
     skyBoxTextureFaces.push_back( "resources/img/skybox/iceflats_dn.tga" );
     skyBoxTextureFaces.push_back( "resources/img/skybox/iceflats_ft.tga" );
     skyBoxTextureFaces.push_back( "resources/img/skybox/iceflats_bk.tga" );
-    cubemapTexture = TextureLoading::LoadCubemap( skyBoxTextureFaces );
+    cubemapTextureValue = TextureLoading::LoadCubemap( skyBoxTextureFaces );
 
 
     // Henter inn uniform-loactions fra cube-shadere
@@ -322,37 +265,19 @@ int initGL() {
     projLoc = glGetUniformLocation( cubeShader.Program, "projection" );
     modelLoc = glGetUniformLocation( cubeShader.Program, "model" );
     
-    // Henter inn unfirm-locations fra light-shadere
-    // glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);
+    cubeTextureLoc = glGetUniformLocation( cubeShader.Program, "cubeTexture" );
     
-    
-    //lightShader.Use();
-    
-    
-    //ObjektColorPos = glGetUniformLocation(cubeShader.Program, "objectColor");
     lightColorLoc = glGetUniformLocation(cubeShader.Program, "lightColor");
     lightPositionLoc = glGetUniformLocation(cubeShader.Program, "lightPos");
     viewPositionLoc = glGetUniformLocation(cubeShader.Program, "viewPos");
     
     
-    /*
-    lightPositionPos = glGetUniformLocation(cubeShader.Program, "lightPosition");
-    lightAmbientPos = glGetUniformLocation(cubeShader.Program, "lightAmbient");
-    lightDiffusePos = glGetUniformLocation(cubeShader.Program, "lightDiffuse");
-    lightSpecularPos = glGetUniformLocation(cubeShader.Program, "lightSpecular");
-    materialShininessColorPos = glGetUniformLocation(cubeShader.Program, "shininessColor");
-    materialShininessPos = glGetUniformLocation(cubeShader.Program, "shininess");
-    cameraPositionPos = glGetUniformLocation(cubeShader.Program, "cameraPosition");
-    viewLocLight = glGetUniformLocation( cubeShader.Program, "view" );
-    projLocLight = glGetUniformLocation( cubeShader.Program, "projection" );
-    modelLocLight = glGetUniformLocation( cubeShader.Program, "model" );
-     */
-    
-    
-    // Henter inn uniform-loactions fra skybox-shadere
+    // Henter inn uniform-loactions fra skybox-shader
     skyboxShader.Use();
     projLocSkybox = glGetUniformLocation( skyboxShader.Program, "projection" );
     viewLocSkybox = glGetUniformLocation( skyboxShader.Program, "view" );
+    
+    
     
     // Implementerer Depth i applikasjonen ?????
     glEnable(GL_DEPTH_TEST);
@@ -382,42 +307,30 @@ void drawGLScene() {
     // Aktiverer programmet
     cubeShader.Use();
         
-    // Binder Textures ved å bruke texture units:
+    // Henter og setter texture som sendes til cube-fragshader
     glActiveTexture( GL_TEXTURE0 );
-    glBindTexture( GL_TEXTURE_2D, cubeTexture );
-    glUniform1i( glGetUniformLocation( cubeShader.Program, "cubeTexture" ), 0 );
+    glUniform1i(cubeTextureLoc , 0);
+    glBindTexture( GL_TEXTURE_2D, cubeTextureValue );
 
     // Setter view matrisen
-    glm::mat4 viewValue = camera.GetViewMatrix();
+    glm::mat4 viewCubeValue = camera.GetViewMatrix();
     // Sender view-matrise til cube-shaderen:
-    glUniformMatrix4fv( viewLoc, 1, GL_FALSE, glm::value_ptr( viewValue ) );
+    glUniformMatrix4fv( viewLoc, 1, GL_FALSE, glm::value_ptr( viewCubeValue ) );
 
-    // Sender model-matrise til cube-shaderen:
-    glm::mat4 modelValue = glm::mat4(1.0);
+    // Setter model-matrise
+    glm::mat4 modelCubeValue = glm::mat4(1.0);
     //model = glm::rotate(model, time * 0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
-    // Kalkulerer modelmatrisen for hvert objekt og sender den til shaderen
-    glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( modelValue ) );
+    // Sender model-matrise til cube-shaderen:
+    glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( modelCubeValue ) );
     
-
-    // Sette lysets posisjon:
-    //glm::vec3 lightPositionLoc(sinf(time * 1.0f), cosf(time * 2.0f), 0.8f);
-    //glUniform3f(lightPositionLoc, lightPositionValue.x, lightPositionValue.y, lightPositionValue.z);
+    // Sender resten av lys-matrisene??? til cube-shaderen:
     
-    //glUniform3fv(ObjektColorPos, 1, ObjektColor);
+        //glm::vec3 lightPositionLoc(sinf(time * 1.0f), cosf(time * 2.0f), 0.8f);
+        //glUniform3f(lightPositionLoc, lightPositionValue.x, lightPositionValue.y, lightPositionValue.z);
+    
     glUniform3fv(lightColorLoc, 1, lightColorValue);
     glUniform3fv(lightPositionLoc, 1, lightPositionValue);
     glUniform3fv(viewPositionLoc, 1, cameraPositionValue);
-    
-
-    /*
-    glUniform3f(lightAmbientPos, lightAmbient[0], lightAmbient[1], lightAmbient[2]);
-    glUniform3fv(lightDiffusePos, 1, lightDiffuse);
-    glUniform3fv(lightSpecularPos, 1, lightSpecular);
-    glUniform4fv(materialShininessColorPos, 1, materialShininessColor);
-    glUniform1f(materialShininessPos, materialShininess);
-    glUniform3fv(cameraPositionPos, 1, cameraPosition);
-     */
-    
     
 
     // Aktiverer vertex-arrayen for kuben:
@@ -449,7 +362,7 @@ void drawGLScene() {
     // Aktiverer vertex-arrayen for skyBox:
     glBindVertexArray( skyboxVAO );
     
-    glBindTexture( GL_TEXTURE_CUBE_MAP, cubemapTexture );
+    glBindTexture( GL_TEXTURE_CUBE_MAP, cubemapTextureValue );
     glDrawArrays( GL_TRIANGLES, 0, 36 );
     glDepthFunc( GL_LESS ); // Setter dybdefunksjonen tilbake til default
     

@@ -28,7 +28,7 @@ uniform vec3 objectColor;
 
 // Endelig farge på lys sendes ut
 //out vec4 outputLightColor;
-//out vec4 FragColor;
+out vec4 FragColor;
 
 // Vectors
 vec3 L;
@@ -42,6 +42,8 @@ vec4 ambient;
 vec4 diffuse;
 vec4 specular;
 
+vec3 result;
+
 
 // Henter inn cube-texturen
 uniform sampler2D cubeTexture;
@@ -49,8 +51,7 @@ uniform sampler2D cubeTexture;
 
 // Sender ut resultat
 //out vec4 textureResult;
-//out vec4 out_color;
-layout (location=0) out vec4 out_color;
+
 
 void main()
 {
@@ -60,29 +61,37 @@ void main()
 
     
     /*** LYS ****/
+
+    
     // ambient
     float ambientStrength = 0.1;
-    vec3 ambient = ambientStrength * lightColor;
+    vec3 ambient = ambientStrength * texture( cubeTexture, cubeTextureCoordinates ).rgb;
 
     // diffuse
     vec3 norm = normalize(Normal);
     vec3 lightDir = normalize(lightPos - FragPos);
     float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = diff * lightColor;
+    vec3 diffuse = diff * texture( cubeTexture, cubeTextureCoordinates ).rgb;
 
     // specular
     float specularStrength = 0.5;
     vec3 viewDir = normalize(viewPos - FragPos);
     vec3 reflectDir = reflect(-lightDir, norm);
     float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
-    vec3 specular = specularStrength * spec * lightColor;
+    //vec3 specular = specularStrength * spec * lightColor;
         
-    //vec3 result = (ambient + diffuse + specular) * objectColor;
-    //FragColor = vec4(result, 1.0);
     
     
-     out_color = (ambient + diffuse + specular ) * texture( cubeTexture, cubeTextureCoordinates );
+    vec3 specular = specularStrength * spec * texture( cubeTexture, cubeTextureCoordinates ).rgb;
     
+    vec3 result = (ambient + diffuse + specular) * objectColor;
+    
+    FragColor = vec4(result, 1.0);
+    
+    
+    
+    //result = (ambient + diffuse + specular ) * texture( cubeTexture, cubeTextureCoordinates );
+    //out_color = vec4(result, 1.0);
     
     
     

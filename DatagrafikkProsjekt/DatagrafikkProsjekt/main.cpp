@@ -23,9 +23,10 @@
 
 // Vertex Array attributes
 #define POSITION 0
-#define COLOR 1
-#define NORMAL 2
-
+#define NORMAL 1
+#define COLOR 2
+#define TANGENT 3
+#define BITANGENT 4
 
 // GLSL Uniform indices
 #define TRANSFORM0 0
@@ -35,11 +36,12 @@
 #define CAMERA 4
 
 // KUBE:
-
+GLfloat *cubeVertices;
+/*
  GLfloat cubeVertices[] =
  {
      // Posisjon            // Texture      // Normal
-    -0.5f, -0.5f, -0.5f,    0.0f, 0.0f,     0.0f,0.0f, 1.0f,
+    -0.5f, -0.5f, -0.5f,    0.0f, 0.0f,     0.0f, 0.0f, 1.0f,
      0.5f, -0.5f, -0.5f,    1.0f, 0.0f,     0.0f, 0.0f, 1.0f,
      0.5f,  0.5f, -0.5f,    1.0f, 1.0f,     0.0f, 0.0f, 1.0f,
      0.5f,  0.5f, -0.5f,    1.0f, 1.0f,     0.0f, 0.0f, 1.0f,
@@ -81,8 +83,10 @@
     -0.5f,  0.5f,  0.5f,    0.0f, 0.0f,     0.0f, -1.0f, 0.0f,
     -0.5f,  0.5f, -0.5f,    0.0f, 1.0f,     0.0f, -1.0f, 0.0f
  };
+ */
 
 // SKYBOX
+/*
 GLfloat skyboxVertices[] =
 {
     // Posisjon
@@ -128,6 +132,7 @@ GLfloat skyboxVertices[] =
     -1.0f, -1.0f,  1.0f,
      1.0f, -1.0f,  1.0f
  };
+*/
 
 // Dimensjonene til vinduet
 // const GLuint WIDTH = 800, HEIGHT = 600;
@@ -138,6 +143,10 @@ void KeyCallback( GLFWwindow *window, int key, int scancode, int action, int mod
 void MouseCallback( GLFWwindow *window, double xPos, double yPos );
 void DoMovement( );
 
+
+void generateCubeVerticesAndSetArraysAndBuffers();
+void generateSkyBoxVerticesAndSetArraysAndBuffers();
+
 // Setter startposisjon til kamera
 Camera camera( glm::vec3( 1.0f, 0.0f, 3.0f ) );
 
@@ -146,7 +155,6 @@ GLfloat lastY = SCREEN_WIDTH / 2.0f;
 
 bool keys[1024];
 bool firstMouse = true;
-void DoMovement();
 
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
@@ -162,12 +170,16 @@ Shader skyboxShader;
 // Textures
 GLuint cubemapTextureValue;
 GLuint cubeTextureValue;
+GLuint cubeNormalMapValue;
 
 // Cube & light  Uniform locations
 GLint modelLoc;
 GLint viewLoc;
 GLint projLoc;
+
 GLint cubeTextureLoc;
+GLint cubeNormalMapLoc;
+
 GLint lightColorLoc;
 GLint lightPositionLoc;
 GLint viewPositionLoc;
@@ -181,56 +193,19 @@ GLfloat lightPositionValue[] { 1.0f, -2.0f, -2.0f };
 GLfloat cameraPositionValue[] { 1.0f, 0.0f, 4.0f };
 GLfloat lightColorValue[] = {1.0f, 0.5f, 0.31f};
 
+
+
+
+
+
 /*
  * Initialize OpenGL
  */
 int initGL() {
     
+    generateSkyBoxVerticesAndSetArraysAndBuffers();
 
-// CUBE
-    //Antall man ønsker å opprette, arrayen som skal benyttes.
-    glGenVertexArrays( 1, &cubeVAO );
-    //Forteller OpenGL hvilken vertex-array som skal brukes.
-    glBindVertexArray( cubeVAO );
-    
-    //Antall man ønsker å opprette, arrayen som skal benyttes.
-    glGenBuffers( 1, &cubeVBO );
-    //Forteller OpenGL at dette er current bufferen som skal brukes (Skal bufferen modifiseres senere er det denne som skal endres)
-    glBindBuffer( GL_ARRAY_BUFFER, cubeVBO );
-    
-    
-    //Fyller bufferen med data: Bufferen som skal brukes, størrelsen den må holde av, de vertices som skal lagres, og info at det skal tegnes.
-     glBufferData( GL_ARRAY_BUFFER, 6 * 6 * 8 * sizeof( GL_FLOAT ), cubeVertices, GL_STATIC_DRAW );
-     glVertexAttribPointer( POSITION, 3, GL_FLOAT, GL_FALSE, 8 * sizeof( GL_FLOAT ), ( GLvoid * ) 0 );
-     glVertexAttribPointer( COLOR, 3, GL_FLOAT, GL_FALSE, 8 * sizeof( GL_FLOAT ), ( GLvoid * )( 3 * sizeof( GLfloat ) ) );
-     glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (const void *)(5 * sizeof(GLfloat)));
-     
-    // Aktivere attributtene
-    glEnableVertexAttribArray(POSITION);
-    glEnableVertexAttribArray(COLOR);
-    glEnableVertexAttribArray(NORMAL);
-
-   // Deaktiverer vertexarrayen
-    glBindVertexArray(0);
-
-    
-// SKYBOX
-    glGenVertexArrays( 1, &skyboxVAO );
-    glGenBuffers( 1, &skyboxVBO );
-    glBindVertexArray( skyboxVAO );
-    glBindBuffer( GL_ARRAY_BUFFER, skyboxVBO );
-    
-    //Fyller bufferen med data: Bufferen som skal brukes, størrelsen den på holde av, de vertices som skal lagres, og info at det skal tegnes.
-    glBufferData( GL_ARRAY_BUFFER, 108 * sizeof( GL_FLOAT ), skyboxVertices, GL_STATIC_DRAW );
-    
-    // Posisjon attribute
-    glVertexAttribPointer( POSITION, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( GLfloat ), ( GLvoid * ) 0 );
-    
-    // Aktivere attributten
-    glEnableVertexAttribArray(POSITION);
-
-    // Deaktiverer vertexarrayen
-    glBindVertexArray(0);
+    generateCubeVerticesAndSetArraysAndBuffers();
     
     
     // Setup and compile our shaders
@@ -238,7 +213,8 @@ int initGL() {
     skyboxShader = Shader( "resources/shaders/skybox.vert", "resources/shaders/skybox.frag" );
 
     //Laste inn texture til kuben:
-    cubeTextureValue = TextureLoading::LoadTexture("resources/img/cube/texture.png");
+    cubeTextureValue = TextureLoading::LoadTexture("resources/img/cube/texture.jpg");
+    cubeNormalMapValue = TextureLoading::LoadTexture("resources/img/cube/texture_normal.jpg");
     
     //Laste inn texture til skyboxen:
     std::vector<const GLchar*> skyBoxTextureFaces;
@@ -258,10 +234,11 @@ int initGL() {
     modelLoc = glGetUniformLocation( cubeShader.Program, "model" );
     
     cubeTextureLoc = glGetUniformLocation( cubeShader.Program, "cubeTexture" );
+    cubeNormalMapLoc = glGetUniformLocation( cubeShader.Program, "cubeNormalMap" );
     
-    lightColorLoc = glGetUniformLocation(cubeShader.Program, "lightColor");
-    lightPositionLoc = glGetUniformLocation(cubeShader.Program, "lightPos");
-    viewPositionLoc = glGetUniformLocation(cubeShader.Program, "viewPos");
+    lightColorLoc = glGetUniformLocation(cubeShader.Program, "lightColor" );
+    lightPositionLoc = glGetUniformLocation( cubeShader.Program, "lightPos" );
+    viewPositionLoc = glGetUniformLocation( cubeShader.Program, "viewPos" );
     
     
     // Henter inn uniform-loactions fra skybox-shader
@@ -290,6 +267,32 @@ void drawGLScene() {
     
     float time = glfwGetTime();
     
+    /* * * * * * *
+    *
+    * Tegner skyboxen:
+    *
+    * * * * * * */
+
+        skyboxShader.Use();
+        
+        // Change depth function so depth test passes when values are equal to depth buffer's content
+        glDepthFunc( GL_LEQUAL );
+
+        // TODO: Tidligere. Hva gjør denne:  glm::mat4 viewSkybox = camera.GetViewMatrix();
+        glm::mat4 viewSkyboxValue = glm::mat4( glm::mat3( camera.GetViewMatrix( ) ) );
+        glUniformMatrix4fv( viewLocSkybox, 1, GL_FALSE, glm::value_ptr( viewSkyboxValue ) );
+
+        // Aktiverer vertex-arrayen for skyBox:
+        glBindVertexArray( skyboxVAO );
+        
+        glBindTexture( GL_TEXTURE_CUBE_MAP, cubemapTextureValue );
+        glDrawArrays( GL_TRIANGLES, 0, 36 );
+        glDepthFunc( GL_LESS ); // Setter dybdefunksjonen tilbake til default
+        
+        glUseProgram(0);
+        glBindVertexArray(0);
+    
+    
 /* * * * * * *
  *
  * Tegner kuben
@@ -303,7 +306,13 @@ void drawGLScene() {
     glActiveTexture( GL_TEXTURE0 );
     glUniform1i(cubeTextureLoc , 0);
     glBindTexture( GL_TEXTURE_2D, cubeTextureValue );
-
+    
+    // Henter og setter normalMap som sendes til cube-fragshader
+    glActiveTexture( GL_TEXTURE1 );
+    glUniform1i(cubeNormalMapLoc , 1);
+    glBindTexture( GL_TEXTURE_2D, cubeNormalMapValue );
+    
+    
     // Setter view matrisen
     glm::mat4 viewCubeValue = camera.GetViewMatrix();
     // Sender view-matrise til cube-shaderen:
@@ -315,7 +324,7 @@ void drawGLScene() {
     // Sender model-matrise til cube-shaderen:
     glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( modelCubeValue ) );
     
-    // Sender resten av lys-matrisene??? til cube-shaderen:
+    // Sender resten av lys-matrisene til cube-shaderen:
     
         //glm::vec3 lightPositionLoc(sinf(time * 1.0f), cosf(time * 2.0f), 0.8f);
         //glUniform3f(lightPositionLoc, lightPositionValue.x, lightPositionValue.y, lightPositionValue.z);
@@ -324,43 +333,19 @@ void drawGLScene() {
     glUniform3fv(lightPositionLoc, 1, lightPositionValue);
     glUniform3fv(viewPositionLoc, 1, cameraPositionValue);
     
+    
+    
 
     // Aktiverer vertex-arrayen for kuben:
     glBindVertexArray( cubeVAO );
        
     // Deretter tegnes trianglene:
-    glDrawArrays( GL_TRIANGLES, 0, 36 );
+    glDrawArrays( GL_TRIANGLES, 0, 6 );
     
     // Deaktiverer shaderprogram som brukes og vertexarray
     glUseProgram(0);
     glBindVertexArray(0);
-    
-    
-/* * * * * * *
-*
-* Tegner skyboxen:
-*
-* * * * * * */
-
-    skyboxShader.Use();
-    
-    // Change depth function so depth test passes when values are equal to depth buffer's content
-    glDepthFunc( GL_LEQUAL );
-
-    // TODO: Tidligere. Hva gjør denne:  glm::mat4 viewSkybox = camera.GetViewMatrix();
-    glm::mat4 viewSkyboxValue = glm::mat4( glm::mat3( camera.GetViewMatrix( ) ) );
-    glUniformMatrix4fv( viewLocSkybox, 1, GL_FALSE, glm::value_ptr( viewSkyboxValue ) );
-
-    // Aktiverer vertex-arrayen for skyBox:
-    glBindVertexArray( skyboxVAO );
-    
-    glBindTexture( GL_TEXTURE_CUBE_MAP, cubemapTextureValue );
-    glDrawArrays( GL_TRIANGLES, 0, 36 );
-    glDepthFunc( GL_LESS ); // Setter dybdefunksjonen tilbake til default
-    
-    glUseProgram(0);
-    glBindVertexArray(0);
-    
+        
 }
 
 void resizeGL(int width, int height) {
@@ -460,6 +445,179 @@ void glfwWindowSizeCallback(GLFWwindow* window, int width, int height) {
     resizeGL(width, height);
     
 }
+
+// renders a 1x1 quad in NDC with manually calculated tangent vectors
+// ------------------------------------------------------------------
+
+void generateCubeVerticesAndSetArraysAndBuffers()
+{
+    if (cubeVAO == 0)
+    {
+        // positions
+        glm::vec3 pos1(-1.0f,  1.0f, 0.0f);
+        glm::vec3 pos2(-1.0f, -1.0f, 0.0f);
+        glm::vec3 pos3( 1.0f, -1.0f, 0.0f);
+        glm::vec3 pos4( 1.0f,  1.0f, 0.0f);
+        // texture coordinates
+        glm::vec2 uv1(0.0f, 1.0f);
+        glm::vec2 uv2(0.0f, 0.0f);
+        glm::vec2 uv3(1.0f, 0.0f);
+        glm::vec2 uv4(1.0f, 1.0f);
+        // normal vector
+        glm::vec3 nm(0.0f, 0.0f, 1.0f);
+
+        // calculate tangent/bitangent vectors of both triangles
+        glm::vec3 tangent1, bitangent1;
+        glm::vec3 tangent2, bitangent2;
+        // triangle 1
+        // ----------
+        glm::vec3 edge1 = pos2 - pos1;
+        glm::vec3 edge2 = pos3 - pos1;
+        glm::vec2 deltaUV1 = uv2 - uv1;
+        glm::vec2 deltaUV2 = uv3 - uv1;
+
+        GLfloat f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+        tangent1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+        tangent1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+        tangent1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+        tangent1 = glm::normalize(tangent1);
+
+        bitangent1.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+        bitangent1.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+        bitangent1.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+        bitangent1 = glm::normalize(bitangent1);
+
+        // triangle 2
+        // ----------
+        edge1 = pos3 - pos1;
+        edge2 = pos4 - pos1;
+        deltaUV1 = uv3 - uv1;
+        deltaUV2 = uv4 - uv1;
+
+        f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+        tangent2.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+        tangent2.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+        tangent2.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+        tangent2 = glm::normalize(tangent2);
+
+
+        bitangent2.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+        bitangent2.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+        bitangent2.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+        bitangent2 = glm::normalize(bitangent2);
+
+
+        GLfloat cubeVertices[] = {
+            // positions            // normal         // texcoords  // tangent                          // bitangent
+            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+            pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+
+            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+            pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z
+        };
+        
+         //Antall man ønsker å opprette, arrayen som skal benyttes.
+         glGenVertexArrays( 1, &cubeVAO );
+         //Forteller OpenGL hvilken vertex-array som skal brukes.
+         glBindVertexArray( cubeVAO );
+         
+         //Antall man ønsker å opprette, arrayen som skal benyttes.
+         glGenBuffers( 1, &cubeVBO );
+         //Forteller OpenGL at dette er current bufferen som skal brukes (Skal bufferen modifiseres senere er det denne som skal endres)
+         glBindBuffer( GL_ARRAY_BUFFER, cubeVBO );
+         
+
+         glBufferData( GL_ARRAY_BUFFER, 6 * 14 * sizeof( GL_FLOAT ), cubeVertices, GL_STATIC_DRAW );
+         
+         glVertexAttribPointer(POSITION, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (GLvoid*)0);
+         glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (GLvoid*)(3 * sizeof(GLfloat)));
+         glVertexAttribPointer(COLOR, 2, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (const void*)(6 * sizeof(GLfloat)));
+         glVertexAttribPointer(TANGENT, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (const void*)(8 * sizeof(GLfloat)));
+         glVertexAttribPointer(BITANGENT, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (const void*)(11 * sizeof(GLfloat)));
+         
+         // Aktivere attributtene
+         glEnableVertexAttribArray(POSITION);
+         glEnableVertexAttribArray(COLOR);
+         glEnableVertexAttribArray(NORMAL);
+         glEnableVertexAttribArray(TANGENT);
+         glEnableVertexAttribArray(BITANGENT);
+   
+    }
+}
+
+void generateSkyBoxVerticesAndSetArraysAndBuffers() {
+    
+    
+    if (cubeVAO == 0)
+    {
+        
+        GLfloat skyboxVertices[] =
+        {
+            // Posisjon
+            -1.0f,  1.0f, -1.0f,
+            -1.0f, -1.0f, -1.0f,
+             1.0f, -1.0f, -1.0f,
+             1.0f, -1.0f, -1.0f,
+             1.0f,  1.0f, -1.0f,
+            -1.0f,  1.0f, -1.0f,
+
+            -1.0f, -1.0f,  1.0f,
+            -1.0f, -1.0f, -1.0f,
+            -1.0f,  1.0f, -1.0f,
+            -1.0f,  1.0f, -1.0f,
+            -1.0f,  1.0f,  1.0f,
+            -1.0f, -1.0f,  1.0f,
+
+             1.0f, -1.0f, -1.0f,
+             1.0f, -1.0f,  1.0f,
+             1.0f,  1.0f,  1.0f,
+             1.0f,  1.0f,  1.0f,
+             1.0f,  1.0f, -1.0f,
+             1.0f, -1.0f, -1.0f,
+
+            -1.0f, -1.0f,  1.0f,
+            -1.0f,  1.0f,  1.0f,
+             1.0f,  1.0f,  1.0f,
+             1.0f,  1.0f,  1.0f,
+             1.0f, -1.0f,  1.0f,
+            -1.0f, -1.0f,  1.0f,
+
+            -1.0f,  1.0f, -1.0f,
+             1.0f,  1.0f, -1.0f,
+             1.0f,  1.0f,  1.0f,
+             1.0f,  1.0f,  1.0f,
+            -1.0f,  1.0f,  1.0f,
+            -1.0f,  1.0f, -1.0f,
+
+            -1.0f, -1.0f, -1.0f,
+            -1.0f, -1.0f,  1.0f,
+             1.0f, -1.0f, -1.0f,
+             1.0f, -1.0f, -1.0f,
+            -1.0f, -1.0f,  1.0f,
+             1.0f, -1.0f,  1.0f
+         };
+        
+        glGenVertexArrays( 1, &skyboxVAO );
+        glGenBuffers( 1, &skyboxVBO );
+        glBindVertexArray( skyboxVAO );
+        glBindBuffer( GL_ARRAY_BUFFER, skyboxVBO );
+        
+        //Fyller bufferen med data: Bufferen som skal brukes, størrelsen den på holde av, de vertices som skal lagres, og info at det skal tegnes.
+        glBufferData( GL_ARRAY_BUFFER, 108 * sizeof( GL_FLOAT ), skyboxVertices, GL_STATIC_DRAW );
+        
+        // Posisjon attribute
+        glVertexAttribPointer( POSITION, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( GLfloat ), ( GLvoid * ) 0 );
+        
+        // Aktivere attributten
+        glEnableVertexAttribArray(POSITION);
+    }
+}
+
+
 
 /*
  * PROGRAMSTART

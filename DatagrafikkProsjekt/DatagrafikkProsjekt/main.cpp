@@ -299,6 +299,7 @@ void drawGLScene() {
     // Aktiverer programmet
     cubeShader.Use();
         
+    
     // Henter og setter texture som sendes til cube-fragshader
     glActiveTexture( GL_TEXTURE0 );
     glUniform1i(cubeTextureLoc , 0);

@@ -566,8 +566,6 @@ void generateSkyBoxVerticesAndSetArraysAndBuffers() {
     }
 }
 
-
-
 /*
  * PROGRAMSTART
  */

@@ -13,6 +13,7 @@
 		094ED80E23572575007A9B65 /* glm.hpp in Frameworks */ = {isa = PBXBuildFile; fileRef = 094ED72723572560007A9B65 /* glm.hpp */; };
 		094ED81123572B75007A9B65 /* resources in CopyFiles */ = {isa = PBXBuildFile; fileRef = 094ED80F23572B56007A9B65 /* resources */; };
 		094ED818235738F1007A9B65 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 094ED816235738F1007A9B65 /* main.cpp */; };
+		096BE198238E9F3D006FAD6D /* libgio-2.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 096BE197238E9F3D006FAD6D /* libgio-2.0.0.dylib */; };
 		09E4D85623630CF800415536 /* image_helper.c in Sources */ = {isa = PBXBuildFile; fileRef = 09E4D84123630CF800415536 /* image_helper.c */; };
 		09E4D85723630CF800415536 /* image_DXT.c in Sources */ = {isa = PBXBuildFile; fileRef = 09E4D84423630CF800415536 /* image_DXT.c */; };
 		09E4D85823630CF800415536 /* SOIL2.c in Sources */ = {isa = PBXBuildFile; fileRef = 09E4D84723630CF800415536 /* SOIL2.c */; };
@@ -441,6 +442,7 @@
 		094ED812235735E2007A9B65 /* Camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Camera.h; sourceTree = "<group>"; };
 		094ED813235735E3007A9B65 /* shader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = shader.h; sourceTree = "<group>"; };
 		094ED816235738F1007A9B65 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		096BE197238E9F3D006FAD6D /* libgio-2.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libgio-2.0.0.dylib"; path = "../../../../../../../usr/local/Cellar/glib/2.62.3/lib/libgio-2.0.0.dylib"; sourceTree = "<group>"; };
 		09E4D84123630CF800415536 /* image_helper.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = image_helper.c; sourceTree = "<group>"; };
 		09E4D84223630CF800415536 /* stbi_pkm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stbi_pkm.h; sourceTree = "<group>"; };
 		09E4D84323630CF800415536 /* jo_jpeg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jo_jpeg.h; sourceTree = "<group>"; };
@@ -472,6 +474,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				096BE198238E9F3D006FAD6D /* libgio-2.0.0.dylib in Frameworks */,
 				09F75F61237C3842007E8916 /* libGLEW.2.1.0.dylib in Frameworks */,
 				094ED80E23572575007A9B65 /* glm.hpp in Frameworks */,
 				094ED69023572534007A9B65 /* libgio-2.0.0.dylib in Frameworks */,
@@ -516,6 +519,7 @@
 		094ED688235724E1007A9B65 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				096BE197238E9F3D006FAD6D /* libgio-2.0.0.dylib */,
 				09F75F60237C3842007E8916 /* libGLEW.2.1.0.dylib */,
 				09E4D85C23632A9100415536 /* libassimp.4.1.0.dylib */,
 				09E4D84023630CF800415536 /* SOIL2 */,
@@ -1168,6 +1172,7 @@
 					/usr/local/Cellar/glfw/3.3/lib,
 					/usr/local/Cellar/glib/2.58.3/lib,
 					/usr/local/Cellar/assimp/4.1.0/lib,
+					/usr/local/Cellar/glib/2.62.3/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -1184,6 +1189,7 @@
 					/usr/local/Cellar/glfw/3.3/lib,
 					/usr/local/Cellar/glib/2.58.3/lib,
 					/usr/local/Cellar/assimp/4.1.0/lib,
+					/usr/local/Cellar/glib/2.62.3/lib,
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

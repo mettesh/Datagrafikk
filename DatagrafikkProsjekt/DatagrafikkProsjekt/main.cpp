@@ -36,7 +36,6 @@
 #define CAMERA 4
 
 // KUBE:
-GLfloat *cubeVertices;
 /*
  GLfloat cubeVertices[] =
  {
@@ -85,54 +84,6 @@ GLfloat *cubeVertices;
  };
  */
 
-// SKYBOX
-/*
-GLfloat skyboxVertices[] =
-{
-    // Posisjon
-    -1.0f,  1.0f, -1.0f,
-    -1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
-     1.0f,  1.0f, -1.0f,
-    -1.0f,  1.0f, -1.0f,
-
-    -1.0f, -1.0f,  1.0f,
-    -1.0f, -1.0f, -1.0f,
-    -1.0f,  1.0f, -1.0f,
-    -1.0f,  1.0f, -1.0f,
-    -1.0f,  1.0f,  1.0f,
-    -1.0f, -1.0f,  1.0f,
-
-     1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
-
-    -1.0f, -1.0f,  1.0f,
-    -1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f, -1.0f,  1.0f,
-    -1.0f, -1.0f,  1.0f,
-
-    -1.0f,  1.0f, -1.0f,
-     1.0f,  1.0f, -1.0f,
-     1.0f,  1.0f,  1.0f,
-     1.0f,  1.0f,  1.0f,
-    -1.0f,  1.0f,  1.0f,
-    -1.0f,  1.0f, -1.0f,
-
-    -1.0f, -1.0f, -1.0f,
-    -1.0f, -1.0f,  1.0f,
-     1.0f, -1.0f, -1.0f,
-     1.0f, -1.0f, -1.0f,
-    -1.0f, -1.0f,  1.0f,
-     1.0f, -1.0f,  1.0f
- };
-*/
 
 // Dimensjonene til vinduet
 // const GLuint WIDTH = 800, HEIGHT = 600;
@@ -142,10 +93,8 @@ int SCREEN_WIDTH, SCREEN_HEIGHT;
 void KeyCallback( GLFWwindow *window, int key, int scancode, int action, int mode );
 void MouseCallback( GLFWwindow *window, double xPos, double yPos );
 void DoMovement( );
-
-
-void generateCubeVerticesAndSetArraysAndBuffers();
 void generateSkyBoxVerticesAndSetArraysAndBuffers();
+void generateCubeVerticesAndSetArraysAndBuffers();
 
 // Setter startposisjon til kamera
 Camera camera( glm::vec3( 1.0f, 0.0f, 3.0f ) );
@@ -180,7 +129,7 @@ GLint projLoc;
 GLint cubeTextureLoc;
 GLint cubeNormalMapLoc;
 
-GLint lightColorLoc;
+// GLint lightColorLoc;
 GLint lightPositionLoc;
 GLint viewPositionLoc;
 
@@ -191,10 +140,8 @@ GLint viewLocSkybox;
 // Uniforms values
 GLfloat lightPositionValue[] { 1.0f, -2.0f, -2.0f };
 GLfloat cameraPositionValue[] { 1.0f, 0.0f, 4.0f };
-GLfloat lightColorValue[] = {1.0f, 0.5f, 0.31f};
 
-
-
+// GLfloat lightColorValue[] = {1.0f, 0.5f, 0.31f};
 
 
 
@@ -236,7 +183,7 @@ int initGL() {
     cubeTextureLoc = glGetUniformLocation( cubeShader.Program, "cubeTexture" );
     cubeNormalMapLoc = glGetUniformLocation( cubeShader.Program, "cubeNormalMap" );
     
-    lightColorLoc = glGetUniformLocation(cubeShader.Program, "lightColor" );
+    //lightColorLoc = glGetUniformLocation(cubeShader.Program, "lightColor" );
     lightPositionLoc = glGetUniformLocation( cubeShader.Program, "lightPos" );
     viewPositionLoc = glGetUniformLocation( cubeShader.Program, "viewPos" );
     
@@ -329,7 +276,7 @@ void drawGLScene() {
         //glm::vec3 lightPositionLoc(sinf(time * 1.0f), cosf(time * 2.0f), 0.8f);
         //glUniform3f(lightPositionLoc, lightPositionValue.x, lightPositionValue.y, lightPositionValue.z);
     
-    glUniform3fv(lightColorLoc, 1, lightColorValue);
+    // glUniform3fv(lightColorLoc, 1, lightColorValue);
     glUniform3fv(lightPositionLoc, 1, lightPositionValue);
     glUniform3fv(viewPositionLoc, 1, cameraPositionValue);
     
@@ -446,13 +393,14 @@ void glfwWindowSizeCallback(GLFWwindow* window, int width, int height) {
     
 }
 
-// renders a 1x1 quad in NDC with manually calculated tangent vectors
-// ------------------------------------------------------------------
 
 void generateCubeVerticesAndSetArraysAndBuffers()
 {
+    
     if (cubeVAO == 0)
     {
+        
+
         // positions
         glm::vec3 pos1(-1.0f,  1.0f, 0.0f);
         glm::vec3 pos2(-1.0f, -1.0f, 0.0f);
@@ -465,7 +413,7 @@ void generateCubeVerticesAndSetArraysAndBuffers()
         glm::vec2 uv4(1.0f, 1.0f);
         // normal vector
         glm::vec3 nm(0.0f, 0.0f, 1.0f);
-
+        
         // calculate tangent/bitangent vectors of both triangles
         glm::vec3 tangent1, bitangent1;
         glm::vec3 tangent2, bitangent2;
@@ -519,6 +467,7 @@ void generateCubeVerticesAndSetArraysAndBuffers()
             pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
             pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z
         };
+         
         
          //Antall man ønsker å opprette, arrayen som skal benyttes.
          glGenVertexArrays( 1, &cubeVAO );
@@ -624,7 +573,6 @@ void generateSkyBoxVerticesAndSetArraysAndBuffers() {
  */
 int main(void) {
     
-    // Set error callback TODO: Fjerne???
     glfwSetErrorCallback(glfwErrorCallback);
     
     // Initialiserer GLWF og sjekker at det gikk OK

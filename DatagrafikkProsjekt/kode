@@ -1,0 +1,183 @@
+        /*
+        GLfloat cubeVertices[] =
+        {
+            // Posisjon            // Texture      // Normal
+           -0.5f, -0.5f, -0.5f,    0.0f, 0.0f,     0.0f, 0.0f, 1.0f,
+            0.5f, -0.5f, -0.5f,    1.0f, 0.0f,     0.0f, 0.0f, 1.0f,
+            0.5f,  0.5f, -0.5f,    1.0f, 1.0f,     0.0f, 0.0f, 1.0f,
+            0.5f,  0.5f, -0.5f,    1.0f, 1.0f,     0.0f, 0.0f, 1.0f,
+           -0.5f,  0.5f, -0.5f,    0.0f, 1.0f,     0.0f, 0.0f, 1.0f,
+           -0.5f, -0.5f, -0.5f,    0.0f, 0.0f,     0.0f, 0.0f, 1.0f,
+                     
+           -0.5f, -0.5f,  0.5f,    0.0f, 0.0f,     0.0f, 0.0f, -1.0f,
+            0.5f, -0.5f,  0.5f,    1.0f, 0.0f,     0.0f, 0.0f, -1.0f,
+            0.5f,  0.5f,  0.5f,    1.0f, 1.0f,     0.0f, 0.0f, -1.0f,
+            0.5f,  0.5f,  0.5f,    1.0f, 1.0f,     0.0f, 0.0f, -1.0f,
+           -0.5f,  0.5f,  0.5f,    0.0f, 1.0f,     0.0f, 0.0f, -1.0f,
+           -0.5f, -0.5f,  0.5f,    0.0f, 0.0f,     0.0f, 0.0f, -1.0f,
+                     
+            -0.5f,  0.5f,  0.5f,   1.0f, 0.0f,    -1.0f, 0.0f, 0.0f,
+            -0.5f,  0.5f, -0.5f,   1.0f, 1.0f,    -1.0f, 0.0f, 0.0f,
+            -0.5f, -0.5f, -0.5f,   0.0f, 1.0f,    -1.0f, 0.0f, 0.0f,
+            -0.5f, -0.5f, -0.5f,   0.0f, 1.0f,    -1.0f, 0.0f, 0.0f,
+            -0.5f, -0.5f,  0.5f,   0.0f, 0.0f,    -1.0f, 0.0f, 0.0f,
+            -0.5f,  0.5f,  0.5f,   1.0f, 0.0f,    -1.0f, 0.0f, 0.0f,
+
+            0.5f,  0.5f,  0.5f,    1.0f, 0.0f,     1.0f, 0.0f, 0.0f,
+            0.5f,  0.5f, -0.5f,    1.0f, 1.0f,     1.0f, 0.0f, 0.0f,
+            0.5f, -0.5f, -0.5f,    0.0f, 1.0f,     1.0f, 0.0f, 0.0f,
+            0.5f, -0.5f, -0.5f,    0.0f, 1.0f,     1.0f, 0.0f, 0.0f,
+            0.5f, -0.5f,  0.5f,    0.0f, 0.0f,     1.0f, 0.0f, 0.0f,
+            0.5f,  0.5f,  0.5f,    1.0f, 0.0f,     1.0f, 0.0f, 0.0f, - - - - - -
+
+           -0.5f, -0.5f, -0.5f,    0.0f, 1.0f,     0.0f, 1.0f, 0.0f,
+            0.5f, -0.5f, -0.5f,    1.0f, 1.0f,     0.0f, 1.0f, 0.0f,
+            0.5f, -0.5f,  0.5f,    1.0f, 0.0f,     0.0f, 1.0f, 0.0f,
+            0.5f, -0.5f,  0.5f,    1.0f, 0.0f,     0.0f, 1.0f, 0.0f,
+           -0.5f, -0.5f,  0.5f,    0.0f, 0.0f,     0.0f, 1.0f, 0.0f,
+           -0.5f, -0.5f, -0.5f,    0.0f, 1.0f,     0.0f, 1.0f, 0.0f,
+
+           -0.5f,  0.5f, -0.5f,    0.0f, 1.0f,     0.0f, -1.0f, 0.0f,
+            0.5f,  0.5f, -0.5f,    1.0f, 1.0f,     0.0f, -1.0f, 0.0f,
+            0.5f,  0.5f,  0.5f,    1.0f, 0.0f,     0.0f, -1.0f, 0.0f,
+            0.5f,  0.5f,  0.5f,    1.0f, 0.0f,     0.0f, -1.0f, 0.0f,
+           -0.5f,  0.5f,  0.5f,    0.0f, 0.0f,     0.0f, -1.0f, 0.0f,
+           -0.5f,  0.5f, -0.5f,    0.0f, 1.0f,     0.0f, -1.0f, 0.0f
+        };
+        */
+        
+        
+        // positions
+        glm::vec3 frontPos1(-0.5f, -0.5f, -0.5f);
+        glm::vec3 frontPos2( 0.5f, -0.5f, -0.5f);
+        glm::vec3 frontPos3( 0.5f,  0.5f, -0.5f);
+        glm::vec3 frontPos4( 0.5f,  0.5f, -0.5f);
+        glm::vec3 frontPos5(-0.5f,  0.5f, -0.5f);
+        glm::vec3 frontPos6(-0.5f, -0.5f, -0.5f);
+        
+        glm::vec3 backPos1(-0.5f, -0.5f,  0.5f);
+        glm::vec3 backPos2( 0.5f, -0.5f,  0.5f);
+        glm::vec3 backPos3( 0.5f,  0.5f,  0.5f);
+        glm::vec3 backPos4( 0.5f,  0.5f,  0.5f);
+        glm::vec3 backPos5(-0.5f,  0.5f,  0.5f);
+        glm::vec3 backPos6(-0.5f, -0.5f,  0.5f);
+        
+        glm::vec3 leftPos1(-0.5f,  0.5f,  0.5f);
+        glm::vec3 leftPos2(-0.5f,  0.5f, -0.5f);
+        glm::vec3 leftPos3(-0.5f, -0.5f, -0.5f);
+        glm::vec3 leftPos4(-0.5f, -0.5f, -0.5f);
+        glm::vec3 leftPos5(-0.5f, -0.5f,  0.5f);
+        glm::vec3 leftPos6(-0.5f,  0.5f,  0.5f);
+        
+        glm::vec3 rightPos1( 0.5f, -0.5f,  0.5f);
+        glm::vec3 rightPos2( 0.5f,  0.5f, -0.5f);
+        glm::vec3 rightPos3( 0.5f,  0.5f, -0.5f);
+        glm::vec3 rightPos4( 0.5f,  0.5f, -0.5f);
+        glm::vec3 rightPos5( 0.5f,  0.5f,  0.5f);
+        glm::vec3 rightPos6( 0.5f, -0.5f,  0.5f);
+        
+        glm::vec3 topPos1(-0.5f, -0.5f, -0.5f);
+        glm::vec3 topPos2( 0.5f, -0.5f, -0.5f);
+        glm::vec3 topPos3( 0.5f, -0.5f,  0.5f);
+        glm::vec3 topPos4( 0.5f, -0.5f,  0.5f);
+        glm::vec3 topPos5(-0.5f, -0.5f,  0.5f);
+        glm::vec3 topPos6(-0.5f, -0.5f, -0.5f);
+        
+        glm::vec3 bottomPos1(-0.5f, -0.5f, -0.5f);
+        glm::vec3 bottomPos2( 0.5f, -0.5f, -0.5f);
+        glm::vec3 bottomPos3( 0.5f, -0.5f,  0.5f);
+        glm::vec3 bottomPos4( 0.5f, -0.5f,  0.5f);
+        glm::vec3 bottomPos5(-0.5f, -0.5f,  0.5f);
+        glm::vec3 bottomPos6(-0.5f, -0.5f, -0.5f);
+        
+        
+        // Normal
+        glm::vec3 frontNormal1(0.0f, 0.0f, 1.0f);
+        glm::vec3 frontNormal2(0.0f, 0.0f, 1.0f);
+        glm::vec3 frontNormal3(0.0f, 0.0f, 1.0f);
+        glm::vec3 frontNormal4(0.0f, 0.0f, 1.0f);
+        glm::vec3 frontNormal5(0.0f, 0.0f, 1.0f);
+        glm::vec3 frontNormal6(0.0f, 0.0f, 1.0f);
+        
+        glm::vec3 backNormal1(0.0f, 0.0f, -1.0f);
+        glm::vec3 backNormal2(0.0f, 0.0f, -1.0f);
+        glm::vec3 backNormal3(0.0f, 0.0f, -1.0f);
+        glm::vec3 backNormal4(0.0f, 0.0f, -1.0f);
+        glm::vec3 backNormal5(0.0f, 0.0f, -1.0f);
+        glm::vec3 backNormal6(0.0f, 0.0f, -1.0f);
+        
+        glm::vec3 leftNormal1(-1.0f, 0.0f, 0.0f);
+        glm::vec3 leftNormal2(-1.0f, 0.0f, 0.0f);
+        glm::vec3 leftNormal3(-1.0f, 0.0f, 0.0f);
+        glm::vec3 leftNormal4(-1.0f, 0.0f, 0.0f);
+        glm::vec3 leftNormal5(-1.0f, 0.0f, 0.0f);
+        glm::vec3 leftNormal6(-1.0f, 0.0f, 0.0f);
+        
+        glm::vec3 rightNormal1(1.0f, 0.0f, 0.0f);
+        glm::vec3 rightNormal2(1.0f, 0.0f, 0.0f);
+        glm::vec3 rightNormal3(1.0f, 0.0f, 0.0f);
+        glm::vec3 rightNormal4(1.0f, 0.0f, 0.0f);
+        glm::vec3 rightNormal5(1.0f, 0.0f, 0.0f);
+        glm::vec3 rightNormal6(1.0f, 0.0f, 0.0f);
+        
+        glm::vec3 topNormal1(0.0f, 1.0f, 0.0f);
+        glm::vec3 topNormal2(0.0f, 1.0f, 0.0f);
+        glm::vec3 topNormal3(0.0f, 1.0f, 0.0f);
+        glm::vec3 topNormal4(0.0f, 1.0f, 0.0f);
+        glm::vec3 topNormal5(0.0f, 1.0f, 0.0f);
+        glm::vec3 topNormal6(0.0f, 1.0f, 0.0f);
+        
+        glm::vec3 bottomNormal1(0.0f, -1.0f, 0.0f);
+        glm::vec3 bottomNormal2(0.0f, -1.0f, 0.0f);
+        glm::vec3 bottomNormal3(0.0f, -1.0f, 0.0f);
+        glm::vec3 bottomNormal4(0.0f, -1.0f, 0.0f);
+        glm::vec3 bottomNormal5(0.0f, -1.0f, 0.0f);
+        glm::vec3 bottomNormal6(0.0f, -1.0f, 0.0f);
+        
+
+        // Texture
+        glm::vec2 frontTexture1(0.0f, 0.0f);
+        glm::vec2 frontTexture2(1.0f, 0.0f);
+        glm::vec2 frontTexture3(1.0f, 1.0f);
+        glm::vec2 frontTexture4(1.0f, 1.0f);
+        glm::vec2 frontTexture5(0.0f, 1.0f);
+        glm::vec2 frontTexture6(0.0f, 0.0f);
+        
+        glm::vec2 backTexture1(0.0f, 0.0f);
+        glm::vec2 backTexture2(1.0f, 0.0f);
+        glm::vec2 backTexture3(1.0f, 1.0f);
+        glm::vec2 backTexture4(1.0f, 1.0f);
+        glm::vec2 backTexture5(0.0f, 1.0f);
+        glm::vec2 backTexture6(0.0f, 0.0f);
+        
+        glm::vec2 leftTexture1(1.0f, 0.0f);
+        glm::vec2 leftTexture2(1.0f, 1.0f);
+        glm::vec2 leftTexture3(0.0f, 1.0f);
+        glm::vec2 leftTexture4(0.0f, 1.0f);
+        glm::vec2 leftTexture5(0.0f, 0.0f);
+        glm::vec2 leftTexture6(1.0f, 0.0f);
+        
+        glm::vec2 rightTexture1(1.0f, 0.0f);
+        glm::vec2 rightTexture2(1.0f, 1.0f);
+        glm::vec2 rightTexture3(0.0f, 1.0f);
+        glm::vec2 rightTexture4(0.0f, 1.0f);
+        glm::vec2 rightTexture5(0.0f, 0.0f);
+        glm::vec2 rightTexture6(1.0f, 0.0f);
+        
+        glm::vec2 topTexture1(0.0f, 1.0f);
+        glm::vec2 topTexture2(1.0f, 1.0f);
+        glm::vec2 topTexture3(1.0f, 0.0f);
+        glm::vec2 topTexture4(1.0f, 0.0f);
+        glm::vec2 topTexture5(0.0f, 0.0f);
+        glm::vec2 topTexture6(0.0f, 1.0f);
+        
+        glm::vec2 bottomTexture1(0.0f, 1.0f);
+        glm::vec2 bottomTexture2(1.0f, 1.0f);
+        glm::vec2 bottomTexture3(1.0f, 0.0f);
+        glm::vec2 bottomTexture4(1.0f, 0.0f);
+        glm::vec2 bottomTexture5(0.0f, 0.0f);
+        glm::vec2 bottomTexture6(0.0f, 1.0f);
+
+        
+        
+        

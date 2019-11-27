@@ -51,15 +51,6 @@ void main()
     TangentViewPos  = TBN * viewPos;
     TangentFragPos  = TBN * FragPos;
     
-    
-    // Set the transformed normal
-    //Normal = mat3(model) * aNormal;
-    //Normal = mat3(transpose(inverse(model))) * aNormal;
-    
-    // We assign the color to the outgoing variable.
-   //interpolatedColor = textureCoordinates;
-    
-    
     // Setter posisjonen til kuben i verden
     gl_Position = projection * view * model * vec4(cubePositions, 1.0);
     

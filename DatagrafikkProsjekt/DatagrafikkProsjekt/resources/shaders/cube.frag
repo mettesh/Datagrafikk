@@ -19,15 +19,9 @@ uniform sampler2D cubeNormalMap;
 uniform vec3 lightPos;
 uniform vec3 viewPos;
 
-
 //uniform vec3 lightColor;
 
-
-// PRØV LIGHTING-MAPS!!
-
-
-
-// Endelig farge på lys sendes ut
+// Endelig resultat som sendes ut
 out vec4 FragColor;
 
 void main()
@@ -57,7 +51,7 @@ void main()
     
     //vec3 result = (ambient + diffuse + specular)
     FragColor = vec4(ambient + diffuse + specular, 1.0);
-    
+
 }
 
 

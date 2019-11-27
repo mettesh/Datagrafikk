@@ -177,7 +177,7 @@ GLint projLocSkybox;
 GLint viewLocSkybox;
 
 // Uniforms values
-GLfloat lightPositionValue[] { 1.0f, 0.0f, 4.0f };
+GLfloat lightPositionValue[] { 1.0f, -2.0f, -2.0f };
 GLfloat cameraPositionValue[] { 1.0f, 0.0f, 4.0f };
 GLfloat lightColorValue[] = {1.0f, 0.5f, 0.31f};
 

@@ -59,6 +59,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0946B74A23914C7B0061B8F9 /* CubeTexture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CubeTexture.h; sourceTree = "<group>"; };
 		094ED67E23572460007A9B65 /* DatagrafikkProsjekt */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = DatagrafikkProsjekt; sourceTree = BUILT_PRODUCTS_DIR; };
 		094ED689235724E1007A9B65 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
 		094ED68D2357251B007A9B65 /* libglfw.3.3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libglfw.3.3.dylib; path = ../../../../../../../usr/local/Cellar/glfw/3.3/lib/libglfw.3.3.dylib; sourceTree = "<group>"; };
@@ -512,6 +513,7 @@
 				094ED813235735E3007A9B65 /* shader.h */,
 				094ED816235738F1007A9B65 /* main.cpp */,
 				09E4D85A23631E2A00415536 /* Texture.h */,
+				0946B74A23914C7B0061B8F9 /* CubeTexture.h */,
 			);
 			path = DatagrafikkProsjekt;
 			sourceTree = "<group>";

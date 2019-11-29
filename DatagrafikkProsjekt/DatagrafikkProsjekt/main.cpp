@@ -95,6 +95,7 @@ void MouseCallback( GLFWwindow *window, double xPos, double yPos );
 void DoMovement( );
 void generateSkyBoxVerticesAndSetArraysAndBuffers();
 void generateCubeVerticesAndSetArraysAndBuffers();
+unsigned int loadTexture(const char *path);
 
 // Setter startposisjon til kamera
 Camera camera( glm::vec3( 1.0f, 0.0f, 3.0f ) );
@@ -121,6 +122,7 @@ GLuint cubemapTextureValue;
 GLuint cubeTextureValue;
 GLuint cubeNormalMapValue;
 
+
 // Cube & light  Uniform locations
 GLint modelLoc;
 GLint viewLoc;
@@ -138,7 +140,7 @@ GLint projLocSkybox;
 GLint viewLocSkybox;
 
 // Uniforms values
-GLfloat lightPositionValue[] { 1.0f, -2.0f, -2.0f };
+GLfloat lightPositionValue[] { 0.5f, 1.0f, 0.3f };
 GLfloat cameraPositionValue[] { 1.0f, 0.0f, 4.0f };
 
 // GLfloat lightColorValue[] = {1.0f, 0.5f, 0.31f};
@@ -151,9 +153,7 @@ GLfloat cameraPositionValue[] { 1.0f, 0.0f, 4.0f };
 int initGL() {
     
     generateSkyBoxVerticesAndSetArraysAndBuffers();
-
     generateCubeVerticesAndSetArraysAndBuffers();
-    
     
     // Setup and compile our shaders
     cubeShader = Shader( "resources/shaders/cube.vert", "resources/shaders/cube.frag" );
@@ -218,7 +218,7 @@ void drawGLScene() {
     *
     * Tegner skyboxen:
     *
-    * * * * * * */
+     * * * * * * */;
 
         skyboxShader.Use();
         
@@ -229,6 +229,8 @@ void drawGLScene() {
         glm::mat4 viewSkyboxValue = glm::mat4( glm::mat3( camera.GetViewMatrix( ) ) );
         glUniformMatrix4fv( viewLocSkybox, 1, GL_FALSE, glm::value_ptr( viewSkyboxValue ) );
 
+
+    
         // Aktiverer vertex-arrayen for skyBox:
         glBindVertexArray( skyboxVAO );
         
@@ -273,10 +275,11 @@ void drawGLScene() {
     
     // Sender resten av lys-matrisene til cube-shaderen:
     
-        //glm::vec3 lightPositionLoc(sinf(time * 1.0f), cosf(time * 2.0f), 0.8f);
-        //glUniform3f(lightPositionLoc, lightPositionValue.x, lightPositionValue.y, lightPositionValue.z);
+    //glm::vec3 lightPositionValue(sinf(time * 1.0f), cosf(time * 2.0f), 0.8f);
+    //glUniform3f(lightPositionLoc, lightPositionValue.x, lightPositionValue.y, lightPositionValue.z);
     
     // glUniform3fv(lightColorLoc, 1, lightColorValue);
+    
     glUniform3fv(lightPositionLoc, 1, lightPositionValue);
     glUniform3fv(viewPositionLoc, 1, cameraPositionValue);
     
@@ -285,13 +288,13 @@ void drawGLScene() {
 
     // Aktiverer vertex-arrayen for kuben:
     glBindVertexArray( cubeVAO );
-       
     // Deretter tegnes trianglene:
     glDrawArrays( GL_TRIANGLES, 0, 6 );
+
+    glBindVertexArray(0);
     
     // Deaktiverer shaderprogram som brukes og vertexarray
     glUseProgram(0);
-    glBindVertexArray(0);
         
 }
 
@@ -594,6 +597,7 @@ void generateSkyBoxVerticesAndSetArraysAndBuffers() {
         glEnableVertexAttribArray(POSITION);
     }
 }
+
 
 /*
  * PROGRAMSTART

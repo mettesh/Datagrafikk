@@ -179,7 +179,7 @@ GLint viewLocSkybox;
 // Uniforms values
 GLfloat lightPositionValue[] { 1.0f, -2.0f, -2.0f };
 GLfloat cameraPositionValue[] { 1.0f, 0.0f, 4.0f };
-GLfloat lightColorValue[] = {1.0f, 0.5f, 0.31f};
+GLfloat lightColorValue[] = {1.0f, 1.0f, 1.0f};
 
 /*
  * Initialize OpenGL
@@ -312,7 +312,7 @@ void drawGLScene() {
 
     // Setter model-matrise
     glm::mat4 modelCubeValue = glm::mat4(1.0);
-    //model = glm::rotate(model, time * 0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
+    modelCubeValue = glm::rotate(modelCubeValue, time * 0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
     // Sender model-matrise til cube-shaderen:
     glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( modelCubeValue ) );
     

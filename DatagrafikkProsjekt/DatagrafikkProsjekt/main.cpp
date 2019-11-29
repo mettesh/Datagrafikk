@@ -266,8 +266,8 @@ void drawGLScene() {
     glUniformMatrix4fv( viewLoc, 1, GL_FALSE, glm::value_ptr( viewCubeValue ) );
 
     // Setter model-matrise
-    glm::mat4 modelCubeValue = glm::mat4(1.0);
-    //model = glm::rotate(model, time * 0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
+    glm::mat4 modelCubeValue = glm::mat4(1.0f);
+    //modelCubeValue = glm::rotate(modelCubeValue, time * 0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
     // Sender model-matrise til cube-shaderen:
     glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( modelCubeValue ) );
     
@@ -402,10 +402,19 @@ void generateCubeVerticesAndSetArraysAndBuffers()
         
 
         // positions
-        glm::vec3 pos1(-1.0f,  1.0f, 0.0f);
-        glm::vec3 pos2(-1.0f, -1.0f, 0.0f);
-        glm::vec3 pos3( 1.0f, -1.0f, 0.0f);
-        glm::vec3 pos4( 1.0f,  1.0f, 0.0f);
+        glm::vec3 pos1(-1.0f,  1.0f, -1.0f);
+        glm::vec3 pos2(-1.0f, -1.0f, -1.0f);
+        glm::vec3 pos3( 1.0f, -1.0f, -1.0f);
+        glm::vec3 pos4( 1.0f,  1.0f, -1.0f);
+        
+        //glm::vec3 pos5(-1.0f,  1.0f, 1.0f);
+        //glm::vec3 pos6(-1.0f, -1.0f, 1.0f);
+        //glm::vec3 pos7( 1.0f, -1.0f, 1.0f);
+        //glm::vec3 pos8( 1.0f,  1.0f, 1.0f);
+        
+        //glm::vec3 positions[8];
+        //positions[0] = glm:vec3(
+        
         // texture coordinates
         glm::vec2 uv1(0.0f, 1.0f);
         glm::vec2 uv2(0.0f, 0.0f);
@@ -414,11 +423,30 @@ void generateCubeVerticesAndSetArraysAndBuffers()
         // normal vector
         glm::vec3 nm(0.0f, 0.0f, 1.0f);
         
+        //glm::vec3 nm2(0.0f, 0.0f, -1.0f);
+        //glm::vec3 nm3(-1.0f, 0.0f, 0.0f);
+        //glm::vec3 nm4(1.0f, 0.0f, 0.0f);
+        //glm::vec3 nm5(0.0f, -1.0f, 0.0f);
+        //glm::vec3 nm6(0.0f, 1.0f, 0.0f);
+                                
+        // Sette på alle kantene i riktig rekkefølge!
+        //int indices[] = {0,1,2,3,2,3,4,5,4, . . . . . .}
+        
+        //for (int face =0; face<indices.length(); faces+=4)?  // Kjører løkke 4 om gangen
+          //  positions[face*4+0]
+          //  positions[face*4+0]
+        
+        // For hver side (alle 6) gjør jeg utregninger og oppretter bittangent og tangents!
+                                
         // calculate tangent/bitangent vectors of both triangles
         glm::vec3 tangent1, bitangent1;
         glm::vec3 tangent2, bitangent2;
+        
+        
+        
         // triangle 1
         // ----------
+        // Kalkulerer kanter og UV-koordinater til den første trekanten
         glm::vec3 edge1 = pos2 - pos1;
         glm::vec3 edge2 = pos3 - pos1;
         glm::vec2 deltaUV1 = uv2 - uv1;
@@ -457,6 +485,7 @@ void generateCubeVerticesAndSetArraysAndBuffers()
         bitangent2 = glm::normalize(bitangent2);
 
 
+        // Gjenbruker 2 av punktene!
         GLfloat cubeVertices[] = {
             // positions            // normal         // texcoords  // tangent                          // bitangent
             pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,

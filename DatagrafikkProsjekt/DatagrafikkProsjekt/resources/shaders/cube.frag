@@ -10,8 +10,7 @@ in vec3 TangentViewPos;
 in vec3 TangentFragPos;
 
 
-
-// Henter inn cube-texturen
+// Henter inn texture og normal-texture
 uniform sampler2D cubeTexture;
 uniform sampler2D cubeNormalMap;
 

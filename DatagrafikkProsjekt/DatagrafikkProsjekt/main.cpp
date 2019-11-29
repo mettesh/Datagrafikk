@@ -275,12 +275,10 @@ void drawGLScene() {
     
     // Sender resten av lys-matrisene til cube-shaderen:
     
-    //glm::vec3 lightPositionValue(sinf(time * 1.0f), cosf(time * 2.0f), 0.8f);
-    //glUniform3f(lightPositionLoc, lightPositionValue.x, lightPositionValue.y, lightPositionValue.z);
+    glm::vec3 lightPositionValue(sinf(time * 1.0f), cosf(time * 2.0f), 0.8f);
+    glUniform3f(lightPositionLoc, lightPositionValue.x, lightPositionValue.y, lightPositionValue.z);
     
-    // glUniform3fv(lightColorLoc, 1, lightColorValue);
-    
-    glUniform3fv(lightPositionLoc, 1, lightPositionValue);
+    //glUniform3fv(lightPositionLoc, 1, lightPositionValue);
     glUniform3fv(viewPositionLoc, 1, cameraPositionValue);
     
     

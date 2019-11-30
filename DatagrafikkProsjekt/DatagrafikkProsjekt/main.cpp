@@ -289,7 +289,7 @@ void drawGLScene() {
     sphereShader.Use();
 
     // Set the view matrix
-    glm::mat4 viewSphereValue = glm::mat4(1.0f);
+    glm::mat4 viewSphereValue = camera.GetViewMatrix();
     viewSphereValue = glm::translate(viewSphereValue, glm::vec3(-cameraPositionValue[0], -cameraPositionValue[1], -cameraPositionValue[2]));
     
     glUniformMatrix4fv( viewSphereLoc, 1, GL_FALSE, glm::value_ptr( viewSphereValue ) );
@@ -297,13 +297,13 @@ void drawGLScene() {
 
     // Set the model matrix
     glm::mat4 modelSphereValue = glm::mat4(1.0);
-    modelSphereValue = glm::rotate(modelSphereValue, (float)glfwGetTime() * 0.3f, glm::vec3(0.0f, 1.0f,  0.0f));
+    //modelSphereValue = glm::rotate(modelSphereValue, (float)glfwGetTime() * 0.3f, glm::vec3(0.0f, 1.0f,  0.0f));
     glUniformMatrix4fv( modelSphereLoc, 1, GL_FALSE, glm::value_ptr( modelSphereValue ) );
 
     // Set the remaining uniforms
     
     glm::vec3 lightPositionSphereValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
-    glUniform3f(lightPositionLoc, lightPositionValue.x, lightPositionValue.y, lightPositionValue.z);
+    glUniform3f(lightPositionLoc, lightPositionSphereValue.x, lightPositionSphereValue.y, lightPositionSphereValue.z);
     
     //glUniform3fv(lightPositionLoc, 1, lightPositionValue);
     //glUniform3fv(viewPositionLoc, 1, cameraPositionValue);
@@ -343,6 +343,11 @@ void resizeGL(int width, int height) {
     cubeShader.Use();
     glm::mat4 projectionCubeValue = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 100.0f);
     glUniformMatrix4fv( projLoc, 1, GL_FALSE, glm::value_ptr( projectionCubeValue ) );
+    
+    sphereShader.Use();
+    glm::mat4 projectionSphereValue = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 1000.0f);
+    glUniformMatrix4fv( projSphereLoc, 1, GL_FALSE, glm::value_ptr( projectionSphereValue ) );
+       
     
     skyboxShader.Use();
     glm::mat4 projectionSkyboxValue = glm::perspective(camera.GetZoom(), (float)width/height, 0.1f, 1000.0f );

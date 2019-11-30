@@ -3,11 +3,12 @@
 // Incoming vertex position, Model Space.
 layout (location = 0) in vec3 position;
 
+
 // Incoming vertex color.
 layout (location = 1) in vec3 normal;
 
 // Incoming normal
-layout (location = 2) in vec2 uv;
+layout (location = 2) in vec2 textureCoord;
 
 // Projection, view and model matrices.
 uniform mat4 proj;
@@ -15,7 +16,7 @@ uniform mat4 view;
 uniform mat4 model;
 
 // Output variables
-out vec2 UV;
+out vec2 TextureCoordinates;
 out vec3 N;
 out vec3 worldVertex;
 
@@ -31,6 +32,6 @@ void main() {
     N = mat3(model) * normal;
 
     // We assign the uv to the outgoing variable.
-    UV = uv;
+    TextureCoordinates = textureCoord;
 
 }

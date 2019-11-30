@@ -275,19 +275,17 @@ void drawGLScene() {
     
     // Sender resten av lys-matrisene til cube-shaderen:
     
-    glm::vec3 lightPositionValue(sinf(time * 1.0f), cosf(time * 2.0f), 0.8f);
+    glm::vec3 lightPositionValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
     glUniform3f(lightPositionLoc, lightPositionValue.x, lightPositionValue.y, lightPositionValue.z);
     
     //glUniform3fv(lightPositionLoc, 1, lightPositionValue);
     glUniform3fv(viewPositionLoc, 1, cameraPositionValue);
     
-    
-    
 
     // Aktiverer vertex-arrayen for kuben:
     glBindVertexArray( cubeVAO );
     // Deretter tegnes trianglene:
-    glDrawArrays( GL_TRIANGLES, 0, 6 );
+    glDrawArrays( GL_TRIANGLES, 0, 36 );
 
     glBindVertexArray(0);
     
@@ -397,199 +395,160 @@ void glfwWindowSizeCallback(GLFWwindow* window, int width, int height) {
 
 void generateCubeVerticesAndSetArraysAndBuffers()
 {
+    // Punktene som tilsammen bygger kuben
+    glm::vec3 positions[8];
+    positions[0] = glm::vec3(-1.0f,  1.0f, -1.0f);
+    positions[1] = glm::vec3(-1.0f, -1.0f, -1.0f);
+    positions[2] = glm::vec3( 1.0f, -1.0f, -1.0f);
+    positions[3] = glm::vec3( 1.0f,  1.0f, -1.0f);
+    positions[4] = glm::vec3(-1.0f,  1.0f, 1.0f);
+    positions[5] = glm::vec3(-1.0f, -1.0f, 1.0f);
+    positions[6] = glm::vec3( 1.0f, -1.0f, 1.0f);
+    positions[7] = glm::vec3( 1.0f,  1.0f, 1.0f);
     
-    if (cubeVAO == 0)
-    {
-        
+    
+    // Texture-koordinater. SAmme for hver side
+    glm::vec2 uv1(0.0f, 1.0f);
+    glm::vec2 uv2(0.0f, 0.0f);
+    glm::vec2 uv3(1.0f, 0.0f);
+    glm::vec2 uv4(1.0f, 1.0f);
+    
+    // Normal-koordinater. En per side
+    glm::vec3 normals[8];
+     normals[0] = glm::vec3( 0.0f, 0.0f, 1.0f);
+     normals[1] = glm::vec3( 0.0f, 0.0f,-1.0f);
+     normals[2] = glm::vec3(-1.0f, 0.0f, 0.0f);
+     normals[3] = glm::vec3( 1.0f, 0.0f, 0.0f);
+     normals[4] = glm::vec3( 0.0f,-1.0f, 0.0f);
+     normals[5] = glm::vec3( 0.0f, 1.0f, 0.0f);
 
-        // positions
-        //glm::vec3 pos1(-1.0f,  1.0f, -1.0f);
-        //glm::vec3 pos2(-1.0f, -1.0f, -1.0f);
-        //glm::vec3 pos3( 1.0f, -1.0f, -1.0f);
-        //glm::vec3 pos4( 1.0f,  1.0f, -1.0f);
+                            
+    // For å sette opp kantene i riktig rekkefølge!
+    int indices[] = {0,1,2,3,1,5,6,2,4,5,1,0,4,5,6,7,3,2,6,7,0,4,7,3};
+    
+    // Teller for å styre hvilken normal som skal brukes til en side
+    int sideCounter = 0;
+    
+    // Deklarerer en vector som skal holde på de ferdige verdiene til kuben
+    std::vector<GLfloat> cubeVertices;
+    
+    // Deklarer vec3 som skal holde på de 4 ulike posisjons-punktene til hver side
+    glm::vec3 pos1, pos2, pos3, pos4;
+    
+    // Deklarerer vec3 som skal holde på normalen til hver side
+    glm::vec3 nm;
+    
+    // Deklarerer vec3 som skal holde på tangent og bittangent for hver side
+    glm::vec3 tangent1, bitangent1;
+    glm::vec3 tangent2, bitangent2;
+     
+    // Løkka kjører 6 ganger - en gang for hver side.
+    for (int face = 0; face < 24; face = face + 4){
         
-        //glm::vec3 pos5(-1.0f,  1.0f, 1.0f);
-        //glm::vec3 pos6(-1.0f, -1.0f, 1.0f);
-        //glm::vec3 pos7( 1.0f, -1.0f, 1.0f);
-        //glm::vec3 pos8( 1.0f,  1.0f, 1.0f);
+        // Henter ut de korrektene posisjons-koordinatene for denne siden
+        pos1 = positions[indices[face]];
+        pos2 = positions[indices[face + 1]];
+        pos3 = positions[indices[face + 2]];
+        pos4 = positions[indices[face + 3]];
         
-        glm::vec3 pos1, pos2, pos3, pos4;
-        glm::vec3 nm;
-        glm::vec3 tangent1, bitangent1;
-        glm::vec3 tangent2, bitangent2;
-        
-        glm::vec3 positions[8];
-        positions[0] = glm::vec3(-1.0f,  1.0f, -1.0f);
-        positions[1] = glm::vec3(-1.0f, -1.0f, -1.0f);
-        positions[2] = glm::vec3( 1.0f, -1.0f, -1.0f);
-        positions[3] = glm::vec3( 1.0f,  1.0f, -1.0f);
-        
-        positions[4] = glm::vec3(-1.0f,  1.0f, 1.0f);
-        positions[5] = glm::vec3(-1.0f, -1.0f, 1.0f);
-        positions[6] = glm::vec3( 1.0f, -1.0f, 1.0f);
-        positions[7] = glm::vec3( 1.0f,  1.0f, 1.0f);
-        
-        
-        // texture coordinates  // Kan gjenbrukes som før
-        glm::vec2 uv1(0.0f, 1.0f);
-        glm::vec2 uv2(0.0f, 0.0f);
-        glm::vec2 uv3(1.0f, 0.0f);
-        glm::vec2 uv4(1.0f, 1.0f);
-        
-        // normal vector   // En til hver side
-        //glm::vec3 nm(0.0f, 0.0f, 1.0f);
-        //glm::vec3 nm2(0.0f, 0.0f, -1.0f);
-        //glm::vec3 nm3(-1.0f, 0.0f, 0.0f);
-        //glm::vec3 nm4(1.0f, 0.0f, 0.0f);
-        //glm::vec3 nm5(0.0f, -1.0f, 0.0f);
-        //glm::vec3 nm6(0.0f, 1.0f, 0.0f);
-        
-        glm::vec3 normals[8];
-         normals[0] = glm::vec3( 0.0f, 0.0f, 1.0f);
-         normals[1] = glm::vec3( 0.0f, 0.0f,-1.0f);
-         normals[2] = glm::vec3(-1.0f, 0.0f, 0.0f);
-         normals[3] = glm::vec3( 1.0f, 0.0f, 0.0f);
-         normals[4] = glm::vec3( 0.0f,-1.0f, 0.0f);
-         normals[5] = glm::vec3( 0.0f, 1.0f, 0.0f);
-
+        // Henter ut korrekt normal-verdi for denne siden
+        nm = normals[sideCounter];
+        // plusser på en slik at neste normal-verdi blir valgt for neste side
+        sideCounter++;
                                 
-        // Sette på alle kantene i riktig rekkefølge!
-        int indices[] = {0,1,2,3,1,5,6,2,4,5,1,0,4,5,6,7,3,2,6,7,0,4,7,3};
+    
+        /* Kalkulerer verdier for 1. trekant til denne siden */
+        glm::vec3 edge1 = pos2 - pos1;
+        glm::vec3 edge2 = pos3 - pos1;
+        glm::vec2 deltaUV1 = uv2 - uv1;
+        glm::vec2 deltaUV2 = uv3 - uv1;
+
+        GLfloat f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+        tangent1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+        tangent1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+        tangent1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+        tangent1 = glm::normalize(tangent1);
+
+        bitangent1.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+        bitangent1.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+        bitangent1.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+        bitangent1 = glm::normalize(bitangent1);
+
         
-        int normalCounter = 0;
+        /* Kalkulerer verdier for 2. trekant til denne siden */
+        edge1 = pos3 - pos1;
+        edge2 = pos4 - pos1;
+        deltaUV1 = uv3 - uv1;
+        deltaUV2 = uv4 - uv1;
+
+        f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+        tangent2.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+        tangent2.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+        tangent2.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+        tangent2 = glm::normalize(tangent2);
+
+
+        bitangent2.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+        bitangent2.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+        bitangent2.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+        bitangent2 = glm::normalize(bitangent2);
         
-        // Holdr av plass til den ferdig array med vertices
-        //GLfloat cubeVertices[504];
         
-        std::vector<GLfloat> cubeVertices;
-        //GLfloat oneSideVertices[84];
+        // Har nå alt for å bygge en side. Legger dette til i en midlertidig array
+        std::vector<GLfloat> oneSideVertices = {
+            // positions            // normal         // texcoords  // tangent                          // bitangent
+            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+            pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+
+            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+            pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z
+        };
         
-        int face = 0;
-         
-        for (face = 0; face < 24; face = face + 4){ // Kjører løkke 4 om gangen. ($ punkter per side!)
-            
-            pos1 = positions[indices[face]];
-            
-            printf("runde %i", face);
-            
-            
-            pos2 = positions[indices[face + 1]];
-            pos3 = positions[indices[face + 2]];
-            pos4 = positions[indices[face + 3]];
-            
-            
-            nm = normals[normalCounter];
-            normalCounter++;
-                                    
-        
-            // triangle 1
-            // ----------
-            // Kalkulerer kanter og UV-koordinater til den første trekanten
-            glm::vec3 edge1 = pos2 - pos1;
-            glm::vec3 edge2 = pos3 - pos1;
-            glm::vec2 deltaUV1 = uv2 - uv1;
-            glm::vec2 deltaUV2 = uv3 - uv1;
-
-            GLfloat f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-            tangent1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
-            tangent1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
-            tangent1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
-            tangent1 = glm::normalize(tangent1);
-
-            bitangent1.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
-            bitangent1.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
-            bitangent1.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
-            bitangent1 = glm::normalize(bitangent1);
-
-            // triangle 2
-            // ----------
-            edge1 = pos3 - pos1;
-            edge2 = pos4 - pos1;
-            deltaUV1 = uv3 - uv1;
-            deltaUV2 = uv4 - uv1;
-
-            f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-            tangent2.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
-            tangent2.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
-            tangent2.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
-            tangent2 = glm::normalize(tangent2);
-
-
-            bitangent2.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
-            bitangent2.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
-            bitangent2.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
-            bitangent2 = glm::normalize(bitangent2);
-            
-            
-            // Har alt til en side. Kan legge til
-
-
-            std::vector<GLfloat> oneSideVertices = {
-                // positions            // normal         // texcoords  // tangent                          // bitangent
-                pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-                pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-                pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-
-                pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
-                pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
-                pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z
-            };
-            
-            
-            //std::copy(oneSideVertices.be, oneSideVertices.begin() + 4, cubeVertices.begin() + face);
-            
-            //std::copy(oneSideVertices.glBegin(), oneSideVertices.glBegin() + 84, cubeVertices.glBegin() + (84 * face));
-            
-            
-            //std::copy(std::begin(oneSideVertices), std::end(oneSideVertices), std::end(cubeVertices));
-            for(int i = 0; i < 84; i++){
-                printf("Legger til %i", i);
-                cubeVertices.push_back(oneSideVertices[i]);
-            }
-            
-            oneSideVertices.clear();
-            
-            
-            printf("Arrayer nå %i ", cubeVertices.size());
-            
-            //memcpy(cubeVertices, oneSideVertices, 504*sizeof(GLfloat));
-            
-            
+        // Appender den ferdige siden til cubeVertices
+        for(int i = 0; i < 84; i++){
+            cubeVertices.push_back(oneSideVertices[i]);
         }
         
+        // Frigjør minnet. TODO: Må denne gjøres?
+        oneSideVertices.clear();
+        
+    }
     
 
-         
-        
-         //Antall man ønsker å opprette, arrayen som skal benyttes.
-         glGenVertexArrays( 1, &cubeVAO );
-         //Forteller OpenGL hvilken vertex-array som skal brukes.
-         glBindVertexArray( cubeVAO );
-         
-         //Antall man ønsker å opprette, arrayen som skal benyttes.
-         glGenBuffers( 1, &cubeVBO );
-         //Forteller OpenGL at dette er current bufferen som skal brukes (Skal bufferen modifiseres senere er det denne som skal endres)
-         glBindBuffer( GL_ARRAY_BUFFER, cubeVBO );
-         
 
-         glBufferData( GL_ARRAY_BUFFER, 6 * 14 * 6 * sizeof( GL_FLOAT ), cubeVertices.data(), GL_STATIC_DRAW );
-         
-         glVertexAttribPointer(POSITION, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (GLvoid*)0);
-         glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (GLvoid*)(3 * sizeof(GLfloat)));
-         glVertexAttribPointer(COLOR, 2, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (const void*)(6 * sizeof(GLfloat)));
-         glVertexAttribPointer(TANGENT, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (const void*)(8 * sizeof(GLfloat)));
-         glVertexAttribPointer(BITANGENT, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (const void*)(11 * sizeof(GLfloat)));
-         
-         // Aktivere attributtene
-         glEnableVertexAttribArray(POSITION);
-         glEnableVertexAttribArray(COLOR);
-         glEnableVertexAttribArray(NORMAL);
-         glEnableVertexAttribArray(TANGENT);
-         glEnableVertexAttribArray(BITANGENT);
-   
-    }
+     
+    
+     //Antall man ønsker å opprette, arrayen som skal benyttes.
+     glGenVertexArrays( 1, &cubeVAO );
+     //Forteller OpenGL hvilken vertex-array som skal brukes.
+     glBindVertexArray( cubeVAO );
+     
+     //Antall man ønsker å opprette, arrayen som skal benyttes.
+     glGenBuffers( 1, &cubeVBO );
+     //Forteller OpenGL at dette er current bufferen som skal brukes (Skal bufferen modifiseres senere er det denne som skal endres)
+     glBindBuffer( GL_ARRAY_BUFFER, cubeVBO );
+     
+
+     glBufferData( GL_ARRAY_BUFFER, 6 * 14 * 6 * sizeof( GL_FLOAT ), cubeVertices.data(), GL_STATIC_DRAW );
+     
+     glVertexAttribPointer(POSITION, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (GLvoid*)0);
+     glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (GLvoid*)(3 * sizeof(GLfloat)));
+     glVertexAttribPointer(COLOR, 2, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (const void*)(6 * sizeof(GLfloat)));
+     glVertexAttribPointer(TANGENT, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (const void*)(8 * sizeof(GLfloat)));
+     glVertexAttribPointer(BITANGENT, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (const void*)(11 * sizeof(GLfloat)));
+     
+     // Aktivere attributtene
+     glEnableVertexAttribArray(POSITION);
+     glEnableVertexAttribArray(COLOR);
+     glEnableVertexAttribArray(NORMAL);
+     glEnableVertexAttribArray(TANGENT);
+     glEnableVertexAttribArray(BITANGENT);
+
+
 }
 
 void generateSkyBoxVerticesAndSetArraysAndBuffers() {

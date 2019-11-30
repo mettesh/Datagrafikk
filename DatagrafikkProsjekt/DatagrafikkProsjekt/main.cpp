@@ -35,6 +35,12 @@
 #define MATERIAL 3
 #define CAMERA 4
 
+
+#define VERTICES 0
+#define SPHEREPOSITION 0
+#define SPHERENORMAL 1
+#define SPHEREUV 2
+
 // Dimensjonene til vinduet
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
@@ -45,6 +51,7 @@ void DoMovement( );
 void generateSkyBoxVerticesAndSetArraysAndBuffers();
 void generateCubeVerticesAndSetArraysAndBuffers();
 unsigned int loadTexture(const char *path);
+void createSphere();
 
 // Setter startposisjon til kamera
 Camera camera( glm::vec3( 1.0f, 0.0f, 3.0f ) );
@@ -60,22 +67,33 @@ GLfloat lastFrame = 0.0f;
 
 // Vertex-array og buffer -object for KUBE og SKYBOX
 GLuint cubeVAO, cubeVBO;
+GLuint sphereVAO, sphereVBO;
 GLuint skyboxVAO, skyboxVBO;
 
 // Shadere
 Shader cubeShader;
+Shader sphereShader;
 Shader skyboxShader;
 
 // Textures
 GLuint cubemapTextureValue;
 GLuint cubeTextureValue;
 GLuint cubeNormalMapValue;
+GLuint sphereTextureValue;
 
 
 // Cube & light  Uniform locations
 GLint modelLoc;
 GLint viewLoc;
 GLint projLoc;
+
+GLint modelSphereLoc;
+GLint viewSphereLoc;
+GLint projSphereLoc;
+GLint sphereTextureLoc;
+
+GLint lightPositionSphereLoc;
+GLint viewPositionSphereLoc;
 
 GLint cubeTextureLoc;
 GLint cubeNormalMapLoc;
@@ -92,6 +110,11 @@ GLint viewLocSkybox;
 GLfloat lightPositionValue[] { 0.5f, 1.0f, 0.3f };
 GLfloat cameraPositionValue[] { 1.0f, 0.0f, 4.0f };
 
+// Global variables to store the index data and the number of indices in
+// the generated sphere
+GLushort *indexData;
+int numIndices;
+
 /*
  * Initialize OpenGL
  */
@@ -100,13 +123,19 @@ int initGL() {
     generateSkyBoxVerticesAndSetArraysAndBuffers();
     generateCubeVerticesAndSetArraysAndBuffers();
     
+
+    createSphere();
+    
     // Setup and compile our shaders
     cubeShader = Shader( "resources/shaders/cube.vert", "resources/shaders/cube.frag" );
+    sphereShader = Shader( "resources/shaders/sphere.vert", "resources/shaders/sphere.frag" );
     skyboxShader = Shader( "resources/shaders/skybox.vert", "resources/shaders/skybox.frag" );
 
     //Laste inn texture til kuben:
     cubeTextureValue = TextureLoading::LoadTexture("resources/img/cube/texture.jpg");
     cubeNormalMapValue = TextureLoading::LoadTexture("resources/img/cube/texture_normal.jpg");
+    
+    sphereTextureValue = TextureLoading::LoadTexture("resources/img/cube/ice.jpg");
     
     //Laste inn texture til skyboxen:
     std::vector<const GLchar*> skyBoxTextureFaces;
@@ -131,6 +160,19 @@ int initGL() {
     //lightColorLoc = glGetUniformLocation(cubeShader.Program, "lightColor" );
     lightPositionLoc = glGetUniformLocation( cubeShader.Program, "lightPos" );
     viewPositionLoc = glGetUniformLocation( cubeShader.Program, "viewPos" );
+    
+    
+
+    sphereShader.Use();
+    viewSphereLoc = glGetUniformLocation( sphereShader.Program, "view" );
+    projSphereLoc = glGetUniformLocation( sphereShader.Program, "proj" );
+    modelSphereLoc = glGetUniformLocation( sphereShader.Program, "model" );
+    
+    
+    lightPositionSphereLoc = glGetUniformLocation( sphereShader.Program, "lightPos" );
+    viewPositionSphereLoc = glGetUniformLocation( sphereShader.Program, "viewPos" );
+    
+    sphereTextureLoc = glGetUniformLocation( sphereShader.Program, "sphereTexture" );
     
     
     // Henter inn uniform-loactions fra skybox-shader
@@ -236,6 +278,59 @@ void drawGLScene() {
     
     // Deaktiverer shaderprogram som brukes og vertexarray
     glUseProgram(0);
+    
+    
+    /* * * * * * *
+    *
+    * Tegner Sphere
+    *
+    * * * * * * */
+    
+    sphereShader.Use();
+
+    // Set the view matrix
+    glm::mat4 viewSphereValue = glm::mat4(1.0f);
+    viewSphereValue = glm::translate(viewSphereValue, glm::vec3(-cameraPositionValue[0], -cameraPositionValue[1], -cameraPositionValue[2]));
+    
+    glUniformMatrix4fv( viewSphereLoc, 1, GL_FALSE, glm::value_ptr( viewSphereValue ) );
+    
+
+    // Set the model matrix
+    glm::mat4 modelSphereValue = glm::mat4(1.0);
+    modelSphereValue = glm::rotate(modelSphereValue, (float)glfwGetTime() * 0.3f, glm::vec3(0.0f, 1.0f,  0.0f));
+    glUniformMatrix4fv( modelSphereLoc, 1, GL_FALSE, glm::value_ptr( modelSphereValue ) );
+
+    // Set the remaining uniforms
+    
+    glm::vec3 lightPositionSphereValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
+    glUniform3f(lightPositionLoc, lightPositionValue.x, lightPositionValue.y, lightPositionValue.z);
+    
+    //glUniform3fv(lightPositionLoc, 1, lightPositionValue);
+    //glUniform3fv(viewPositionLoc, 1, cameraPositionValue);
+
+    // Bind the vertex array and texture of the sphere
+    glActiveTexture( GL_TEXTURE0 );
+    glUniform1i(sphereTextureLoc , 0);
+    glBindTexture( GL_TEXTURE_2D, sphereTextureValue );
+    
+    
+    
+    glBindVertexArray( sphereVAO );
+    
+    
+    // Draw the vertex array
+    glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, indexData);
+
+    // Disable vertex array and texture
+    glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    // Disable
+    glUseProgram(0);
+
+    
+    
+    
         
 }
 
@@ -337,6 +432,113 @@ void glfwWindowSizeCallback(GLFWwindow* window, int width, int height) {
     
 }
 
+void createSphere() {
+
+    float radius = 2.3;
+    int numH = 6;
+    int numV = 3;
+    
+    // Variables needed for the calculations
+    float pi = glm::pi<float>();
+    float pi2 = pi * 2.0f;
+    float d1 = pi / numV;
+    float d2 = pi2 / numH;
+
+    // Allocate the data needed to store the necessary positions, normals and texture coordinates
+    int numVertices = numH*(numV-1)+2;
+    int numPer = (3+3+2);
+    std::vector<GLfloat> vertexData(numVertices * numPer);
+
+    // Create the top vertex
+    vertexData[0] = 0.0f; vertexData[1] = radius; vertexData[2] = 0.0f;
+    vertexData[3] = 0.0f; vertexData[4] = 1.0f; vertexData[5] = 0.0f;
+    vertexData[6] = 0.5f; vertexData[7] = 1.0f;
+
+    // Loop through the divisions along the vertical axis
+    for (int i=0; i<numV-1; ++i) {
+        // Loop through the divisions along the horizontal axis
+        for (int j=0; j<numH; ++j) {
+            // Calculate the variables needed for this iteration
+            int base = (i * numH + j + 1) * numPer;
+            float t1 = d1 * (i + 1);
+            float t2 = d2 * j;
+            // Position (like given in lecture)
+            vertexData[base] = radius * glm::sin(t2) * glm::sin(t1);
+            vertexData[base+1] = radius * glm::cos(t1);
+            vertexData[base+2] = radius * glm::cos(t2) * glm::sin(t1);
+            // Normal (the same as position except unit length)
+            vertexData[base+3] = glm::sin(t2) * glm::sin(t1);
+            vertexData[base+4] = glm::cos(t1);
+            vertexData[base+5] = glm::cos(t2)*glm::sin(t1);
+            // UV
+            vertexData[base+6] = glm::asin(vertexData[base+3]) / pi + 0.5f;
+            vertexData[base+7] = glm::asin(vertexData[base+4]) / pi + 0.5f;
+        }
+    }
+
+    // Create the bottom vertex
+    vertexData[(numVertices-1)*numPer] = 0.0f; vertexData[(numVertices-1)*numPer+1] = -radius; vertexData[(numVertices-1)*numPer+2] = 0.0f;
+    vertexData[(numVertices-1)*numPer+3] = 0.0f; vertexData[(numVertices-1)*numPer+4] = -1.0f; vertexData[(numVertices-1)*numPer+5] = 0.0f;
+    vertexData[(numVertices-1)*numPer+6] = 0.5f; vertexData[(numVertices-1)*numPer+7] = 0.0f;
+
+    // Allocate the data needed to store the indices
+    int numTriangles = (numH*(numV-1)*2);
+    numIndices = numTriangles * 3;
+    indexData = (GLushort *)malloc(numIndices * sizeof(GLushort));
+
+    // Create the triangles for the top
+    for (int j=0; j<numH; j++) {
+        indexData[j*3] = 0;
+        indexData[j*3+1] = (GLushort)(j+1);
+        indexData[j*3+2] = (GLushort)((j+1)%numH+1);
+    }
+    // Loop through the segment circles
+    for (int i=0; i<numV-2; ++i) {
+        for (int j=0; j<numH; ++j) {
+            indexData[((i*numH+j)*2+numH)*3] = (GLushort)(i*numH+j+1);
+            indexData[((i*numH+j)*2+numH)*3+1] = (GLushort)((i+1)*numH+j+1);
+            indexData[((i*numH+j)*2+numH)*3+2] = (GLushort)((i+1)*numH+(j+1)%numH+1);
+
+            indexData[((i*numH+j)*2+numH)*3+3] = (GLushort)((i+1)*numH+(j+1)%numH+1);
+            indexData[((i*numH+j)*2+numH)*3+4] = (GLushort)(i*numH+(j+1)%numH+1);
+            indexData[((i*numH+j)*2+numH)*3+5] = (GLushort)(i*numH+j+1);
+        }
+    }
+    // Create the triangles for the bottom
+    int triIndex = (numTriangles-numH);
+    int vertIndex = (numV-2)*numH+1;
+    for (short i=0; i<numH; i++) {
+        indexData[(triIndex+i)*3] = (GLushort)(vertIndex+i);
+        indexData[(triIndex+i)*3+1] = (GLushort)((numH*(numV-1)+1));
+        indexData[(triIndex+i)*3+2] = (GLushort)(vertIndex+(i+1)%numH);
+    }
+
+    
+    //Antall man ønsker å opprette, arrayen som skal benyttes.
+    glGenVertexArrays( 1, &sphereVAO );
+    //Forteller OpenGL hvilken vertex-array som skal brukes.
+    glBindVertexArray( sphereVAO );
+    
+    //Antall man ønsker å opprette, arrayen som skal benyttes.
+    glGenBuffers( 1, &sphereVBO );
+    //Forteller OpenGL at dette er current bufferen som skal brukes (Skal bufferen modifiseres senere er det denne som skal endres)
+    glBindBuffer( GL_ARRAY_BUFFER, sphereVBO );
+    
+    glBufferData(GL_ARRAY_BUFFER, numVertices * numPer * sizeof(GLfloat), &vertexData[0], GL_STATIC_DRAW);
+ 
+
+    glVertexAttribPointer(SPHEREPOSITION, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), 0); // 3.0
+    glVertexAttribPointer(SPHERENORMAL, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (void *)(3 * sizeof(GL_FLOAT))); // 3.0
+    glVertexAttribPointer(SPHEREUV, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (void *)(6 * sizeof(GL_FLOAT))); // 3.0
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    // Enable the attributes
+    glEnableVertexAttribArray(SPHEREPOSITION); // 2.0
+    glEnableVertexAttribArray(SPHERENORMAL);
+    glEnableVertexAttribArray(SPHEREUV);
+
+    glBindVertexArray(0);
+}
 
 void generateCubeVerticesAndSetArraysAndBuffers()
 {

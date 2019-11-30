@@ -526,7 +526,7 @@ void generateCubeVerticesAndSetArraysAndBuffers()
             // Har alt til en side. Kan legge til
 
 
-            GLfloat oneSideVertices[] = {
+            std::vector<GLfloat> oneSideVertices = {
                 // positions            // normal         // texcoords  // tangent                          // bitangent
                 pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
                 pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
@@ -545,8 +545,14 @@ void generateCubeVerticesAndSetArraysAndBuffers()
             
             //std::copy(std::begin(oneSideVertices), std::end(oneSideVertices), std::end(cubeVertices));
             for(int i = 0; i < 84; i++){
+                printf("Legger til %i", i);
                 cubeVertices.push_back(oneSideVertices[i]);
             }
+            
+            oneSideVertices.clear();
+            
+            
+            printf("Arrayer nå %i ", cubeVertices.size());
             
             //memcpy(cubeVertices, oneSideVertices, 504*sizeof(GLfloat));
             

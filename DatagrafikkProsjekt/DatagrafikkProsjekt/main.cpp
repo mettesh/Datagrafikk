@@ -287,7 +287,7 @@ void drawGLScene() {
     // Aktiverer vertex-arrayen for kuben:
     glBindVertexArray( cubeVAO );
     // Deretter tegnes trianglene:
-    glDrawArrays( GL_TRIANGLES, 0, 6 );
+    glDrawArrays( GL_TRIANGLES, 0, 36 );
 
     glBindVertexArray(0);
     
@@ -419,11 +419,13 @@ void generateCubeVerticesAndSetArraysAndBuffers()
         glm::vec3 nm;
         glm::vec3 nmTop, nmBottom, nmLeft, nmRight, nmBack, nmFront;
         
-        glm::vec3 tangentTop1, tangentBottom1, tangentLeft1, tangentRight1, tangentLeft1, tangentBack1, tangentFront1;
-        glm::vec3 tangentTop2, tangentBottom2, tangentLeft2, tangentRight2, tangentLeft2, tangentBack2, tangentFront2;
+        glm::vec3 tangentTop1, tangentBottom1, tangentLeft1, tangentRight1, tangentBack1, tangentFront1;
+        glm::vec3 tangentTop2, tangentBottom2, tangentLeft2, tangentRight2, tangentBack2, tangentFront2;
         
-        glm::vec3 bitangentTop1, bitangentBottom1, bitangentLeft1, bitangentRight1, bitangentLeft1, bitangentBack1, bitangentFront1;
-         glm::vec3 tangentTop2, bitangentBottom2, bitangentLeft2, bitangentRight2, bitangentLeft2, bitangentBack2, bitangentFront2;
+        glm::vec3 bitangentTop1, bitangentBottom1, bitangentLeft1, bitangentRight1, bitangentBack1, bitangentFront1;
+        glm::vec3 bitangentTop2, bitangentBottom2, bitangentLeft2, bitangentRight2, bitangentBack2, bitangentFront2;
+        
+        GLfloat f;
         
         
         glm::vec3 edge1;
@@ -489,6 +491,9 @@ void generateCubeVerticesAndSetArraysAndBuffers()
             {
                 case 1: // code to be executed if n = 1;
                     
+                    
+                    printf("case 1", 2);
+                    
                     posTop1 = pos1;
                     posTop2 = pos2;
                     posTop3 = pos3;
@@ -504,7 +509,7 @@ void generateCubeVerticesAndSetArraysAndBuffers()
                     deltaUV1 = uv2 - uv1;
                     deltaUV2 = uv3 - uv1;
 
-                    GLfloat f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+                    f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
 
                     tangentTop1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
                     tangentTop1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
@@ -540,6 +545,7 @@ void generateCubeVerticesAndSetArraysAndBuffers()
                     
                 case 2:
 
+                    printf("case 2", 2);
                     
                     posBottom1 = pos1;
                     posBottom2 = pos2;
@@ -553,7 +559,7 @@ void generateCubeVerticesAndSetArraysAndBuffers()
                     deltaUV1 = uv2 - uv1;
                     deltaUV2 = uv3 - uv1;
 
-                    GLfloat f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+                    f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
 
                     tangentBottom1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
                     tangentBottom1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
@@ -589,6 +595,8 @@ void generateCubeVerticesAndSetArraysAndBuffers()
                     
                 case 3:
                     
+                    printf("case 3", 2);
+                    
                     posLeft1 = pos1;
                     posLeft2 = pos2;
                     posLeft3 = pos3;
@@ -601,7 +609,7 @@ void generateCubeVerticesAndSetArraysAndBuffers()
                     deltaUV1 = uv2 - uv1;
                     deltaUV2 = uv3 - uv1;
 
-                    GLfloat f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+                    f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
 
                     tangentLeft1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
                     tangentLeft1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
@@ -637,6 +645,8 @@ void generateCubeVerticesAndSetArraysAndBuffers()
                     
                 case 4:
                     
+                    printf("case 4", 2);
+                    
                     posRight1 = pos1;
                     posRight2 = pos2;
                     posRight3 = pos3;
@@ -649,7 +659,7 @@ void generateCubeVerticesAndSetArraysAndBuffers()
                     deltaUV1 = uv2 - uv1;
                     deltaUV2 = uv3 - uv1;
 
-                    GLfloat f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+                    f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
 
                     tangentRight1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
                     tangentRight1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
@@ -687,6 +697,8 @@ void generateCubeVerticesAndSetArraysAndBuffers()
                     
                 case 5:
                     
+                    printf("case 5", 2);
+                    
                     posBack1 = pos1;
                     posBack2 = pos2;
                     posBack3 = pos3;
@@ -699,7 +711,7 @@ void generateCubeVerticesAndSetArraysAndBuffers()
                     deltaUV1 = uv2 - uv1;
                     deltaUV2 = uv3 - uv1;
 
-                    GLfloat f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+                    f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
 
                     tangentBack1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
                     tangentBack1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
@@ -735,6 +747,8 @@ void generateCubeVerticesAndSetArraysAndBuffers()
                     
                 case 6:
                     
+                    printf("case 6", 2);
+                    
                     posFront1 = pos1;
                     posFront2 = pos2;
                     posFront3 = pos3;
@@ -747,7 +761,7 @@ void generateCubeVerticesAndSetArraysAndBuffers()
                     deltaUV1 = uv2 - uv1;
                     deltaUV2 = uv3 - uv1;
 
-                    GLfloat f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+                    f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
 
                     tangentFront1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
                     tangentFront1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
@@ -782,6 +796,7 @@ void generateCubeVerticesAndSetArraysAndBuffers()
                     break;
                     
                 default: // code to be executed if n doesn't match any cases
+                    printf("Hei", 2);
             }
             
 
@@ -789,10 +804,29 @@ void generateCubeVerticesAndSetArraysAndBuffers()
         }
         
         
-        GLfloat cubeVertices = {
+        GLfloat cubeVertices[] = {
+            
+            
+            posLeft1.x, posLeft1.y, posLeft1.z, nmLeft.x, nmLeft.y, nmLeft.z, uv1.x, uv1.y, tangentLeft1.x, tangentLeft1.y, tangentLeft1.z, bitangentLeft1.x, bitangentLeft1.y, bitangentLeft1.z,
+              posLeft2.x, posLeft2.y, posLeft2.z, nmLeft.x, nmLeft.y, nmLeft.z, uv2.x, uv2.y, tangentLeft1.x, tangentLeft1.y, tangentLeft1.z, bitangentLeft1.x, bitangentLeft1.y, bitangentLeft1.z,
+              posLeft3.x, posLeft3.y, posLeft3.z, nmLeft.x, nmLeft.y, nm.z, uv3.x, uv3.y, tangentLeft1.x, tangentLeft1.y, tangentLeft1.z, bitangentLeft1.x, bitangentLeft1.y, bitangentLeft1.z,
+
+              posLeft1.x, posLeft1.y, posLeft1.z, nmLeft.x, nmLeft.y, nmLeft.z, uv1.x, uv1.y, tangentLeft2.x, tangentLeft2.y, tangentLeft2.z, bitangentLeft2.x, bitangentLeft2.y, bitangentLeft2.z,
+              posLeft3.x, posLeft3.y, posLeft3.z, nmLeft.x, nmLeft.y, nmLeft.z, uv3.x, uv3.y, tangentLeft2.x, tangentLeft2.y, tangentLeft2.z, bitangentLeft2.x, bitangentLeft2.y, bitangentLeft2.z,
+              posLeft4.x, posLeft4.y, posLeft4.z, nmLeft.x, nmLeft.y, nmLeft.z, uv4.x, uv4.y, tangentLeft2.x, tangentLeft2.y, tangentLeft2.z, bitangentLeft2.x, bitangentLeft2.y, bitangentLeft2.z,
+            
+            posBottom1.x, posBottom1.y, posBottom1.z, nmBottom.x, nmBottom.y, nmBottom.z, uv1.x, uv1.y, tangentBottom1.x, tangentBottom1.y, tangentBottom1.z, bitangentBottom1.x, bitangentBottom1.y, bitangentBottom1.z,
+             posBottom2.x, posBottom2.y, posBottom2.z, nmBottom.x, nmBottom.y, nmBottom.z, uv2.x, uv2.y, tangentBottom1.x, tangentBottom1.y, tangentBottom1.z, bitangentBottom1.x, bitangentBottom1.y, bitangentBottom1.z,
+             posBottom3.x, posBottom3.y, posBottom3.z, nmBottom.x, nmBottom.y, nm.z, uv3.x, uv3.y, tangentBottom1.x, tangentBottom1.y, tangentBottom1.z, bitangentBottom1.x, bitangentBottom1.y, bitangentBottom1.z,
+
+             posBottom1.x, posBottom1.y, posBottom1.z, nmBottom.x, nmBottom.y, nmBottom.z, uv1.x, uv1.y, tangentBottom2.x, tangentBottom2.y, tangentBottom2.z, bitangentBottom2.x, bitangentBottom2.y, bitangentBottom2.z,
+             posBottom3.x, posBottom3.y, posBottom3.z, nmBottom.x, nmBottom.y, nmBottom.z, uv3.x, uv3.y, tangentBottom2.x, tangentBottom2.y, tangentBottom2.z, bitangentBottom2.x, bitangentBottom2.y, bitangentBottom2.z,
+             posBottom4.x, posBottom4.y, posBottom4.z, nmBottom.x, nmBottom.y, nmBottom.z, uv4.x, uv4.y, tangentBottom2.x, tangentBottom2.y, tangentBottom2.z, bitangentBottom2.x, bitangentBottom2.y, bitangentBottom2.z,
+            
+            
             // positions            // normal         // texcoords  // tangent                          // bitangent
             posTop1.x, posTop1.y, posTop1.z, nmTop.x, nmTop.y, nmTop.z, uv1.x, uv1.y, tangentTop1.x, tangentTop1.y, tangentTop1.z, bitangentTop1.x, bitangentTop1.y, bitangentTop1.z,
-            posTop2.x, posTop2.y, posTop2.z, nmTop.x, nmTop.y, nmTop.z, uv2.x, uv2.y, tangentTop1.x, tangentTop1.y, tangentTop1.z, bitangentTop1.x, bitangentTop1.y, bitangent1.z,
+            posTop2.x, posTop2.y, posTop2.z, nmTop.x, nmTop.y, nmTop.z, uv2.x, uv2.y, tangentTop1.x, tangentTop1.y, tangentTop1.z, bitangentTop1.x, bitangentTop1.y, bitangentTop1.z,
             posTop3.x, posTop3.y, posTop3.z, nmTop.x, nmTop.y, nm.z, uv3.x, uv3.y, tangentTop1.x, tangentTop1.y, tangentTop1.z, bitangentTop1.x, bitangentTop1.y, bitangentTop1.z,
 
             posTop1.x, posTop1.y, posTop1.z, nmTop.x, nmTop.y, nmTop.z, uv1.x, uv1.y, tangentTop2.x, tangentTop2.y, tangentTop2.z, bitangentTop2.x, bitangentTop2.y, bitangentTop2.z,
@@ -801,56 +835,47 @@ void generateCubeVerticesAndSetArraysAndBuffers()
             
             
             
-            // positions            // normal         // texcoords  // tangent                          // bitangent
-            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-            pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
 
-            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
-            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
-            pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+             
             
             
-            // positions            // normal         // texcoords  // tangent                          // bitangent
-            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-            pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+ 
+             
+            
+            
+            posRight1.x, posRight1.y, posRight1.z, nmRight.x, nmRight.y, nmRight.z, uv1.x, uv1.y, tangentRight1.x, tangentRight1.y, tangentRight1.z, bitangentRight1.x, bitangentRight1.y, bitangentRight1.z,
+             posRight2.x, posRight2.y, posRight2.z, nmRight.x, nmRight.y, nmRight.z, uv2.x, uv2.y, tangentRight1.x, tangentRight1.y, tangentRight1.z, bitangentRight1.x, bitangentRight1.y, bitangentRight1.z,
+             posRight3.x, posRight3.y, posRight3.z, nmRight.x, nmRight.y, nm.z, uv3.x, uv3.y, tangentRight1.x, tangentRight1.y, tangentRight1.z, bitangentRight1.x, bitangentRight1.y, bitangentRight1.z,
 
-            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
-            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
-            pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+             posRight1.x, posRight1.y, posRight1.z, nmRight.x, nmRight.y, nmRight.z, uv1.x, uv1.y, tangentRight2.x, tangentRight2.y, tangentRight2.z, bitangentRight2.x, bitangentRight2.y, bitangentRight2.z,
+             posRight3.x, posRight3.y, posRight3.z, nmRight.x, nmRight.y, nmRight.z, uv3.x, uv3.y, tangentRight2.x, tangentRight2.y, tangentRight2.z, bitangentRight2.x, bitangentRight2.y, bitangentRight2.z,
+             posRight4.x, posRight4.y, posRight4.z, nmRight.x, nmRight.y, nmRight.z, uv4.x, uv4.y, tangentRight2.x, tangentRight2.y, tangentRight2.z, bitangentRight2.x, bitangentRight2.y, bitangentRight2.z,
+             
             
             
             
-            // positions            // normal         // texcoords  // tangent                          // bitangent
-            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-            pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+            posBack1.x, posBack1.y, posBack1.z, nmBack.x, nmBack.y, nmBack.z, uv1.x, uv1.y, tangentBack1.x, tangentBack1.y, tangentBack1.z, bitangentBack1.x, bitangentBack1.y, bitangentBack1.z,
+             posBack2.x, posBack2.y, posBack2.z, nmBack.x, nmBack.y, nmBack.z, uv2.x, uv2.y, tangentBack1.x, tangentBack1.y, tangentBack1.z, bitangentBack1.x, bitangentBack1.y, bitangentBack1.z,
+             posBack3.x, posBack3.y, posBack3.z, nmBack.x, nmBack.y, nm.z, uv3.x, uv3.y, tangentBack1.x, tangentBack1.y, tangentBack1.z, bitangentBack1.x, bitangentBack1.y, bitangentBack1.z,
 
-            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
-            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
-            pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+             posBack1.x, posBack1.y, posBack1.z, nmBack.x, nmBack.y, nmBack.z, uv1.x, uv1.y, tangentBack2.x, tangentBack2.y, tangentBack2.z, bitangentBack2.x, bitangentBack2.y, bitangentBack2.z,
+             posBack3.x, posBack3.y, posBack3.z, nmBack.x, nmBack.y, nmBack.z, uv3.x, uv3.y, tangentBack2.x, tangentBack2.y, tangentBack2.z, bitangentBack2.x, bitangentBack2.y, bitangentBack2.z,
+             posBack4.x, posBack4.y, posBack4.z, nmBack.x, nmBack.y, nmBack.z, uv4.x, uv4.y, tangentBack2.x, tangentBack2.y, tangentBack2.z, bitangentBack2.x, bitangentBack2.y, bitangentBack2.z,
+             
             
             
-            
-            // positions            // normal         // texcoords  // tangent                          // bitangent
-            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-            pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+            posFront1.x, posFront1.y, posFront1.z, nmFront.x, nmFront.y, nmFront.z, uv1.x, uv1.y, tangentFront1.x, tangentFront1.y, tangentFront1.z, bitangentFront1.x, bitangentFront1.y, bitangentFront1.z,
+             posFront2.x, posFront2.y, posFront2.z, nmFront.x, nmFront.y, nmFront.z, uv2.x, uv2.y, tangentFront1.x, tangentFront1.y, tangentFront1.z, bitangentFront1.x, bitangentFront1.y, bitangentFront1.z,
+             posFront3.x, posFront3.y, posFront3.z, nmFront.x, nmFront.y, nm.z, uv3.x, uv3.y, tangentFront1.x, tangentFront1.y, tangentFront1.z, bitangentFront1.x, bitangentFront1.y, bitangentFront1.z,
 
-            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
-            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
-            pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+             posFront1.x, posFront1.y, posFront1.z, nmFront.x, nmFront.y, nmFront.z, uv1.x, uv1.y, tangentFront2.x, tangentFront2.y, tangentFront2.z, bitangentFront2.x, bitangentFront2.y, bitangentFront2.z,
+             posFront3.x, posFront3.y, posFront3.z, nmFront.x, nmFront.y, nmFront.z, uv3.x, uv3.y, tangentFront2.x, tangentFront2.y, tangentFront2.z, bitangentFront2.x, bitangentFront2.y, bitangentFront2.z,
+             posFront4.x, posFront4.y, posFront4.z, nmFront.x, nmFront.y, nmFront.z, uv4.x, uv4.y, tangentFront2.x, tangentFront2.y, tangentFront2.z, bitangentFront2.x, bitangentFront2.y, bitangentFront2.z
+             
             
             
-            // positions            // normal         // texcoords  // tangent                          // bitangent
-            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-            pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-
-            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
-            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
-            pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z
+            
+            
         };
         
     

@@ -414,9 +414,22 @@ void generateCubeVerticesAndSetArraysAndBuffers()
         //glm::vec3 pos8( 1.0f,  1.0f, 1.0f);
         
         glm::vec3 pos1, pos2, pos3, pos4;
+        glm::vec3 posTop1, posTop2, posTop3, posTop4, posBottom1, posBottom2, posBottom3, posBottom4, posLeft1, posLeft2, posLeft3, posLeft4, posRight1, posRight2, posRight3, posRight4, posBack1, posBack2, posBack3, posBack4, posFront1, posFront2, posFront3, posFront4;
+        
         glm::vec3 nm;
-        glm::vec3 tangent1, bitangent1;
-        glm::vec3 tangent2, bitangent2;
+        glm::vec3 nmTop, nmBottom, nmLeft, nmRight, nmBack, nmFront;
+        
+        glm::vec3 tangentTop1, tangentBottom1, tangentLeft1, tangentRight1, tangentLeft1, tangentBack1, tangentFront1;
+        glm::vec3 tangentTop2, tangentBottom2, tangentLeft2, tangentRight2, tangentLeft2, tangentBack2, tangentFront2;
+        
+        glm::vec3 bitangentTop1, bitangentBottom1, bitangentLeft1, bitangentRight1, bitangentLeft1, bitangentBack1, bitangentFront1;
+         glm::vec3 tangentTop2, bitangentBottom2, bitangentLeft2, bitangentRight2, bitangentLeft2, bitangentBack2, bitangentFront2;
+        
+        
+        glm::vec3 edge1;
+        glm::vec3 edge2;
+        glm::vec2 deltaUV1;
+        glm::vec2 deltaUV2;
         
         glm::vec3 positions[8];
         positions[0] = glm::vec3(-1.0f,  1.0f, -1.0f);
@@ -456,108 +469,389 @@ void generateCubeVerticesAndSetArraysAndBuffers()
         // Sette på alle kantene i riktig rekkefølge!
         int indices[] = {0,1,2,3,1,5,6,2,4,5,1,0,4,5,6,7,3,2,6,7,0,4,7,3};
         
-        int normalCounter = 0;
+        int sideCounter = 0;
         
-        // Holdr av plass til den ferdig array med vertices
-        //GLfloat cubeVertices[504];
-        
-        std::vector<GLfloat> cubeVertices;
-        //GLfloat oneSideVertices[84];
         
         int face = 0;
          
         for (face = 0; face < 24; face = face + 4){ // Kjører løkke 4 om gangen. ($ punkter per side!)
             
             pos1 = positions[indices[face]];
-            
-            printf("runde %i", face);
-            
-            
             pos2 = positions[indices[face + 1]];
             pos3 = positions[indices[face + 2]];
             pos4 = positions[indices[face + 3]];
             
             
-            nm = normals[normalCounter];
-            normalCounter++;
-                                    
-        
-            // triangle 1
-            // ----------
-            // Kalkulerer kanter og UV-koordinater til den første trekanten
-            glm::vec3 edge1 = pos2 - pos1;
-            glm::vec3 edge2 = pos3 - pos1;
-            glm::vec2 deltaUV1 = uv2 - uv1;
-            glm::vec2 deltaUV2 = uv3 - uv1;
-
-            GLfloat f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-            tangent1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
-            tangent1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
-            tangent1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
-            tangent1 = glm::normalize(tangent1);
-
-            bitangent1.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
-            bitangent1.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
-            bitangent1.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
-            bitangent1 = glm::normalize(bitangent1);
-
-            // triangle 2
-            // ----------
-            edge1 = pos3 - pos1;
-            edge2 = pos4 - pos1;
-            deltaUV1 = uv3 - uv1;
-            deltaUV2 = uv4 - uv1;
-
-            f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-            tangent2.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
-            tangent2.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
-            tangent2.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
-            tangent2 = glm::normalize(tangent2);
-
-
-            bitangent2.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
-            bitangent2.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
-            bitangent2.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
-            bitangent2 = glm::normalize(bitangent2);
+            nm = normals[sideCounter];
+            sideCounter++;
             
-            
-            // Har alt til en side. Kan legge til
+            switch (sideCounter)
+            {
+                case 1: // code to be executed if n = 1;
+                    
+                    posTop1 = pos1;
+                    posTop2 = pos2;
+                    posTop3 = pos3;
+                    posTop4 = pos4;
+                    
+                    nmTop = nm;
+
+                    // triangle 1
+                    // ----------
+                    // Kalkulerer kanter og UV-koordinater til den første trekanten
+                    edge1 = posTop2 - posTop1;
+                    edge2 = posTop3 - posTop1;
+                    deltaUV1 = uv2 - uv1;
+                    deltaUV2 = uv3 - uv1;
+
+                    GLfloat f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+                    tangentTop1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+                    tangentTop1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+                    tangentTop1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+                    tangentTop1 = glm::normalize(tangentTop1);
+
+                    bitangentTop1.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+                    bitangentTop1.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+                    bitangentTop1.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+                    bitangentTop1 = glm::normalize(bitangentTop1);
+
+                    // triangle 2
+                    // ----------
+                    edge1 = posTop3 - posTop1;
+                    edge2 = posTop4 - posTop1;
+                    deltaUV1 = uv3 - uv1;
+                    deltaUV2 = uv4 - uv1;
+
+                    f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+                    tangentTop2.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+                    tangentTop2.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+                    tangentTop2.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+                    tangentTop2 = glm::normalize(tangentTop2);
 
 
-            std::vector<GLfloat> oneSideVertices = {
-                // positions            // normal         // texcoords  // tangent                          // bitangent
-                pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-                pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-                pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+                    bitangentTop2.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+                    bitangentTop2.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+                    bitangentTop2.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+                    bitangentTop2 = glm::normalize(bitangentTop2);
+                    
+                    break;
+                    
+                case 2:
 
-                pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
-                pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
-                pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z
-            };
-            
-            
-            //std::copy(oneSideVertices.be, oneSideVertices.begin() + 4, cubeVertices.begin() + face);
-            
-            //std::copy(oneSideVertices.glBegin(), oneSideVertices.glBegin() + 84, cubeVertices.glBegin() + (84 * face));
-            
-            
-            //std::copy(std::begin(oneSideVertices), std::end(oneSideVertices), std::end(cubeVertices));
-            for(int i = 0; i < 84; i++){
-                printf("Legger til %i", i);
-                cubeVertices.push_back(oneSideVertices[i]);
+                    
+                    posBottom1 = pos1;
+                    posBottom2 = pos2;
+                    posBottom3 = pos3;
+                    posBottom4 = pos4;
+                    
+                    nmBottom = nm;
+                    
+                    edge1 = posBottom2 - posBottom1;
+                    edge2 = posBottom3 - posBottom1;
+                    deltaUV1 = uv2 - uv1;
+                    deltaUV2 = uv3 - uv1;
+
+                    GLfloat f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+                    tangentBottom1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+                    tangentBottom1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+                    tangentBottom1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+                    tangentBottom1 = glm::normalize(tangentBottom1);
+
+                    bitangentBottom1.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+                    bitangentBottom1.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+                    bitangentBottom1.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+                    bitangentBottom1 = glm::normalize(bitangentBottom1);
+
+                    // triangle 2
+                    // ----------
+                    edge1 = posBottom3 - posBottom1;
+                    edge2 = posBottom4 - posBottom1;
+                    deltaUV1 = uv3 - uv1;
+                    deltaUV2 = uv4 - uv1;
+
+                    f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+                    tangentBottom2.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+                    tangentBottom2.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+                    tangentBottom2.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+                    tangentBottom2 = glm::normalize(tangentBottom2);
+
+
+                    bitangentBottom2.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+                    bitangentBottom2.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+                    bitangentBottom2.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+                    bitangentBottom2 = glm::normalize(bitangentBottom2);
+                    
+                    break;
+                    
+                case 3:
+                    
+                    posLeft1 = pos1;
+                    posLeft2 = pos2;
+                    posLeft3 = pos3;
+                    posLeft4 = pos4;
+                    
+                    nmLeft = nm;
+                    
+                    edge1 = posLeft2 - posLeft1;
+                    edge2 = posLeft3 - posLeft1;
+                    deltaUV1 = uv2 - uv1;
+                    deltaUV2 = uv3 - uv1;
+
+                    GLfloat f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+                    tangentLeft1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+                    tangentLeft1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+                    tangentLeft1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+                    tangentLeft1 = glm::normalize(tangentLeft1);
+
+                    bitangentLeft1.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+                    bitangentLeft1.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+                    bitangentLeft1.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+                    bitangentLeft1 = glm::normalize(bitangentLeft1);
+
+                    // triangle 2
+                    // ----------
+                    edge1 = posLeft3 - posLeft1;
+                    edge2 = posLeft4 - posLeft1;
+                    deltaUV1 = uv3 - uv1;
+                    deltaUV2 = uv4 - uv1;
+
+                    f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+                    tangentLeft2.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+                    tangentLeft2.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+                    tangentLeft2.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+                    tangentLeft2 = glm::normalize(tangentLeft2);
+
+
+                    bitangentLeft2.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+                    bitangentLeft2.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+                    bitangentLeft2.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+                    bitangentLeft2 = glm::normalize(bitangentLeft2);
+                    
+                    break;
+                    
+                case 4:
+                    
+                    posRight1 = pos1;
+                    posRight2 = pos2;
+                    posRight3 = pos3;
+                    posRight4 = pos4;
+                    
+                    nmRight = nm;
+                    
+                    edge1 = posRight2 - posRight1;
+                    edge2 = posRight3 - posRight1;
+                    deltaUV1 = uv2 - uv1;
+                    deltaUV2 = uv3 - uv1;
+
+                    GLfloat f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+                    tangentRight1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+                    tangentRight1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+                    tangentRight1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+                    tangentRight1 = glm::normalize(tangentRight1);
+
+                    bitangentRight1.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+                    bitangentRight1.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+                    bitangentRight1.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+                    bitangentRight1 = glm::normalize(bitangentRight1);
+
+                    // triangle 2
+                    // ----------
+                    edge1 = posRight3 - posRight1;
+                    edge2 = posRight4 - posRight1;
+                    deltaUV1 = uv3 - uv1;
+                    deltaUV2 = uv4 - uv1;
+
+                    f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+                    tangentRight2.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+                    tangentRight2.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+                    tangentRight2.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+                    tangentRight2 = glm::normalize(tangentRight2);
+
+
+                    bitangentRight2.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+                    bitangentRight2.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+                    bitangentRight2.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+                    bitangentRight2 = glm::normalize(bitangentRight2);
+                    
+                    break;
+                    
+
+                    
+                case 5:
+                    
+                    posBack1 = pos1;
+                    posBack2 = pos2;
+                    posBack3 = pos3;
+                    posBack4 = pos4;
+                    
+                    nmBack = nm;
+                    
+                    edge1 = posBack2 - posBack1;
+                    edge2 = posBack3 - posBack1;
+                    deltaUV1 = uv2 - uv1;
+                    deltaUV2 = uv3 - uv1;
+
+                    GLfloat f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+                    tangentBack1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+                    tangentBack1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+                    tangentBack1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+                    tangentBack1 = glm::normalize(tangentBack1);
+
+                    bitangentBack1.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+                    bitangentBack1.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+                    bitangentBack1.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+                    bitangentBack1 = glm::normalize(bitangentBack1);
+
+                    // triangle 2
+                    // ----------
+                    edge1 = posBack3 - posBack1;
+                    edge2 = posBack4 - posBack1;
+                    deltaUV1 = uv3 - uv1;
+                    deltaUV2 = uv4 - uv1;
+
+                    f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+                    tangentBack2.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+                    tangentBack2.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+                    tangentBack2.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+                    tangentBack2 = glm::normalize(tangentBack2);
+
+
+                    bitangentBack2.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+                    bitangentBack2.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+                    bitangentBack2.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+                    bitangentBack2 = glm::normalize(bitangentBack2);
+                    
+                    break;
+                    
+                case 6:
+                    
+                    posFront1 = pos1;
+                    posFront2 = pos2;
+                    posFront3 = pos3;
+                    posFront4 = pos4;
+                    
+                    nmFront = nm;
+                    
+                    edge1 = posFront2 - posFront1;
+                    edge2 = posFront3 - posFront1;
+                    deltaUV1 = uv2 - uv1;
+                    deltaUV2 = uv3 - uv1;
+
+                    GLfloat f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+                    tangentFront1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+                    tangentFront1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+                    tangentFront1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+                    tangentFront1 = glm::normalize(tangentFront1);
+
+                    bitangentFront1.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+                    bitangentFront1.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+                    bitangentFront1.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+                    bitangentFront1 = glm::normalize(bitangentFront1);
+
+                    // triangle 2
+                    // ----------
+                    edge1 = posFront3 - posFront1;
+                    edge2 = posFront4 - posFront1;
+                    deltaUV1 = uv3 - uv1;
+                    deltaUV2 = uv4 - uv1;
+
+                    f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+                    tangentFront2.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+                    tangentFront2.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+                    tangentFront2.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+                    tangentFront2 = glm::normalize(tangentFront2);
+
+
+                    bitangentFront2.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+                    bitangentFront2.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+                    bitangentFront2.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+                    bitangentFront2 = glm::normalize(bitangentFront2);
+                    
+                    break;
+                    
+                default: // code to be executed if n doesn't match any cases
             }
             
-            oneSideVertices.clear();
-            
-            
-            printf("Arrayer nå %i ", cubeVertices.size());
-            
-            //memcpy(cubeVertices, oneSideVertices, 504*sizeof(GLfloat));
-            
+
             
         }
+        
+        
+        GLfloat cubeVertices = {
+            // positions            // normal         // texcoords  // tangent                          // bitangent
+            posTop1.x, posTop1.y, posTop1.z, nmTop.x, nmTop.y, nmTop.z, uv1.x, uv1.y, tangentTop1.x, tangentTop1.y, tangentTop1.z, bitangentTop1.x, bitangentTop1.y, bitangentTop1.z,
+            posTop2.x, posTop2.y, posTop2.z, nmTop.x, nmTop.y, nmTop.z, uv2.x, uv2.y, tangentTop1.x, tangentTop1.y, tangentTop1.z, bitangentTop1.x, bitangentTop1.y, bitangent1.z,
+            posTop3.x, posTop3.y, posTop3.z, nmTop.x, nmTop.y, nm.z, uv3.x, uv3.y, tangentTop1.x, tangentTop1.y, tangentTop1.z, bitangentTop1.x, bitangentTop1.y, bitangentTop1.z,
+
+            posTop1.x, posTop1.y, posTop1.z, nmTop.x, nmTop.y, nmTop.z, uv1.x, uv1.y, tangentTop2.x, tangentTop2.y, tangentTop2.z, bitangentTop2.x, bitangentTop2.y, bitangentTop2.z,
+            posTop3.x, posTop3.y, posTop3.z, nmTop.x, nmTop.y, nmTop.z, uv3.x, uv3.y, tangentTop2.x, tangentTop2.y, tangentTop2.z, bitangentTop2.x, bitangentTop2.y, bitangentTop2.z,
+            posTop4.x, posTop4.y, posTop4.z, nmTop.x, nmTop.y, nmTop.z, uv4.x, uv4.y, tangentTop2.x, tangentTop2.y, tangentTop2.z, bitangentTop2.x, bitangentTop2.y, bitangentTop2.z,
+            
+            
+            
+            // positions            // normal         // texcoords  // tangent                          // bitangent
+            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+            pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+
+            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+            pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+            
+            
+            // positions            // normal         // texcoords  // tangent                          // bitangent
+            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+            pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+
+            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+            pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+            
+            
+            
+            // positions            // normal         // texcoords  // tangent                          // bitangent
+            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+            pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+
+            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+            pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+            
+            
+            
+            // positions            // normal         // texcoords  // tangent                          // bitangent
+            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+            pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+
+            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+            pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+            
+            
+            // positions            // normal         // texcoords  // tangent                          // bitangent
+            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+            pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+
+            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+            pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z
+        };
         
     
 
@@ -574,7 +868,7 @@ void generateCubeVerticesAndSetArraysAndBuffers()
          glBindBuffer( GL_ARRAY_BUFFER, cubeVBO );
          
 
-         glBufferData( GL_ARRAY_BUFFER, 6 * 14 * 6 * sizeof( GL_FLOAT ), cubeVertices.data(), GL_STATIC_DRAW );
+         glBufferData( GL_ARRAY_BUFFER, 6 * 14 * 6 * sizeof( GL_FLOAT ), cubeVertices, GL_STATIC_DRAW );
          
          glVertexAttribPointer(POSITION, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (GLvoid*)0);
          glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (GLvoid*)(3 * sizeof(GLfloat)));

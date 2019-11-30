@@ -135,7 +135,7 @@ int initGL() {
     cubeTextureValue = TextureLoading::LoadTexture("resources/img/cube/texture.jpg");
     cubeNormalMapValue = TextureLoading::LoadTexture("resources/img/cube/texture_normal.jpg");
     
-    sphereTextureValue = TextureLoading::LoadTexture("resources/img/cube/ice.jpg");
+    sphereTextureValue = TextureLoading::LoadTexture("resources/img/cube/grill.jpg");
     
     //Laste inn texture til skyboxen:
     std::vector<const GLchar*> skyBoxTextureFaces;
@@ -268,7 +268,6 @@ void drawGLScene() {
     //glUniform3fv(lightPositionLoc, 1, lightPositionValue);
     glUniform3fv(viewPositionLoc, 1, cameraPositionValue);
      
-
     // Aktiverer vertex-arrayen for kuben:
     glBindVertexArray( cubeVAO );
     // Deretter tegnes trianglene:
@@ -288,9 +287,15 @@ void drawGLScene() {
     
     sphereShader.Use();
 
+    // Bind the vertex array and texture of the sphere
+    glActiveTexture( GL_TEXTURE0 );
+    glUniform1i(sphereTextureLoc , 0);
+    glBindTexture( GL_TEXTURE_2D, sphereTextureValue );
+    
+
     // Set the view matrix
     glm::mat4 viewSphereValue = camera.GetViewMatrix();
-    viewSphereValue = glm::translate(viewSphereValue, glm::vec3(-cameraPositionValue[0], -cameraPositionValue[1], -cameraPositionValue[2]));
+    //viewSphereValue = glm::translate(viewSphereValue, glm::vec3(-cameraPositionValue[0], -cameraPositionValue[1], -cameraPositionValue[2]));
     
     glUniformMatrix4fv( viewSphereLoc, 1, GL_FALSE, glm::value_ptr( viewSphereValue ) );
     
@@ -305,14 +310,8 @@ void drawGLScene() {
     glm::vec3 lightPositionSphereValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
     glUniform3f(lightPositionLoc, lightPositionSphereValue.x, lightPositionSphereValue.y, lightPositionSphereValue.z);
     
-    //glUniform3fv(lightPositionLoc, 1, lightPositionValue);
-    //glUniform3fv(viewPositionLoc, 1, cameraPositionValue);
-
-    // Bind the vertex array and texture of the sphere
-    glActiveTexture( GL_TEXTURE0 );
-    glUniform1i(sphereTextureLoc , 0);
-    glBindTexture( GL_TEXTURE_2D, sphereTextureValue );
     
+    glUniform3fv(viewPositionSphereLoc, 1, cameraPositionValue);
     
     
     glBindVertexArray( sphereVAO );
@@ -347,7 +346,6 @@ void resizeGL(int width, int height) {
     sphereShader.Use();
     glm::mat4 projectionSphereValue = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 1000.0f);
     glUniformMatrix4fv( projSphereLoc, 1, GL_FALSE, glm::value_ptr( projectionSphereValue ) );
-       
     
     skyboxShader.Use();
     glm::mat4 projectionSkyboxValue = glm::perspective(camera.GetZoom(), (float)width/height, 0.1f, 1000.0f );
@@ -439,9 +437,9 @@ void glfwWindowSizeCallback(GLFWwindow* window, int width, int height) {
 
 void createSphere() {
 
-    float radius = 2.3;
-    int numH = 6;
-    int numV = 3;
+    float radius = 20;
+    int numH = 10;
+    int numV = 10;
     
     // Variables needed for the calculations
     float pi = glm::pi<float>();

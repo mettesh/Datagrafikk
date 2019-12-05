@@ -18,8 +18,7 @@
 #define DEFAULT_WIDTH 1024
 #define DEFAULT_HEIGHT 768
 
-// Vertex Buffer Identifiers
-#define VERTICES 0
+
 
 // Vertex Array attributes
 #define POSITION 0
@@ -35,11 +34,9 @@
 #define MATERIAL 3
 #define CAMERA 4
 
-
-#define VERTICES 0
 #define SPHEREPOSITION 0
 #define SPHERENORMAL 1
-#define SPHEREUV 2
+#define SPHERETEXTURE 2
 
 // Dimensjonene til vinduet
 int SCREEN_WIDTH, SCREEN_HEIGHT;
@@ -110,6 +107,28 @@ GLint viewLocSkybox;
 GLfloat lightPositionValue[] { 0.5f, 1.0f, 0.3f };
 GLfloat cameraPositionValue[] { 1.0f, 0.0f, 4.0f };
 
+
+// Uniforms values
+GLfloat lightPosition[] { 0.0f, 0.0f, 10.0f };
+GLfloat lightAmbient[] { 0.4f, 0.4f, 0.4f };
+GLfloat lightDiffuse[] { 0.7f, 0.5f, 0.5f };
+GLfloat lightSpecular[] { 0.6f, 0.6f, 0.6f };
+GLfloat materialShininessColor[] { 1.0f, 1.0f, 1.0f,  1.0f };
+GLfloat materialShininess = 32.0f;
+GLfloat cameraPosition[] { 0.0f, 0.0f, 10.0f };
+
+// Uniform locations
+GLint projectionMatrixPos;
+GLint viewMatrixPos;
+GLint modelMatrixPos;
+GLint lightPositionPos;
+GLint lightAmbientPos;
+GLint lightDiffusePos;
+GLint lightSpecularPos;
+GLint materialShininessColorPos;
+GLint materialShininessPos;
+GLint cameraPositionPos;
+
 // Global variables to store the index data and the number of indices in
 // the generated sphere
 GLushort *indexData;
@@ -120,11 +139,13 @@ int numIndices;
  */
 int initGL() {
     
+    createSphere();
+    
     generateSkyBoxVerticesAndSetArraysAndBuffers();
     generateCubeVerticesAndSetArraysAndBuffers();
     
 
-    createSphere();
+    
     
     // Setup and compile our shaders
     cubeShader = Shader( "resources/shaders/cube.vert", "resources/shaders/cube.frag" );
@@ -164,13 +185,26 @@ int initGL() {
     
 
     sphereShader.Use();
+    /*
     viewSphereLoc = glGetUniformLocation( sphereShader.Program, "view" );
     projSphereLoc = glGetUniformLocation( sphereShader.Program, "proj" );
     modelSphereLoc = glGetUniformLocation( sphereShader.Program, "model" );
     
-    
     lightPositionSphereLoc = glGetUniformLocation( sphereShader.Program, "lightPos" );
     viewPositionSphereLoc = glGetUniformLocation( sphereShader.Program, "viewPos" );
+     */
+    
+    // Get uniform locations
+    projectionMatrixPos = glGetUniformLocation(sphereShader.Program, "proj");
+    viewMatrixPos = glGetUniformLocation(sphereShader.Program, "view");
+    modelMatrixPos = glGetUniformLocation(sphereShader.Program, "model");
+    lightPositionPos = glGetUniformLocation(sphereShader.Program, "lightPosition");
+    lightAmbientPos = glGetUniformLocation(sphereShader.Program, "lightAmbient");
+    lightDiffusePos = glGetUniformLocation(sphereShader.Program, "lightDiffuse");
+    lightSpecularPos = glGetUniformLocation(sphereShader.Program, "lightSpecular");
+    materialShininessColorPos = glGetUniformLocation(sphereShader.Program, "shininessColor");
+    materialShininessPos = glGetUniformLocation(sphereShader.Program, "shininess");
+    cameraPositionPos = glGetUniformLocation(sphereShader.Program, "cameraPosition");
     
     sphereTextureLoc = glGetUniformLocation( sphereShader.Program, "sphereTexture" );
     
@@ -200,6 +234,62 @@ void drawGLScene() {
     DoMovement();
     
     float time = glfwGetTime();
+    
+    /* * * * * * *
+    *
+    * Tegner Sphere
+    *
+    * * * * * * */
+    
+    sphereShader.Use();
+
+    // Bind the vertex array and texture of the sphere
+    glActiveTexture( GL_TEXTURE0 );
+    glUniform1i(sphereTextureLoc , 0);
+    glBindTexture( GL_TEXTURE_2D, sphereTextureValue );
+    
+
+    // Set the view matrix
+    glm::mat4 viewSphereValue = glm::mat4(1.0f);
+    viewSphereValue = glm::translate(viewSphereValue, glm::vec3(-cameraPositionValue[0], -cameraPositionValue[1], -cameraPositionValue[2]));
+    
+    glUniformMatrix4fv( viewSphereLoc, 1, GL_FALSE, &viewSphereValue[0][0]);
+    
+
+    // Set the model matrix
+    glm::mat4 modelSphereValue = glm::mat4(1.0);
+    modelSphereValue = glm::rotate(modelSphereValue, (float)glfwGetTime() * 0.3f, glm::vec3(0.0f, 1.0f,  0.0f));
+    glUniformMatrix4fv( modelSphereLoc, 1, GL_FALSE, &modelSphereValue[0][0]);
+
+    // Set the remaining uniforms
+    
+    //glm::vec3 lightPositionSphereValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
+    //glUniform3f(lightPositionLoc, lightPositionSphereValue.x, lightPositionSphereValue.y, lightPositionSphereValue.z);
+    //glUniform3fv(viewPositionSphereLoc, 1, cameraPositionValue);
+    
+    // Set the remaining uniforms
+    glUniform3fv(lightPositionPos, 1, lightPosition);
+    glUniform3f(lightAmbientPos, lightAmbient[0], lightAmbient[1], lightAmbient[2]);
+    glUniform3fv(lightDiffusePos, 1, lightDiffuse);
+    glUniform3fv(lightSpecularPos, 1, lightSpecular);
+    glUniform4fv(materialShininessColorPos, 1, materialShininessColor);
+    glUniform1f(materialShininessPos, materialShininess);
+    glUniform3fv(cameraPositionPos, 1, cameraPosition);
+    
+    
+    glBindVertexArray( sphereVAO );
+    
+    
+    // Draw the vertex array
+    glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, indexData);
+
+    // Disable vertex array and texture
+    glBindVertexArray(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    // Disable
+    glUseProgram(0);
+    
     
     /* * * * * * *
     *
@@ -279,53 +369,7 @@ void drawGLScene() {
     glUseProgram(0);
     
     
-    /* * * * * * *
-    *
-    * Tegner Sphere
-    *
-    * * * * * * */
-    
-    sphereShader.Use();
 
-    // Bind the vertex array and texture of the sphere
-    glActiveTexture( GL_TEXTURE0 );
-    glUniform1i(sphereTextureLoc , 0);
-    glBindTexture( GL_TEXTURE_2D, sphereTextureValue );
-    
-
-    // Set the view matrix
-    glm::mat4 viewSphereValue = camera.GetViewMatrix();
-    //viewSphereValue = glm::translate(viewSphereValue, glm::vec3(-cameraPositionValue[0], -cameraPositionValue[1], -cameraPositionValue[2]));
-    
-    glUniformMatrix4fv( viewSphereLoc, 1, GL_FALSE, glm::value_ptr( viewSphereValue ) );
-    
-
-    // Set the model matrix
-    glm::mat4 modelSphereValue = glm::mat4(1.0);
-    //modelSphereValue = glm::rotate(modelSphereValue, (float)glfwGetTime() * 0.3f, glm::vec3(0.0f, 1.0f,  0.0f));
-    glUniformMatrix4fv( modelSphereLoc, 1, GL_FALSE, glm::value_ptr( modelSphereValue ) );
-
-    // Set the remaining uniforms
-    
-    glm::vec3 lightPositionSphereValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
-    glUniform3f(lightPositionLoc, lightPositionSphereValue.x, lightPositionSphereValue.y, lightPositionSphereValue.z);
-    
-    
-    glUniform3fv(viewPositionSphereLoc, 1, cameraPositionValue);
-    
-    
-    glBindVertexArray( sphereVAO );
-    
-    
-    // Draw the vertex array
-    glDrawElements(GL_TRIANGLES, numIndices, GL_UNSIGNED_SHORT, indexData);
-
-    // Disable vertex array and texture
-    glBindVertexArray(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    // Disable
-    glUseProgram(0);
 
     
     
@@ -345,7 +389,7 @@ void resizeGL(int width, int height) {
     
     sphereShader.Use();
     glm::mat4 projectionSphereValue = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 1000.0f);
-    glUniformMatrix4fv( projSphereLoc, 1, GL_FALSE, glm::value_ptr( projectionSphereValue ) );
+    glUniformMatrix4fv( projSphereLoc, 1, GL_FALSE, &projectionSphereValue[0][0]);
     
     skyboxShader.Use();
     glm::mat4 projectionSkyboxValue = glm::perspective(camera.GetZoom(), (float)width/height, 0.1f, 1000.0f );
@@ -436,7 +480,7 @@ void glfwWindowSizeCallback(GLFWwindow* window, int width, int height) {
 }
 
 void createSphere() {
-
+    
     float radius = 20;
     int numH = 10;
     int numV = 10;
@@ -518,29 +562,30 @@ void createSphere() {
 
     
     //Antall man ønsker å opprette, arrayen som skal benyttes.
+    glGenBuffers( 2, &sphereVBO );
+    
+    //Forteller OpenGL at dette er current bufferen som skal brukes (Skal bufferen modifiseres senere er det denne som skal endres)
+    glBindBuffer( GL_ARRAY_BUFFER, sphereVBO );
+    glBufferData(GL_ARRAY_BUFFER, numVertices * numPer * sizeof(GLfloat), &vertexData[0], GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    
+    //Antall man ønsker å opprette, arrayen som skal benyttes.
     glGenVertexArrays( 1, &sphereVAO );
     //Forteller OpenGL hvilken vertex-array som skal brukes.
     glBindVertexArray( sphereVAO );
     
-    //Antall man ønsker å opprette, arrayen som skal benyttes.
-    glGenBuffers( 1, &sphereVBO );
-    //Forteller OpenGL at dette er current bufferen som skal brukes (Skal bufferen modifiseres senere er det denne som skal endres)
-    glBindBuffer( GL_ARRAY_BUFFER, sphereVBO );
-    
-    glBufferData(GL_ARRAY_BUFFER, numVertices * numPer * sizeof(GLfloat), &vertexData[0], GL_STATIC_DRAW);
- 
-
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
     glVertexAttribPointer(SPHEREPOSITION, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), 0); // 3.0
     glVertexAttribPointer(SPHERENORMAL, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (void *)(3 * sizeof(GL_FLOAT))); // 3.0
-    glVertexAttribPointer(SPHEREUV, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (void *)(6 * sizeof(GL_FLOAT))); // 3.0
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
+    glVertexAttribPointer(SPHERETEXTURE, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (void *)(6 * sizeof(GL_FLOAT))); // 3.0
+    
     // Enable the attributes
     glEnableVertexAttribArray(SPHEREPOSITION); // 2.0
     glEnableVertexAttribArray(SPHERENORMAL);
-    glEnableVertexAttribArray(SPHEREUV);
+    glEnableVertexAttribArray(SPHERETEXTURE);
 
     glBindVertexArray(0);
+    
 }
 
 void generateCubeVerticesAndSetArraysAndBuffers()
@@ -658,6 +703,7 @@ void generateCubeVerticesAndSetArraysAndBuffers()
             pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z
         };
         
+        // TODO: En bedre måte å gjøre dette på?
         // Appender den ferdige siden til cubeVertices
         for(int i = 0; i < 84; i++){
             cubeVertices.push_back(oneSideVertices[i]);

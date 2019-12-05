@@ -1,12 +1,17 @@
 #version 330
 
 // Incoming variables.
-in vec2 TextureCoordinates;
+in vec2 UV;
 in vec3 N;
 in vec3 worldVertex;
 
-uniform vec3 lightPos;
-uniform vec3 viewPos;
+uniform vec3 lightPosition;
+uniform vec3 lightAmbient;
+uniform vec3 lightDiffuse;
+uniform vec3 lightSpecular;
+uniform vec4 shininessColor;
+uniform float shininess;
+uniform vec3 cameraPosition;
 
 // Outgoing final color.
 out vec4 outputColor;
@@ -24,37 +29,34 @@ vec4 diffuse;
 vec4 specular;
 
 // Texture sampler
-uniform sampler2D sphereTexture;
+uniform sampler2D textureSampler;
 
 void main()
 {
+    color = texture(textureSampler, UV).rgba;
 
+    // Normalize the interpolated normal to ensure unit length
+    NN = normalize(N);
     
-    
-    
-    // ambient
-    float ambientStrength = 0.1;
-    vec3 ambient = ambientStrength * texture( sphereTexture, TextureCoordinates ).rgb;
+    // Find the unit length normal giving the direction from the vertex to the light
+    L = normalize(lightPosition - worldVertex);
 
-    // diffuse
-    vec3 norm = normalize(N);
-    vec3 lightDir = normalize(lightPos - worldVertex);
-    float diff = max(dot(norm, lightDir), 0.0);
-    vec3 diffuse = diff * texture( sphereTexture, TextureCoordinates ).rgb;
+    // Find the unit length normal giving the direction from the vertex to the camera
+    V = normalize(cameraPosition - worldVertex);
 
-    // specular
-    float specularStrength = 0.5;
-    vec3 viewDir = normalize(viewPos - worldVertex);
-    vec3 reflectDir = reflect(-lightDir, norm);
-    float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
-    //vec3 specular = specularStrength * spec * lightColor;
-        
+    // Find the unit length reflection normal
+    R = normalize(reflect(-L, NN));
     
-    
-    vec3 specular = specularStrength * spec * texture( sphereTexture, TextureCoordinates ).rgb;
-    
-    vec3 result = (ambient + diffuse + specular);
-    
-    outputColor = vec4(result, 1.0);
+    // Calculate the ambient component
+    ambient = vec4(lightAmbient, 1) * color;
+
+    // Calculate the diffuse component
+    diffuse = vec4(max(dot(L, NN), 0.0) * lightDiffuse, 1) * color;
+
+    // Calculate the specular component
+    specular = vec4(pow(max(dot(R, V), 0.0), shininess) * lightSpecular, 1) * shininessColor;
+
+    // Put it all together
+    outputColor = ambient + diffuse + specular;
 
 }

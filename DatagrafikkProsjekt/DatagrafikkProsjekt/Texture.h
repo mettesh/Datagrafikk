@@ -11,7 +11,7 @@ class TextureLoading
 public:
     static GLuint LoadTexture( GLchar *path )
     {
-        // Generer texture-ID og laste texture-data
+        // Generer texture-ID og laster texture-data
         GLuint textureID;
         glGenTextures( 1, &textureID );
         

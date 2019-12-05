@@ -38,12 +38,20 @@
 // Dimensjonene til vinduet
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
-// For tastatur- og musebevegelser
+// Definerer alle funksjoner da C++ krever dette om de ikke kommer før kallet i koden.
+int initGL();
+static void glfwErrorCallback(int error, const char* description);
+void glfwWindowSizeCallback(GLFWwindow* window, int width, int height);
+void resizeGL(int width, int height);
 void KeyCallback( GLFWwindow *window, int key, int scancode, int action, int mode );
 void MouseCallback( GLFWwindow *window, double xPos, double yPos );
 void DoMovement( );
 void generateSkyBoxVerticesAndSetArraysAndBuffers();
 void generateCubeVerticesAndSetArraysAndBuffers();
+
+void drawSkybox();
+void drawCube();
+
 unsigned int loadTexture(const char *path);
 
 // Setter startposisjon til kamera
@@ -92,9 +100,118 @@ GLint viewLocSkybox;
 GLfloat lightPositionValue[] { 0.5f, 1.0f, 0.3f };
 GLfloat cameraPositionValue[] { 1.0f, 0.0f, 4.0f };
 
-/*
- * Initialize OpenGL
- */
+
+/* PROGRAMSTART */
+int main(void) {
+    
+    // Setter feilmelding
+    glfwSetErrorCallback(glfwErrorCallback);
+    
+    // Initialiserer GLWF og sjekker at det gikk OK
+    if (!glfwInit()) {
+        printf("Failed to initialize GLFW\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    // GLFW benytter noe kalt windowHint. Disse forteller/spør GLFW om å sette visse versjoner
+    // av OpenGL + andre instillinger. - Dette er valgfritt, men Mac trenger noen!
+    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 3 ); //Ber her om OpenGL versjon 3
+    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
+    glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
+    glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
+    glfwWindowHint( GLFW_RESIZABLE, GL_TRUE );
+
+    // Opprette et GLFW-vindu + sjekker at det gikk ok
+    GLFWwindow* window = glfwCreateWindow(DEFAULT_WIDTH, DEFAULT_HEIGHT, "Datagrafikk 2019 - Prosjekt - Mette Strand Hornnes", NULL, NULL);
+    if (!window) {
+        printf("Failed to create GLFW window\n");
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    }
+    
+    // Setter callback-funksjoner som kalles om en tast er trykket ned, eller mus beveget på seg.
+    glfwSetKeyCallback( window, KeyCallback );
+    glfwSetCursorPosCallback( window, MouseCallback );
+    
+    // Setter en input-mode for vinduet. I dette tilfellet settes musepeker til å ikke syntes (heller ikke utenfor vinduet)
+    glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
+    
+
+    // Henter inn størrelse på vinduet og lagrere dette på plassen til SCREEN_WIDTH - og _HEIGHT
+    glfwGetFramebufferSize( window, &SCREEN_WIDTH, &SCREEN_HEIGHT );
+    
+    // Setter endringer av vinduestørrelse
+    // This function sets the size callback of the specified window, which is called when the window is resized. The callback is provided with the size, in screen coordinates, of the content area of the window.
+    glfwSetWindowSizeCallback(window, glfwWindowSizeCallback);
+    
+    // Velger at det er dette vinduet OpenGL skal jobbe i
+    glfwMakeContextCurrent(window);
+    
+    // TODO: Trengs denne? Kun for eldre versjoner??
+    // glewExperimental = GL_TRUE;
+    
+    // Initialiserer GLEW og sjekker at det gikk ok
+    if (glewInit() != GLEW_OK) {
+        printf("Failed to initialize GLEW\n");
+        glfwDestroyWindow(window);
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    }
+    
+    // Sørge for at GLFW bytter buffere med en gang (Front og Back- Buffer)
+    glfwSwapInterval(0);
+    
+    // Initialiserer OpenGL
+    if (!initGL()) {
+        printf("Failed to initialize OpenGL\n");
+        glfwDestroyWindow(window);
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    }
+    
+    // Setter opp OpenGL-viewet
+    resizeGL(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    
+    // Run a loop until the window is closed
+    while (!glfwWindowShouldClose(window)) {
+        
+        // Setter clear-farge og dybdebuffer
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
+        drawSkybox();
+        
+        drawCube();
+        
+        // This function swaps the front and back buffers of the specified window
+        // Front buffer = Det som vises på skjermen (Forrige frame)
+        // Back buffer = Det som nå tegnes (vurrent frame)
+        glfwSwapBuffers(window);
+        
+        // Sjekker om noen eventer er aktivert (F.eks key trykker, musepeker flytter osv.)
+        glfwPollEvents( );
+        
+        
+        // For å bestemme hvor lenge hver frame (bilde) skal vises på skjermen. For å sikre smoothe bevegelser.
+        // Brukes i doMovement()
+        GLfloat currentFrame = glfwGetTime( );
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+        
+        // Kaller deretter den tilhørende responsfunksjonen.
+        DoMovement();
+        
+    }
+    
+    // Shutdown GLFW
+    glfwDestroyWindow(window);
+    glfwTerminate();
+    
+    // Exit
+    exit(EXIT_SUCCESS);
+    
+}
+
+/* Initiliaserer OpenGL */
 int initGL() {
     
     generateSkyBoxVerticesAndSetArraysAndBuffers();
@@ -124,20 +241,15 @@ int initGL() {
     viewLoc = glGetUniformLocation( cubeShader.Program, "view" );
     projLoc = glGetUniformLocation( cubeShader.Program, "projection" );
     modelLoc = glGetUniformLocation( cubeShader.Program, "model" );
-    
     cubeTextureLoc = glGetUniformLocation( cubeShader.Program, "cubeTexture" );
     cubeNormalMapLoc = glGetUniformLocation( cubeShader.Program, "cubeNormalMap" );
-    
-    //lightColorLoc = glGetUniformLocation(cubeShader.Program, "lightColor" );
     lightPositionLoc = glGetUniformLocation( cubeShader.Program, "lightPos" );
     viewPositionLoc = glGetUniformLocation( cubeShader.Program, "viewPos" );
-    
     
     // Henter inn uniform-loactions fra skybox-shader
     skyboxShader.Use();
     projLocSkybox = glGetUniformLocation( skyboxShader.Program, "projection" );
     viewLocSkybox = glGetUniformLocation( skyboxShader.Program, "view" );
-    
     
     
     // Implementerer Depth i applikasjonen ?????
@@ -146,99 +258,7 @@ int initGL() {
     return 1;
 }
 
-
-/*
- * Draw OpenGL screne
- */
-void drawGLScene() {
-    
-    // Setter clear-farge og dybdebuffer
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    DoMovement();
-    
-    float time = glfwGetTime();
-    
-    /* * * * * * *
-    *
-    * Tegner skyboxen:
-    *
-     * * * * * * */;
-
-        skyboxShader.Use();
-        
-        // Change depth function so depth test passes when values are equal to depth buffer's content
-        glDepthFunc( GL_LEQUAL );
-
-        // TODO: Tidligere. Hva gjør denne:  glm::mat4 viewSkybox = camera.GetViewMatrix();
-        glm::mat4 viewSkyboxValue = glm::mat4( glm::mat3( camera.GetViewMatrix( ) ) );
-        glUniformMatrix4fv( viewLocSkybox, 1, GL_FALSE, glm::value_ptr( viewSkyboxValue ) );
-
-
-    
-        // Aktiverer vertex-arrayen for skyBox:
-        glBindVertexArray( skyboxVAO );
-        
-        glBindTexture( GL_TEXTURE_CUBE_MAP, cubemapTextureValue );
-        glDrawArrays( GL_TRIANGLES, 0, 36 );
-        glDepthFunc( GL_LESS ); // Setter dybdefunksjonen tilbake til default
-        
-        glUseProgram(0);
-        glBindVertexArray(0);
-    
-    
-/* * * * * * *
- *
- * Tegner kuben
- *
- * * * * * * */
-    
-    // Aktiverer programmet
-    cubeShader.Use();
-        
-    // Henter og setter texture som sendes til cube-fragshader
-    glActiveTexture( GL_TEXTURE0 );
-    glUniform1i(cubeTextureLoc , 0);
-    glBindTexture( GL_TEXTURE_2D, cubeTextureValue );
-    
-    // Henter og setter normalMap som sendes til cube-fragshader
-    glActiveTexture( GL_TEXTURE1 );
-    glUniform1i(cubeNormalMapLoc , 1);
-    glBindTexture( GL_TEXTURE_2D, cubeNormalMapValue );
-    
-    
-    // Setter view matrisen
-    glm::mat4 viewCubeValue = camera.GetViewMatrix();
-    // Sender view-matrise til cube-shaderen:
-    glUniformMatrix4fv( viewLoc, 1, GL_FALSE, glm::value_ptr( viewCubeValue ) );
-
-    // Setter model-matrise
-    glm::mat4 modelCubeValue = glm::mat4(1.0f);
-    //modelCubeValue = glm::rotate(modelCubeValue, time * 0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
-    // Sender model-matrise til cube-shaderen:
-    glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( modelCubeValue ) );
-    
-    // Sender resten av lys-matrisene til cube-shaderen:
-    
-    glm::vec3 lightPositionValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
-    glUniform3f(lightPositionLoc, lightPositionValue.x, lightPositionValue.y, lightPositionValue.z);
-    
-    //glUniform3fv(lightPositionLoc, 1, lightPositionValue);
-    glUniform3fv(viewPositionLoc, 1, cameraPositionValue);
-     
-
-    // Aktiverer vertex-arrayen for kuben:
-    glBindVertexArray( cubeVAO );
-    // Deretter tegnes trianglene:
-    glDrawArrays( GL_TRIANGLES, 0, 36 );
-
-    glBindVertexArray(0);
-    
-    // Deaktiverer shaderprogram som brukes og vertexarray
-    glUseProgram(0);
-        
-}
-
+/* Endrer størrelse og projectionmatriser ved endring av vindu */
 void resizeGL(int width, int height) {
     
     // Feilhåndtering for å hindre at det blir deling på 0
@@ -259,87 +279,8 @@ void resizeGL(int width, int height) {
     
 }
 
-/*
- * Error callback function for GLFW
- */
-static void glfwErrorCallback(int error, const char* description) {
-    fprintf(stderr, "Error: %s\n", description);
-}
 
-// Metode som kalles hver gang en tast presses ned eller slippes opp
-void KeyCallback( GLFWwindow *window, int key, int scancode, int action, int mode)
-{
-    if ( GLFW_KEY_ESCAPE == key && GLFW_PRESS == action )
-    {
-        glfwSetWindowShouldClose(window, GLFW_TRUE);
-    }
-    
-    if ( key >= 0 && key <= 1024 )
-    {
-        if ( GLFW_PRESS == action )
-        {
-            keys[key] = true;
-        }
-        else if ( GLFW_RELEASE == action)
-        {
-            keys[key] = false;
-        }
-    }
-}
-
-void MouseCallback( GLFWwindow *window, double xPos, double yPos )
-{
-    if ( firstMouse )
-    {
-        lastX = xPos;
-        lastY = yPos;
-        firstMouse = false;
-    }
-    
-    GLfloat xOffset = xPos - lastX;
-    GLfloat yOffset = lastY - yPos;
-    
-    lastX = xPos;
-    lastY = yPos;
-    
-    camera.ProcessMouseMovement( xOffset, yOffset );
-}
-
-void DoMovement( )
-{
-    if ( keys[GLFW_KEY_W] || keys[GLFW_KEY_UP] )
-    {
-        camera.ProcessKeyboard( FORWARD, deltaTime );
-    }
-    
-    if ( keys[GLFW_KEY_S] || keys[GLFW_KEY_DOWN] )
-    {
-        camera.ProcessKeyboard( BACKWARD, deltaTime );
-    }
-    
-    if ( keys[GLFW_KEY_A] || keys[GLFW_KEY_LEFT] )
-    {
-        camera.ProcessKeyboard( LEFT, deltaTime );
-    }
-    
-    if ( keys[GLFW_KEY_D] || keys[GLFW_KEY_RIGHT] )
-    {
-        camera.ProcessKeyboard( RIGHT, deltaTime );
-    }
-}
-
-/*
- * Window size changed callback function for GLFW
- */
-void glfwWindowSizeCallback(GLFWwindow* window, int width, int height) {
-    
-    resizeGL(width, height);
-    
-}
-
-
-void generateCubeVerticesAndSetArraysAndBuffers()
-{
+void generateCubeVerticesAndSetArraysAndBuffers() {
     // Punktene som tilsammen bygger kuben
     glm::vec3 positions[8];
     positions[0] = glm::vec3(-1.0f,  1.0f, -1.0f);
@@ -463,10 +404,6 @@ void generateCubeVerticesAndSetArraysAndBuffers()
         
     }
     
-
-
-     
-    
      //Antall man ønsker å opprette, arrayen som skal benyttes.
      glGenVertexArrays( 1, &cubeVAO );
      //Forteller OpenGL hvilken vertex-array som skal brukes.
@@ -498,169 +435,209 @@ void generateCubeVerticesAndSetArraysAndBuffers()
 
 void generateSkyBoxVerticesAndSetArraysAndBuffers() {
     
-    
-    if (cubeVAO == 0)
+    GLfloat skyboxVertices[] =
     {
+        // Posisjon
+        -1.0f,  1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+        -1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f
+     };
+    
+    glGenVertexArrays( 1, &skyboxVAO );
+    glGenBuffers( 1, &skyboxVBO );
+    glBindVertexArray( skyboxVAO );
+    glBindBuffer( GL_ARRAY_BUFFER, skyboxVBO );
+    
+    //Fyller bufferen med data: Bufferen som skal brukes, størrelsen den på holde av, de vertices som skal lagres, og info at det skal tegnes.
+    glBufferData( GL_ARRAY_BUFFER, 108 * sizeof( GL_FLOAT ), skyboxVertices, GL_STATIC_DRAW );
+    
+    // Posisjon attribute
+    glVertexAttribPointer( POSITION, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( GLfloat ), ( GLvoid * ) 0 );
+    
+    // Aktivere attributten
+    glEnableVertexAttribArray(POSITION);
+}
+
+
+void drawSkybox() {
+    
+    skyboxShader.Use();
+    // Change depth function so depth test passes when values are equal to depth buffer's content
+    glDepthFunc( GL_LEQUAL );
+
+    // TODO: Tidligere. Hva gjør denne:  glm::mat4 viewSkybox = camera.GetViewMatrix();
+    glm::mat4 viewSkyboxValue = glm::mat4( glm::mat3( camera.GetViewMatrix( ) ) );
+    glUniformMatrix4fv( viewLocSkybox, 1, GL_FALSE, glm::value_ptr( viewSkyboxValue ) );
+
+    // Aktiverer vertex-arrayen for skyBox:
+    glBindVertexArray( skyboxVAO );
+    
+    glBindTexture( GL_TEXTURE_CUBE_MAP, cubemapTextureValue );
+    glDrawArrays( GL_TRIANGLES, 0, 36 );
+    glDepthFunc( GL_LESS ); // Setter dybdefunksjonen tilbake til default
+    
+    glUseProgram(0);
+    glBindVertexArray(0);
+}
+
+void drawCube() {
+    
+    float time = glfwGetTime();
+    
+    // Aktiverer programmet
+    cubeShader.Use();
         
-        GLfloat skyboxVertices[] =
+    // Henter og setter texture som sendes til cube-fragshader
+    glActiveTexture( GL_TEXTURE0 );
+    glUniform1i(cubeTextureLoc , 0);
+    glBindTexture( GL_TEXTURE_2D, cubeTextureValue );
+    
+    // Henter og setter normalMap som sendes til cube-fragshader
+    glActiveTexture( GL_TEXTURE1 );
+    glUniform1i(cubeNormalMapLoc , 1);
+    glBindTexture( GL_TEXTURE_2D, cubeNormalMapValue );
+    
+    
+    
+    
+    // Setter view matrisen
+    glm::mat4 viewCubeValue = camera.GetViewMatrix();
+    // Sender view-matrise til cube-shaderen:
+    glUniformMatrix4fv( viewLoc, 1, GL_FALSE, glm::value_ptr( viewCubeValue ) );
+
+    // Setter model-matrise
+    glm::mat4 modelCubeValue = glm::mat4(1.0f);
+    //modelCubeValue = glm::rotate(modelCubeValue, time * 0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
+    // Sender model-matrise til cube-shaderen:
+    glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( modelCubeValue ) );
+    
+    
+    
+    // Sender resten av lys-matrisene til cube-shaderen:
+    glm::vec3 lightPositionValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
+    glUniform3f(lightPositionLoc, lightPositionValue.x, lightPositionValue.y, lightPositionValue.z);
+    
+    //glUniform3fv(lightPositionLoc, 1, lightPositionValue);
+    glUniform3fv(viewPositionLoc, 1, cameraPositionValue);
+     
+
+    // Aktiverer vertex-arrayen for kuben:
+    glBindVertexArray( cubeVAO );
+    // Deretter tegnes trianglene:
+    glDrawArrays( GL_TRIANGLES, 0, 36 );
+
+    glBindVertexArray(0);
+    // Deaktiverer shaderprogram som brukes og vertexarray
+    glUseProgram(0);
+}
+
+
+/* Error callback function for GLFW */
+static void glfwErrorCallback(int error, const char* description) {
+    fprintf(stderr, "Error: %s\n", description);
+}
+
+/* Window size changed callback function for GLFW */
+void glfwWindowSizeCallback(GLFWwindow* window, int width, int height) {
+    resizeGL(width, height);
+}
+
+// Metode som kalles hver gang en tast presses ned eller slippes opp
+void KeyCallback( GLFWwindow *window, int key, int scancode, int action, int mode) {
+    if ( GLFW_KEY_ESCAPE == key && GLFW_PRESS == action )
+    {
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+    }
+    
+    if ( key >= 0 && key <= 1024 )
+    {
+        if ( GLFW_PRESS == action )
         {
-            // Posisjon
-            -1.0f,  1.0f, -1.0f,
-            -1.0f, -1.0f, -1.0f,
-             1.0f, -1.0f, -1.0f,
-             1.0f, -1.0f, -1.0f,
-             1.0f,  1.0f, -1.0f,
-            -1.0f,  1.0f, -1.0f,
+            keys[key] = true;
+        }
+        else if ( GLFW_RELEASE == action)
+        {
+            keys[key] = false;
+        }
+    }
+    
+}
 
-            -1.0f, -1.0f,  1.0f,
-            -1.0f, -1.0f, -1.0f,
-            -1.0f,  1.0f, -1.0f,
-            -1.0f,  1.0f, -1.0f,
-            -1.0f,  1.0f,  1.0f,
-            -1.0f, -1.0f,  1.0f,
+void MouseCallback( GLFWwindow *window, double xPos, double yPos ) {
+    if ( firstMouse )
+    {
+        lastX = xPos;
+        lastY = yPos;
+        firstMouse = false;
+    }
+    
+    GLfloat xOffset = xPos - lastX;
+    GLfloat yOffset = lastY - yPos;
+    
+    lastX = xPos;
+    lastY = yPos;
+    
+    camera.ProcessMouseMovement( xOffset, yOffset );
+}
 
-             1.0f, -1.0f, -1.0f,
-             1.0f, -1.0f,  1.0f,
-             1.0f,  1.0f,  1.0f,
-             1.0f,  1.0f,  1.0f,
-             1.0f,  1.0f, -1.0f,
-             1.0f, -1.0f, -1.0f,
-
-            -1.0f, -1.0f,  1.0f,
-            -1.0f,  1.0f,  1.0f,
-             1.0f,  1.0f,  1.0f,
-             1.0f,  1.0f,  1.0f,
-             1.0f, -1.0f,  1.0f,
-            -1.0f, -1.0f,  1.0f,
-
-            -1.0f,  1.0f, -1.0f,
-             1.0f,  1.0f, -1.0f,
-             1.0f,  1.0f,  1.0f,
-             1.0f,  1.0f,  1.0f,
-            -1.0f,  1.0f,  1.0f,
-            -1.0f,  1.0f, -1.0f,
-
-            -1.0f, -1.0f, -1.0f,
-            -1.0f, -1.0f,  1.0f,
-             1.0f, -1.0f, -1.0f,
-             1.0f, -1.0f, -1.0f,
-            -1.0f, -1.0f,  1.0f,
-             1.0f, -1.0f,  1.0f
-         };
-        
-        glGenVertexArrays( 1, &skyboxVAO );
-        glGenBuffers( 1, &skyboxVBO );
-        glBindVertexArray( skyboxVAO );
-        glBindBuffer( GL_ARRAY_BUFFER, skyboxVBO );
-        
-        //Fyller bufferen med data: Bufferen som skal brukes, størrelsen den på holde av, de vertices som skal lagres, og info at det skal tegnes.
-        glBufferData( GL_ARRAY_BUFFER, 108 * sizeof( GL_FLOAT ), skyboxVertices, GL_STATIC_DRAW );
-        
-        // Posisjon attribute
-        glVertexAttribPointer( POSITION, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( GLfloat ), ( GLvoid * ) 0 );
-        
-        // Aktivere attributten
-        glEnableVertexAttribArray(POSITION);
+void DoMovement( ) {
+    if ( keys[GLFW_KEY_W] || keys[GLFW_KEY_UP] )
+    {
+        camera.ProcessKeyboard( FORWARD, deltaTime );
+    }
+    
+    if ( keys[GLFW_KEY_S] || keys[GLFW_KEY_DOWN] )
+    {
+        camera.ProcessKeyboard( BACKWARD, deltaTime );
+    }
+    
+    if ( keys[GLFW_KEY_A] || keys[GLFW_KEY_LEFT] )
+    {
+        camera.ProcessKeyboard( LEFT, deltaTime );
+    }
+    
+    if ( keys[GLFW_KEY_D] || keys[GLFW_KEY_RIGHT] )
+    {
+        camera.ProcessKeyboard( RIGHT, deltaTime );
     }
 }
 
 
-/*
- * PROGRAMSTART
- */
-int main(void) {
-    
-    glfwSetErrorCallback(glfwErrorCallback);
-    
-    // Initialiserer GLWF og sjekker at det gikk OK
-    if (!glfwInit()) {
-        printf("Failed to initialize GLFW\n");
-        exit(EXIT_FAILURE);
-    }
-    
-       // GLFW benytter noe kalt windowHint. Disse forteller/spør GLFW om å sette visse versjoner
-    // av OpenGL + andre instillinger. - Dette er valgfritt, men Mac trenger noen!
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 3 ); //Ber her om OpenGL versjon 3
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
-    glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
-    glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
-    glfwWindowHint( GLFW_RESIZABLE, GL_TRUE );
-
-    // Opprette et GLFW-vindu + sjekker at det gikk ok
-    GLFWwindow* window = glfwCreateWindow(DEFAULT_WIDTH, DEFAULT_HEIGHT, "Datagrafikk 2019 - Prosjekt - Mette Strand Hornnes", NULL, NULL);
-    if (!window) {
-        printf("Failed to create GLFW window\n");
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    }
-    
-    // Setter callback-funksjoner som kalles om en tast er trykket ned, eller mus beveget på seg.
-    glfwSetKeyCallback( window, KeyCallback );
-    glfwSetCursorPosCallback( window, MouseCallback );
-    
-    // TODO: Trengs denne?
-    // glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
-    
-    // TODO: Trengs denne?
-    // glfwGetFramebufferSize( window, &SCREEN_WIDTH, &SCREEN_HEIGHT );
-    
-    // Setter endringer av vinduestørrelse
-    glfwSetWindowSizeCallback(window, glfwWindowSizeCallback);
-    
-    // Velger at det er dette vinduet OpenGL skal jobbe i
-    glfwMakeContextCurrent(window);
-    
-    // TODO: Trengs denne?
-    // glewExperimental = GL_TRUE;
-    
-    // Initialiserer GLEW og sjekker at det gikk ok
-    if (glewInit() != GLEW_OK) {
-        printf("Failed to initialize GLEW\n");
-        glfwDestroyWindow(window);
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    }
-    
-    // Sørge for at GLFW bytter buffere med en gang
-    glfwSwapInterval(0);
-    
-    // Initialize OpenGL
-    if (!initGL()) {
-        printf("Failed to initialize OpenGL\n");
-        glfwDestroyWindow(window);
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    }
-    
-    // Setter opp OpenGL-viewet
-    resizeGL(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-    
-    // Run a loop until the window is closed
-    while (!glfwWindowShouldClose(window)) {
-        
-        // Setter frame time (For å sikre smoothe bevegesler)
-        GLfloat currentFrame = glfwGetTime( );
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
-        
-        // Draw OpenGL screne
-        drawGLScene();
-        
-        // Swap buffers
-        glfwSwapBuffers(window);
-        
-        // Sjekker om noen eventer er aktivert (F.eks key trykker, musepeker flytter osv.)
-        glfwPollEvents( );
-        // Kaller deretter den tilhørende responsfunksjonen.
-        //DoMovement();
-        
-    }
-    
-    // Shutdown GLFW
-    glfwDestroyWindow(window);
-    glfwTerminate();
-    
-    // Exit
-    exit(EXIT_SUCCESS);
-    
-}

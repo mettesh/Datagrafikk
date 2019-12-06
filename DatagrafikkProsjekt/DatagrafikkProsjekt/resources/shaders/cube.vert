@@ -10,7 +10,7 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-// Trenger 2 nye sånne for lys
+// Trenger 2 nye sånne for lys . . .
 uniform vec3 lightPos;
 uniform vec3 viewPos;
 

@@ -84,21 +84,25 @@ GLuint cubeTextureValue;
 GLuint cubeNormalMapValue;
 
 
-// Cube & light  Uniform locations
+// Cube position Uniform locations
 GLint modelLoc;
 GLint viewLoc;
 GLint projLoc;
 
+// Cube texture locations
 GLint cubeTextureLoc;
 GLint cubeNormalMapLoc;
 
-// Uniform locations
+// Cube light Uniform locations
 GLint lightPositionLoc;
 GLint viewPositionLoc;
+GLint lightColorLoc;
 
-// Uniforms values
+
+// Light Uniforms values (For begge kubene!)
 GLfloat lightPositionValue[] { 0.5f, 1.0f, 0.3f };
 GLfloat cameraPositionValue[] { 1.0f, 0.0f, 4.0f };
+GLfloat lightColorValue[] = {1.0f, 1.0f, 1.0f};
 
 
 
@@ -110,10 +114,6 @@ GLint lightColorLocCubeTwo;
 GLint lightPositionLocCubeTwo;
 GLint viewPositionLocCubeTwo;
 
-
-GLfloat lightPositionCubeTwoValue[] { 1.0f, -2.0f, -2.0f };
-GLfloat cameraPositionCubeTwoValue[] { 1.0f, 0.0f, 4.0f };
-GLfloat lightColorCubeTwoValue[] = {1.0f, 0.5f, 0.31f};
 
 
 
@@ -274,6 +274,7 @@ int initGL() {
     modelLoc = glGetUniformLocation( cubeShader.Program, "model" );
     cubeTextureLoc = glGetUniformLocation( cubeShader.Program, "cubeTexture" );
     cubeNormalMapLoc = glGetUniformLocation( cubeShader.Program, "cubeNormalMap" );
+    lightColorLoc = glGetUniformLocation(cubeShader.Program, "lightColor");
     lightPositionLoc = glGetUniformLocation( cubeShader.Program, "lightPos" );
     viewPositionLoc = glGetUniformLocation( cubeShader.Program, "viewPos" );
     
@@ -687,9 +688,9 @@ void drawCubeTwo() {
         //glm::vec3 lightPositionLoc(sinf(time * 1.0f), cosf(time * 2.0f), 0.8f);
         //glUniform3f(lightPositionLoc, lightPositionValue.x, lightPositionValue.y, lightPositionValue.z);
     
-    glUniform3fv(lightColorLocCubeTwo, 1, lightColorCubeTwoValue);
-    glUniform3fv(lightPositionLocCubeTwo, 1, lightPositionCubeTwoValue);
-    glUniform3fv(viewPositionLocCubeTwo, 1, cameraPositionCubeTwoValue);
+    glUniform3fv(lightColorLocCubeTwo, 1, lightColorValue);
+    glUniform3fv(lightPositionLocCubeTwo, 1, lightPositionValue);
+    glUniform3fv(viewPositionLocCubeTwo, 1, cameraPositionValue);
     
 
     // Aktiverer vertex-arrayen for kuben:
@@ -737,10 +738,11 @@ void drawCube() {
     
     
     // Sender resten av lys-matrisene til cube-shaderen:
-    glm::vec3 lightPositionValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
-    glUniform3f(lightPositionLoc, lightPositionValue.x, lightPositionValue.y, lightPositionValue.z);
+    //glm::vec3 lightPositionValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
+    //glUniform3f(lightPositionLoc, lightPositionValue.x, lightPositionValue.y, lightPositionValue.z);
     
-    //glUniform3fv(lightPositionLoc, 1, lightPositionValue);
+    glUniform3fv(lightColorLoc, 1, lightColorValue);
+    glUniform3fv(lightPositionLoc, 1, lightPositionValue);
     glUniform3fv(viewPositionLoc, 1, cameraPositionValue);
      
 

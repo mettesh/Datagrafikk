@@ -5,17 +5,14 @@ layout (location = 0) in vec3 cubePositions;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 textureCoordinates;
 
-// Får inn matriser satt i drawGLScene()
+// Får inn matriser satt i drawGLScene() og resizeGL()
 uniform mat4 model;
 uniform mat4 view;
-// Får inn matrise satt i og resizeGL()
 uniform mat4 projection;
 
 // Output variables
 out vec2 cubeTextureCoordinates;
-// out vec2 interpolatedColor;
-out vec3 Normal;
-//out vec3 worldVertex;
+out vec3 normalCoordinates;
 out vec3 FragPos;
 
 
@@ -28,16 +25,9 @@ void main()
     cubeTextureCoordinates = vec2(textureCoordinates.x, 1.0 - textureCoordinates.y);
 
     // Set the world vertex for calculating the light direction in the fragment shader
-    //worldVertex = vec3(model * vec4(cubePositions, 1));
     FragPos = vec3(model * vec4(cubePositions, 1.0));
     
     // Set the transformed normal
-    //Normal = mat3(model) * aNormal;
-    Normal = mat3(transpose(inverse(model))) * aNormal;
-    
-    // We assign the color to the outgoing variable.
-   //interpolatedColor = textureCoordinates;
-    
-
-    
+    normalCoordinates = mat3(transpose(inverse(model))) * aNormal;
+   
 }

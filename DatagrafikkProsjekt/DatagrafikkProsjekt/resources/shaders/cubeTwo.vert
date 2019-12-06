@@ -3,7 +3,6 @@
 layout (location = 0) in vec3 cubePosition;
 layout (location = 1) in vec3 normalCoordinates;
 layout (location = 2) in vec2 textureCoordinates;
-layout (location = 3) in vec3 tangentCoordinates;
 
 // Får inn matriser satt i drawGLScene() og resizeGL()
 uniform mat4 model;
@@ -55,3 +54,4 @@ void main()
     // Deretter i vertes: legge de 2 lyskildene sammen!
     
 }
+

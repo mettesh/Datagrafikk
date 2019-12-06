@@ -103,7 +103,7 @@ GLint lightColorTwoLoc;
 
 
 // Light Uniforms values (For begge kubene!)
-GLfloat lightPositionOneValue[] { 0.5f, 1.0f, -0.3f };
+GLfloat lightPositionOneValue[] { 0.5f, 1.0f, 0.3f };
 GLfloat lightPositionTwoValue[] { 0.5f, 1.0f, -0.3f };
 
 GLfloat cameraPositionValue[] { 1.0f, 0.0f, 4.0f };

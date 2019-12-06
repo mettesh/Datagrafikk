@@ -97,7 +97,9 @@ void main()
     vec3 colorOne = ( ( DOne / (DOne + DTwo ) ) * lightOne);
     vec3 colorTwo = ( ( DTwo / (DOne + DTwo ) ) * lightTwo);
     
-    vec3 result = lightOne + lightTwo;
+    
+    // Hvorfor en svart side??
+    vec3 result = colorOne + colorTwo;
     
     FragColor = vec4(result, 1.0);
 }

@@ -1,6 +1,5 @@
 #version 330 core
 
-// Henter inn vec-verdier fra cubeVertices - De 3 første posisjon, de 3 neste texCoord
 layout (location = 0) in vec3 cubePositions;
 layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 textureCoordinates;

@@ -12,14 +12,19 @@ uniform mat4 projection;
 
 // Trenger 2 nye sånne for lys . . .
 uniform vec3 lightPos;
+uniform vec3 lightTwoPos;
+
 uniform vec3 viewPos;
+uniform vec3 viewTwoPos;
 
 // Output variables
 out vec2 cubeTextureCoordinates;
 
 // out - mapping
 out vec3 TangentLightPos;
+out vec3 TangentLightTwoPos;
 out vec3 TangentViewPos;
+out vec3 TangentViewTwoPos;
 out vec3 TangentFragPos;
 
 
@@ -42,16 +47,13 @@ void main()
     
     mat3 TBN = transpose(mat3(tangent, biTangent, normal));
     TangentLightPos = TBN * lightPos;
+    TangentLightTwoPos = TBN * lightTwoPos;
     TangentViewPos  = TBN * viewPos;
+    TangentViewTwoPos  = TBN * viewPos;
     TangentFragPos  = TBN * FragPos;
     
     // Setter posisjonen til kuben i verden
     gl_Position = projection * view * model * vec4(cubePosition, 1.0);
     
-    
-    // Må regne ut lysavstand:
-    // d = len(lightPos - fragPos)
-    
-    // Deretter i vertes: legge de 2 lyskildene sammen!
     
 }

@@ -95,14 +95,22 @@ GLint cubeNormalMapLoc;
 
 // Cube light Uniform locations
 GLint lightPositionLoc;
+GLint lightPositionTwoLoc;
 GLint viewPositionLoc;
+GLint viewPositionTwoLoc;
 GLint lightColorLoc;
+GLint lightColorTwoLoc;
 
 
 // Light Uniforms values (For begge kubene!)
-GLfloat lightPositionValue[] { 0.5f, 1.0f, 0.3f };
+GLfloat lightPositionOneValue[] { 0.5f, 1.0f, -0.3f };
+GLfloat lightPositionTwoValue[] { 0.5f, 1.0f, -0.3f };
+
 GLfloat cameraPositionValue[] { 1.0f, 0.0f, 4.0f };
+GLfloat cameraPositionTwoValue[] {1.0f, 0.0f, 4.0f };
+
 GLfloat lightColorValue[] = {1.0f, 1.0f, 1.0f};
+GLfloat lightColorTwoValue[] = {0.996f, 0.164f, 0.164f};
 
 
 
@@ -252,9 +260,9 @@ int initGL() {
     skyboxShader = Shader( "resources/shaders/skybox.vert", "resources/shaders/skybox.frag" );
 
     //Laste inn texture til kuben:
-    cubeTextureValue = TextureLoading::LoadTexture("resources/img/cube/texture.jpg");
+    cubeTextureValue = TextureLoading::LoadTexture("resources/img/cube/rock.png");
 
-    cubeNormalMapValue = TextureLoading::LoadTexture("resources/img/cube/texture_normal.jpg");
+    cubeNormalMapValue = TextureLoading::LoadTexture("resources/img/cube/rock_normal.png");
     
     //Laste inn texture til skyboxen:
     std::vector<const GLchar*> skyBoxTextureFaces;
@@ -269,14 +277,23 @@ int initGL() {
 
     // Henter inn uniform-loactions fra cube-shadere
     cubeShader.Use();
+    // Kubeplassering
     viewLoc = glGetUniformLocation( cubeShader.Program, "view" );
     projLoc = glGetUniformLocation( cubeShader.Program, "projection" );
     modelLoc = glGetUniformLocation( cubeShader.Program, "model" );
+    // Texture
     cubeTextureLoc = glGetUniformLocation( cubeShader.Program, "cubeTexture" );
     cubeNormalMapLoc = glGetUniformLocation( cubeShader.Program, "cubeNormalMap" );
+    // Lys 1
     lightColorLoc = glGetUniformLocation(cubeShader.Program, "lightColor");
     lightPositionLoc = glGetUniformLocation( cubeShader.Program, "lightPos" );
     viewPositionLoc = glGetUniformLocation( cubeShader.Program, "viewPos" );
+    // Lys 2
+    lightColorTwoLoc = glGetUniformLocation(cubeShader.Program, "lightColorTwo");
+    lightPositionTwoLoc = glGetUniformLocation( cubeShader.Program, "lightTwoPos" );
+    viewPositionTwoLoc = glGetUniformLocation( cubeShader.Program, "viewTwoPos" );
+    
+    
     
     
     cubeTwoShader.Use();
@@ -288,6 +305,8 @@ int initGL() {
     lightPositionLocCubeTwo = glGetUniformLocation( cubeTwoShader.Program, "lightPos" );
     viewPositionLocCubeTwo = glGetUniformLocation( cubeTwoShader.Program, "viewPos" );
 
+    
+    
     // Henter inn uniform-loactions fra skybox-shader
     skyboxShader.Use();
     projLocSkybox = glGetUniformLocation( skyboxShader.Program, "projection" );
@@ -689,9 +708,8 @@ void drawCubeTwo() {
         //glUniform3f(lightPositionLoc, lightPositionValue.x, lightPositionValue.y, lightPositionValue.z);
     
     glUniform3fv(lightColorLocCubeTwo, 1, lightColorValue);
-    glUniform3fv(lightPositionLocCubeTwo, 1, lightPositionValue);
+    glUniform3fv(lightPositionLocCubeTwo, 1, lightPositionOneValue);
     glUniform3fv(viewPositionLocCubeTwo, 1, cameraPositionValue);
-    
 
     // Aktiverer vertex-arrayen for kuben:
     glBindVertexArray( cubeTwoVAO );
@@ -735,15 +753,25 @@ void drawCube() {
     // Sender model-matrise til cube-shaderen:
     glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( modelCubeValue ) );
     
-    
-    
     // Sender resten av lys-matrisene til cube-shaderen:
-    //glm::vec3 lightPositionValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
-    //glUniform3f(lightPositionLoc, lightPositionValue.x, lightPositionValue.y, lightPositionValue.z);
     
+    //Lys 1:
+    glm::vec3 lightPositionOneValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
+    glUniform3f(lightPositionLoc, lightPositionOneValue.x, lightPositionOneValue.y, lightPositionOneValue.z);
+    //glUniform3fv(lightPositionLoc, 1, lightPositionOneValue);
     glUniform3fv(lightColorLoc, 1, lightColorValue);
-    glUniform3fv(lightPositionLoc, 1, lightPositionValue);
     glUniform3fv(viewPositionLoc, 1, cameraPositionValue);
+    
+    //Lys 2:
+    glm::vec3 lightPositionTwoValue(sinf(time * 2.0f), 2.0f, 0.8f);
+    glUniform3f(lightPositionTwoLoc, lightPositionTwoValue.x, lightPositionTwoValue.y, lightPositionTwoValue.z);
+    //glUniform3fv(lightPositionTwoLoc, 1, lightPositionTwoValue);
+    glUniform3fv(lightColorTwoLoc, 1, lightColorTwoValue);
+    glUniform3fv(viewPositionTwoLoc, 1, cameraPositionTwoValue);
+
+    
+    
+
      
 
     // Aktiverer vertex-arrayen for kuben:

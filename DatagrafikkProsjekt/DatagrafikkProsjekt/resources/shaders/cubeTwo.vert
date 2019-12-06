@@ -9,49 +9,30 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-// Trenger 2 nye sånne for lys
-uniform vec3 lightPos;
-uniform vec3 viewPos;
 
 // Output variables
 out vec2 cubeTextureCoordinates;
-
-// out - mapping
-out vec3 TangentLightPos;
-out vec3 TangentViewPos;
-out vec3 TangentFragPos;
+out vec3 Normal;
+out vec3 FragPos;
 
 
 void main()
 {
+    // Setter posisjonen til kuben i verden
+    gl_Position = projection * view * model * vec4(cubePositions, 1.0f);
+    
+    // Kalkulerer texturekoordinater til kuben som skal sendes til frag-shader
+    cubeTextureCoordinates = vec2(textureCoordinates.x, 1.0 - textureCoordinates.y);
 
     // Set the world vertex for calculating the light direction in the fragment shader
-    vec3 FragPos = vec3(model * vec4(cubePosition, 1.0));
+    //worldVertex = vec3(model * vec4(cubePositions, 1));
+    FragPos = vec3(model * vec4(cubePositions, 1.0));
     
-    cubeTextureCoordinates = textureCoordinates;
+    // Set the transformed normal
+    //Normal = mat3(model) * aNormal;
+    Normal = mat3(transpose(inverse(model))) * normalCoordinates;
     
-    // NormalMapping
-    mat3 normalMatrix = transpose(inverse(mat3(model)));
-    vec3 tangent = normalize(normalMatrix * tangentCoordinates);
-    vec3 normal = normalize(normalMatrix * normalCoordinates);
-    tangent = normalize(tangent - dot(tangent, normal) * normal);
-    
-    // Regner ut BiTangent ved å ta kryssproduktet av Normal og Tangent
-    vec3 biTangent = cross(normal, tangent);
-    
-    mat3 TBN = transpose(mat3(tangent, biTangent, normal));
-    TangentLightPos = TBN * lightPos;
-    TangentViewPos  = TBN * viewPos;
-    TangentFragPos  = TBN * FragPos;
-    
-    // Setter posisjonen til kuben i verden
-    gl_Position = projection * view * model * vec4(cubePosition, 1.0);
-    
-    
-    // Må regne ut lysavstand:
-    // d = len(lightPos - fragPos)
-    
-    // Deretter i vertes: legge de 2 lyskildene sammen!
-    
+    // We assign the color to the outgoing variable.
+   //interpolatedColor = textureCoordinates;
 }
 

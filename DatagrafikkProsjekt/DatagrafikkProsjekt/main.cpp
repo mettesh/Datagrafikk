@@ -52,6 +52,7 @@ void generateCubeTwoVerticesAndSetArraysAndBuffers();
 
 void drawSkybox();
 void drawCube();
+void drawCubeTwo();
 
 unsigned int loadTexture(const char *path);
 
@@ -91,9 +92,13 @@ GLint projLoc;
 GLint cubeTextureLoc;
 GLint cubeNormalMapLoc;
 
-// GLint lightColorLoc;
+// Uniform locations
 GLint lightPositionLoc;
 GLint viewPositionLoc;
+
+// Uniforms values
+GLfloat lightPositionValue[] { 0.5f, 1.0f, 0.3f };
+GLfloat cameraPositionValue[] { 1.0f, 0.0f, 4.0f };
 
 
 
@@ -101,8 +106,14 @@ GLint viewLocCubeTwo;
 GLint projLocCubeTwo;
 GLint modelLocCubeTwo;
 GLint cubeTextureLocCubeTwo;
+GLint lightColorLocCubeTwo;
 GLint lightPositionLocCubeTwo;
 GLint viewPositionLocCubeTwo;
+
+
+GLfloat lightPositionCubeTwoValue[] { 1.0f, -2.0f, -2.0f };
+GLfloat cameraPositionCubeTwoValue[] { 1.0f, 0.0f, 4.0f };
+GLfloat lightColorCubeTwoValue[] = {1.0f, 0.5f, 0.31f};
 
 
 
@@ -110,9 +121,8 @@ GLint viewPositionLocCubeTwo;
 GLint projLocSkybox;
 GLint viewLocSkybox;
 
-// Uniforms values
-GLfloat lightPositionValue[] { 0.5f, 1.0f, 0.3f };
-GLfloat cameraPositionValue[] { 1.0f, 0.0f, 4.0f };
+
+
 
 
 /* PROGRAMSTART */
@@ -192,9 +202,13 @@ int main(void) {
         // Setter clear-farge og dybdebuffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
+        drawCubeTwo();
+        
         drawSkybox();
         
         drawCube();
+        
+        
         
         // This function swaps the front and back buffers of the specified window
         // Front buffer = Det som vises på skjermen (Forrige frame)
@@ -267,12 +281,12 @@ int initGL() {
     cubeTwoShader.Use();
     viewLocCubeTwo = glGetUniformLocation( cubeTwoShader.Program, "view" );
     projLocCubeTwo = glGetUniformLocation( cubeTwoShader.Program, "projection" );
-    modelLocCubeTwo = glGetUniformLocation( cubeShader.Program, "model" );
+    modelLocCubeTwo = glGetUniformLocation( cubeTwoShader.Program, "model" );
     cubeTextureLocCubeTwo = glGetUniformLocation( cubeTwoShader.Program, "cubeTexture" );
+    lightColorLocCubeTwo = glGetUniformLocation(cubeTwoShader.Program, "lightColor");
     lightPositionLocCubeTwo = glGetUniformLocation( cubeTwoShader.Program, "lightPos" );
     viewPositionLocCubeTwo = glGetUniformLocation( cubeTwoShader.Program, "viewPos" );
-    
-    
+
     // Henter inn uniform-loactions fra skybox-shader
     skyboxShader.Use();
     projLocSkybox = glGetUniformLocation( skyboxShader.Program, "projection" );
@@ -296,6 +310,10 @@ void resizeGL(int width, int height) {
     glm::mat4 projectionCubeValue = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 100.0f);
     glUniformMatrix4fv( projLoc, 1, GL_FALSE, glm::value_ptr( projectionCubeValue ) );
     
+    cubeTwoShader.Use();
+    glm::mat4 projectionCubeTwoValue = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 100.0f);
+    glUniformMatrix4fv( projLocCubeTwo, 1, GL_FALSE, glm::value_ptr( projectionCubeTwoValue ) );
+    
     skyboxShader.Use();
     glm::mat4 projectionSkyboxValue = glm::perspective(camera.GetZoom(), (float)width/height, 0.1f, 1000.0f );
     glUniformMatrix4fv( projLocSkybox, 1, GL_FALSE, glm::value_ptr( projectionSkyboxValue ) );
@@ -311,17 +329,17 @@ void generateCubeTwoVerticesAndSetArraysAndBuffers() {
     
     // Punktene som tilsammen bygger kuben
     glm::vec3 positions[8];
-    positions[0] = glm::vec3(-1.0f,  1.0f, -1.0f);
-    positions[1] = glm::vec3(-1.0f, -1.0f, -1.0f);
-    positions[2] = glm::vec3( 1.0f, -1.0f, -1.0f);
-    positions[3] = glm::vec3( 1.0f,  1.0f, -1.0f);
-    positions[4] = glm::vec3(-1.0f,  1.0f, 1.0f);
-    positions[5] = glm::vec3(-1.0f, -1.0f, 1.0f);
-    positions[6] = glm::vec3( 1.0f, -1.0f, 1.0f);
-    positions[7] = glm::vec3( 1.0f,  1.0f, 1.0f);
+    positions[0] = glm::vec3( 3.0f,  1.0f, -1.0f);
+    positions[1] = glm::vec3( 3.0f, -1.0f, -1.0f);
+    positions[2] = glm::vec3( 5.0f, -1.0f, -1.0f);
+    positions[3] = glm::vec3( 5.0f,  1.0f, -1.0f);
+    positions[4] = glm::vec3( 3.0f,  1.0f, 1.0f);
+    positions[5] = glm::vec3( 3.0f, -1.0f, 1.0f);
+    positions[6] = glm::vec3( 5.0f, -1.0f, 1.0f);
+    positions[7] = glm::vec3( 5.0f,  1.0f, 1.0f);
     
     
-    // Texture-koordinater. SAmme for hver side
+    // Texture-koordinater. Samme for hver side
     glm::vec2 uv1(0.0f, 1.0f);
     glm::vec2 uv2(0.0f, 0.0f);
     glm::vec2 uv3(1.0f, 0.0f);
@@ -379,7 +397,7 @@ void generateCubeTwoVerticesAndSetArraysAndBuffers() {
         };
         
         // Appender den ferdige siden til cubeVertices
-        for(int i = 0; i < 66; i++){
+        for(int i = 0; i < 48; i++){
             cubeTwoVertices.push_back(oneSide[i]);
         }
         
@@ -399,7 +417,7 @@ void generateCubeTwoVerticesAndSetArraysAndBuffers() {
     glBindBuffer( GL_ARRAY_BUFFER, cubeTwoVBO );
     
 
-    glBufferData( GL_ARRAY_BUFFER, 6 * 9 * 6 * sizeof( GL_FLOAT ), cubeTwoVertices.data(), GL_STATIC_DRAW );
+    glBufferData( GL_ARRAY_BUFFER, 6 * 8 * 6 * sizeof( GL_FLOAT ), cubeTwoVertices.data(), GL_STATIC_DRAW );
     
     glVertexAttribPointer(POSITION, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (GLvoid*)0);
     glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (GLvoid*)(3 * sizeof(GLfloat)));
@@ -407,8 +425,8 @@ void generateCubeTwoVerticesAndSetArraysAndBuffers() {
     
     // Aktivere attributtene
     glEnableVertexAttribArray(POSITION);
-    glEnableVertexAttribArray(COLOR);
     glEnableVertexAttribArray(NORMAL);
+    glEnableVertexAttribArray(COLOR);
 
                                 
     
@@ -645,50 +663,44 @@ void drawCubeTwo() {
     float time = glfwGetTime();
     
     // Aktiverer programmet
-    cubeShader.Use();
+    cubeTwoShader.Use();
         
     // Henter og setter texture som sendes til cube-fragshader
+    // Samme texture som andre kuben
     glActiveTexture( GL_TEXTURE0 );
-    glUniform1i(cubeTextureLoc , 0);
+    glUniform1i(cubeTextureLocCubeTwo , 0);
     glBindTexture( GL_TEXTURE_2D, cubeTextureValue );
-    
-    // Henter og setter normalMap som sendes til cube-fragshader
-    glActiveTexture( GL_TEXTURE1 );
-    glUniform1i(cubeNormalMapLoc , 1);
-    glBindTexture( GL_TEXTURE_2D, cubeNormalMapValue );
-    
-    
-    
-    
+
     // Setter view matrisen
-    glm::mat4 viewCubeValue = camera.GetViewMatrix();
+    glm::mat4 viewCubeTwoValue = camera.GetViewMatrix();
     // Sender view-matrise til cube-shaderen:
-    glUniformMatrix4fv( viewLoc, 1, GL_FALSE, glm::value_ptr( viewCubeValue ) );
+    glUniformMatrix4fv( viewLocCubeTwo, 1, GL_FALSE, glm::value_ptr( viewCubeTwoValue ) );
 
     // Setter model-matrise
-    glm::mat4 modelCubeValue = glm::mat4(1.0f);
-    //modelCubeValue = glm::rotate(modelCubeValue, time * 0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
+    glm::mat4 modelCubeTwoValue = glm::mat4(1.0);
+    //model = glm::rotate(model, time * 0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
     // Sender model-matrise til cube-shaderen:
-    glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( modelCubeValue ) );
+    glUniformMatrix4fv( modelLocCubeTwo, 1, GL_FALSE, glm::value_ptr( modelCubeTwoValue ) );
     
+    // Sender resten av lys-matrisene??? til cube-shaderen:
     
+        //glm::vec3 lightPositionLoc(sinf(time * 1.0f), cosf(time * 2.0f), 0.8f);
+        //glUniform3f(lightPositionLoc, lightPositionValue.x, lightPositionValue.y, lightPositionValue.z);
     
-    // Sender resten av lys-matrisene til cube-shaderen:
-    glm::vec3 lightPositionValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
-    glUniform3f(lightPositionLoc, lightPositionValue.x, lightPositionValue.y, lightPositionValue.z);
+    glUniform3fv(lightColorLocCubeTwo, 1, lightColorCubeTwoValue);
+    glUniform3fv(lightPositionLocCubeTwo, 1, lightPositionCubeTwoValue);
+    glUniform3fv(viewPositionLocCubeTwo, 1, cameraPositionCubeTwoValue);
     
-    //glUniform3fv(lightPositionLoc, 1, lightPositionValue);
-    glUniform3fv(viewPositionLoc, 1, cameraPositionValue);
-     
 
     // Aktiverer vertex-arrayen for kuben:
-    glBindVertexArray( cubeVAO );
+    glBindVertexArray( cubeTwoVAO );
+       
     // Deretter tegnes trianglene:
     glDrawArrays( GL_TRIANGLES, 0, 36 );
-
-    glBindVertexArray(0);
+    
     // Deaktiverer shaderprogram som brukes og vertexarray
     glUseProgram(0);
+    glBindVertexArray(0);
 }
 
 void drawCube() {

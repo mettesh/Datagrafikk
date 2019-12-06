@@ -1,18 +1,21 @@
 #version 330 core
 
-layout (location = 0) in vec3 cubePosition;
-layout (location = 1) in vec3 normalCoordinates;
+// Henter inn vec-verdier fra cubeVertices - De 3 første posisjon, de 3 neste texCoord
+layout (location = 0) in vec3 cubePositions;
+layout (location = 1) in vec3 aNormal;
 layout (location = 2) in vec2 textureCoordinates;
 
-// Får inn matriser satt i drawGLScene() og resizeGL()
+// Får inn matriser satt i drawGLScene()
 uniform mat4 model;
 uniform mat4 view;
+// Får inn matrise satt i og resizeGL()
 uniform mat4 projection;
-
 
 // Output variables
 out vec2 cubeTextureCoordinates;
+// out vec2 interpolatedColor;
 out vec3 Normal;
+//out vec3 worldVertex;
 out vec3 FragPos;
 
 
@@ -30,9 +33,11 @@ void main()
     
     // Set the transformed normal
     //Normal = mat3(model) * aNormal;
-    Normal = mat3(transpose(inverse(model))) * normalCoordinates;
+    Normal = mat3(transpose(inverse(model))) * aNormal;
     
     // We assign the color to the outgoing variable.
    //interpolatedColor = textureCoordinates;
-}
+    
 
+    
+}

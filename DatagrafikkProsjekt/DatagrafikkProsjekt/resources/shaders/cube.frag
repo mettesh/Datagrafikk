@@ -24,7 +24,7 @@ void main()
     vec3 color = texture(cubeTexture, cubeTextureCoordinates).rgb;
     
     // ambient
-    vec3 ambient = 1.0 * color;
+    vec3 ambient = 0.3 * color;
     
     // diffuse
     vec3 lightDir = normalize(TangentLightPos - TangentFragPos);

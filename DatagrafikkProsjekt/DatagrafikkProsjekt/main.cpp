@@ -35,66 +35,24 @@
 #define MATERIAL 3
 #define CAMERA 4
 
-// KUBE:
-/*
- GLfloat cubeVertices[] =
- {
-     // Posisjon            // Texture      // Normal
-    -0.5f, -0.5f, -0.5f,    0.0f, 0.0f,     0.0f, 0.0f, 1.0f,
-     0.5f, -0.5f, -0.5f,    1.0f, 0.0f,     0.0f, 0.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,    1.0f, 1.0f,     0.0f, 0.0f, 1.0f,
-     0.5f,  0.5f, -0.5f,    1.0f, 1.0f,     0.0f, 0.0f, 1.0f,
-    -0.5f,  0.5f, -0.5f,    0.0f, 1.0f,     0.0f, 0.0f, 1.0f,
-    -0.5f, -0.5f, -0.5f,    0.0f, 0.0f,     0.0f, 0.0f, 1.0f,
-              
-    -0.5f, -0.5f,  0.5f,    0.0f, 0.0f,     0.0f, 0.0f, -1.0f,
-     0.5f, -0.5f,  0.5f,    1.0f, 0.0f,     0.0f, 0.0f, -1.0f,
-     0.5f,  0.5f,  0.5f,    1.0f, 1.0f,     0.0f, 0.0f, -1.0f,
-     0.5f,  0.5f,  0.5f,    1.0f, 1.0f,     0.0f, 0.0f, -1.0f,
-    -0.5f,  0.5f,  0.5f,    0.0f, 1.0f,     0.0f, 0.0f, -1.0f,
-    -0.5f, -0.5f,  0.5f,    0.0f, 0.0f,     0.0f, 0.0f, -1.0f,
-              
-     -0.5f,  0.5f,  0.5f,   1.0f, 0.0f,    -1.0f, 0.0f, 0.0f,
-     -0.5f,  0.5f, -0.5f,   1.0f, 1.0f,    -1.0f, 0.0f, 0.0f,
-     -0.5f, -0.5f, -0.5f,   0.0f, 1.0f,    -1.0f, 0.0f, 0.0f,
-     -0.5f, -0.5f, -0.5f,   0.0f, 1.0f,    -1.0f, 0.0f, 0.0f,
-     -0.5f, -0.5f,  0.5f,   0.0f, 0.0f,    -1.0f, 0.0f, 0.0f,
-     -0.5f,  0.5f,  0.5f,   1.0f, 0.0f,    -1.0f, 0.0f, 0.0f,
-
-     0.5f,  0.5f,  0.5f,    1.0f, 0.0f,     1.0f, 0.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,    1.0f, 1.0f,     1.0f, 0.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,    0.0f, 1.0f,     1.0f, 0.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,    0.0f, 1.0f,     1.0f, 0.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,    0.0f, 0.0f,     1.0f, 0.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,    1.0f, 0.0f,     1.0f, 0.0f, 0.0f,
-
-    -0.5f, -0.5f, -0.5f,    0.0f, 1.0f,     0.0f, 1.0f, 0.0f,
-     0.5f, -0.5f, -0.5f,    1.0f, 1.0f,     0.0f, 1.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,    1.0f, 0.0f,     0.0f, 1.0f, 0.0f,
-     0.5f, -0.5f,  0.5f,    1.0f, 0.0f,     0.0f, 1.0f, 0.0f,
-    -0.5f, -0.5f,  0.5f,    0.0f, 0.0f,     0.0f, 1.0f, 0.0f,
-    -0.5f, -0.5f, -0.5f,    0.0f, 1.0f,     0.0f, 1.0f, 0.0f,
-
-    -0.5f,  0.5f, -0.5f,    0.0f, 1.0f,     0.0f, -1.0f, 0.0f,
-     0.5f,  0.5f, -0.5f,    1.0f, 1.0f,     0.0f, -1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,    1.0f, 0.0f,     0.0f, -1.0f, 0.0f,
-     0.5f,  0.5f,  0.5f,    1.0f, 0.0f,     0.0f, -1.0f, 0.0f,
-    -0.5f,  0.5f,  0.5f,    0.0f, 0.0f,     0.0f, -1.0f, 0.0f,
-    -0.5f,  0.5f, -0.5f,    0.0f, 1.0f,     0.0f, -1.0f, 0.0f
- };
- */
-
-
 // Dimensjonene til vinduet
-// const GLuint WIDTH = 800, HEIGHT = 600;
 int SCREEN_WIDTH, SCREEN_HEIGHT;
 
-// For tastatur- og musebevegelser
+// Definerer alle funksjoner da C++ krever dette om de ikke kommer før kallet i koden.
+int initGL();
+static void glfwErrorCallback(int error, const char* description);
+void glfwWindowSizeCallback(GLFWwindow* window, int width, int height);
+void resizeGL(int width, int height);
 void KeyCallback( GLFWwindow *window, int key, int scancode, int action, int mode );
 void MouseCallback( GLFWwindow *window, double xPos, double yPos );
 void DoMovement( );
 void generateSkyBoxVerticesAndSetArraysAndBuffers();
 void generateCubeVerticesAndSetArraysAndBuffers();
+
+void drawSkybox();
+void drawCube();
+
+unsigned int loadTexture(const char *path);
 
 // Setter startposisjon til kamera
 Camera camera( glm::vec3( 1.0f, 0.0f, 3.0f ) );
@@ -121,6 +79,7 @@ GLuint cubemapTextureValue;
 GLuint cubeTextureValue;
 GLuint cubeNormalMapValue;
 
+
 // Cube & light  Uniform locations
 GLint modelLoc;
 GLint viewLoc;
@@ -138,22 +97,125 @@ GLint projLocSkybox;
 GLint viewLocSkybox;
 
 // Uniforms values
-GLfloat lightPositionValue[] { 1.0f, -2.0f, -2.0f };
+GLfloat lightPositionValue[] { 0.5f, 1.0f, 0.3f };
 GLfloat cameraPositionValue[] { 1.0f, 0.0f, 4.0f };
 
-// GLfloat lightColorValue[] = {1.0f, 0.5f, 0.31f};
 
+/* PROGRAMSTART */
+int main(void) {
+    
+    // Setter feilmelding
+    glfwSetErrorCallback(glfwErrorCallback);
+    
+    // Initialiserer GLWF og sjekker at det gikk OK
+    if (!glfwInit()) {
+        printf("Failed to initialize GLFW\n");
+        exit(EXIT_FAILURE);
+    }
+    
+    // GLFW benytter noe kalt windowHint. Disse forteller/spør GLFW om å sette visse versjoner
+    // av OpenGL + andre instillinger. - Dette er valgfritt, men Mac trenger noen!
+    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 3 ); //Ber her om OpenGL versjon 3
+    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
+    glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
+    glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
+    glfwWindowHint( GLFW_RESIZABLE, GL_TRUE );
 
+    // Opprette et GLFW-vindu + sjekker at det gikk ok
+    GLFWwindow* window = glfwCreateWindow(DEFAULT_WIDTH, DEFAULT_HEIGHT, "Datagrafikk 2019 - Prosjekt - Mette Strand Hornnes", NULL, NULL);
+    if (!window) {
+        printf("Failed to create GLFW window\n");
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    }
+    
+    // Setter callback-funksjoner som kalles om en tast er trykket ned, eller mus beveget på seg.
+    glfwSetKeyCallback( window, KeyCallback );
+    glfwSetCursorPosCallback( window, MouseCallback );
+    
+    // Setter en input-mode for vinduet. I dette tilfellet settes musepeker til å ikke syntes (heller ikke utenfor vinduet)
+    glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
+    
 
-/*
- * Initialize OpenGL
- */
+    // Henter inn størrelse på vinduet og lagrere dette på plassen til SCREEN_WIDTH - og _HEIGHT
+    glfwGetFramebufferSize( window, &SCREEN_WIDTH, &SCREEN_HEIGHT );
+    
+    // Setter endringer av vinduestørrelse
+    // This function sets the size callback of the specified window, which is called when the window is resized. The callback is provided with the size, in screen coordinates, of the content area of the window.
+    glfwSetWindowSizeCallback(window, glfwWindowSizeCallback);
+    
+    // Velger at det er dette vinduet OpenGL skal jobbe i
+    glfwMakeContextCurrent(window);
+    
+    // TODO: Trengs denne? Kun for eldre versjoner??
+    // glewExperimental = GL_TRUE;
+    
+    // Initialiserer GLEW og sjekker at det gikk ok
+    if (glewInit() != GLEW_OK) {
+        printf("Failed to initialize GLEW\n");
+        glfwDestroyWindow(window);
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    }
+    
+    // Sørge for at GLFW bytter buffere med en gang (Front og Back- Buffer)
+    glfwSwapInterval(0);
+    
+    // Initialiserer OpenGL
+    if (!initGL()) {
+        printf("Failed to initialize OpenGL\n");
+        glfwDestroyWindow(window);
+        glfwTerminate();
+        exit(EXIT_FAILURE);
+    }
+    
+    // Setter opp OpenGL-viewet
+    resizeGL(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    
+    // Run a loop until the window is closed
+    while (!glfwWindowShouldClose(window)) {
+        
+        // Setter clear-farge og dybdebuffer
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        
+        drawSkybox();
+        
+        drawCube();
+        
+        // This function swaps the front and back buffers of the specified window
+        // Front buffer = Det som vises på skjermen (Forrige frame)
+        // Back buffer = Det som nå tegnes (vurrent frame)
+        glfwSwapBuffers(window);
+        
+        // Sjekker om noen eventer er aktivert (F.eks key trykker, musepeker flytter osv.)
+        glfwPollEvents( );
+        
+        
+        // For å bestemme hvor lenge hver frame (bilde) skal vises på skjermen. For å sikre smoothe bevegelser.
+        // Brukes i doMovement()
+        GLfloat currentFrame = glfwGetTime( );
+        deltaTime = currentFrame - lastFrame;
+        lastFrame = currentFrame;
+        
+        // Kaller deretter den tilhørende responsfunksjonen.
+        DoMovement();
+        
+    }
+    
+    // Shutdown GLFW
+    glfwDestroyWindow(window);
+    glfwTerminate();
+    
+    // Exit
+    exit(EXIT_SUCCESS);
+    
+}
+
+/* Initiliaserer OpenGL */
 int initGL() {
     
     generateSkyBoxVerticesAndSetArraysAndBuffers();
-
     generateCubeVerticesAndSetArraysAndBuffers();
-    
     
     // Setup and compile our shaders
     cubeShader = Shader( "resources/shaders/cube.vert", "resources/shaders/cube.frag" );
@@ -179,20 +241,15 @@ int initGL() {
     viewLoc = glGetUniformLocation( cubeShader.Program, "view" );
     projLoc = glGetUniformLocation( cubeShader.Program, "projection" );
     modelLoc = glGetUniformLocation( cubeShader.Program, "model" );
-    
     cubeTextureLoc = glGetUniformLocation( cubeShader.Program, "cubeTexture" );
     cubeNormalMapLoc = glGetUniformLocation( cubeShader.Program, "cubeNormalMap" );
-    
-    //lightColorLoc = glGetUniformLocation(cubeShader.Program, "lightColor" );
     lightPositionLoc = glGetUniformLocation( cubeShader.Program, "lightPos" );
     viewPositionLoc = glGetUniformLocation( cubeShader.Program, "viewPos" );
-    
     
     // Henter inn uniform-loactions fra skybox-shader
     skyboxShader.Use();
     projLocSkybox = glGetUniformLocation( skyboxShader.Program, "projection" );
     viewLocSkybox = glGetUniformLocation( skyboxShader.Program, "view" );
-    
     
     
     // Implementerer Depth i applikasjonen ?????
@@ -201,100 +258,7 @@ int initGL() {
     return 1;
 }
 
-
-/*
- * Draw OpenGL screne
- */
-void drawGLScene() {
-    
-    // Setter clear-farge og dybdebuffer
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    
-    DoMovement();
-    
-    float time = glfwGetTime();
-    
-    /* * * * * * *
-    *
-    * Tegner skyboxen:
-    *
-    * * * * * * */
-
-        skyboxShader.Use();
-        
-        // Change depth function so depth test passes when values are equal to depth buffer's content
-        glDepthFunc( GL_LEQUAL );
-
-        // TODO: Tidligere. Hva gjør denne:  glm::mat4 viewSkybox = camera.GetViewMatrix();
-        glm::mat4 viewSkyboxValue = glm::mat4( glm::mat3( camera.GetViewMatrix( ) ) );
-        glUniformMatrix4fv( viewLocSkybox, 1, GL_FALSE, glm::value_ptr( viewSkyboxValue ) );
-
-        // Aktiverer vertex-arrayen for skyBox:
-        glBindVertexArray( skyboxVAO );
-        
-        glBindTexture( GL_TEXTURE_CUBE_MAP, cubemapTextureValue );
-        glDrawArrays( GL_TRIANGLES, 0, 36 );
-        glDepthFunc( GL_LESS ); // Setter dybdefunksjonen tilbake til default
-        
-        glUseProgram(0);
-        glBindVertexArray(0);
-    
-    
-/* * * * * * *
- *
- * Tegner kuben
- *
- * * * * * * */
-    
-    // Aktiverer programmet
-    cubeShader.Use();
-        
-    // Henter og setter texture som sendes til cube-fragshader
-    glActiveTexture( GL_TEXTURE0 );
-    glUniform1i(cubeTextureLoc , 0);
-    glBindTexture( GL_TEXTURE_2D, cubeTextureValue );
-    
-    // Henter og setter normalMap som sendes til cube-fragshader
-    glActiveTexture( GL_TEXTURE1 );
-    glUniform1i(cubeNormalMapLoc , 1);
-    glBindTexture( GL_TEXTURE_2D, cubeNormalMapValue );
-    
-    
-    // Setter view matrisen
-    glm::mat4 viewCubeValue = camera.GetViewMatrix();
-    // Sender view-matrise til cube-shaderen:
-    glUniformMatrix4fv( viewLoc, 1, GL_FALSE, glm::value_ptr( viewCubeValue ) );
-
-    // Setter model-matrise
-    glm::mat4 modelCubeValue = glm::mat4(1.0);
-    //model = glm::rotate(model, time * 0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
-    // Sender model-matrise til cube-shaderen:
-    glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( modelCubeValue ) );
-    
-    // Sender resten av lys-matrisene til cube-shaderen:
-    
-        //glm::vec3 lightPositionLoc(sinf(time * 1.0f), cosf(time * 2.0f), 0.8f);
-        //glUniform3f(lightPositionLoc, lightPositionValue.x, lightPositionValue.y, lightPositionValue.z);
-    
-    // glUniform3fv(lightColorLoc, 1, lightColorValue);
-    glUniform3fv(lightPositionLoc, 1, lightPositionValue);
-    glUniform3fv(viewPositionLoc, 1, cameraPositionValue);
-    
-    
-    
-
-    // Aktiverer vertex-arrayen for kuben:
-    glBindVertexArray( cubeVAO );
-       
-    // Deretter tegnes trianglene:
-    glDrawArrays( GL_TRIANGLES, 0, 6 );
-    
-    // Deaktiverer shaderprogram som brukes og vertexarray
-    glUseProgram(0);
-    glBindVertexArray(0);
-        
-}
-
+/* Endrer størrelse og projectionmatriser ved endring av vindu */
 void resizeGL(int width, int height) {
     
     // Feilhåndtering for å hindre at det blir deling på 0
@@ -315,16 +279,309 @@ void resizeGL(int width, int height) {
     
 }
 
-/*
- * Error callback function for GLFW
- */
+
+void generateCubeVerticesAndSetArraysAndBuffers() {
+    // Punktene som tilsammen bygger kuben
+    glm::vec3 positions[8];
+    positions[0] = glm::vec3(-1.0f,  1.0f, -1.0f);
+    positions[1] = glm::vec3(-1.0f, -1.0f, -1.0f);
+    positions[2] = glm::vec3( 1.0f, -1.0f, -1.0f);
+    positions[3] = glm::vec3( 1.0f,  1.0f, -1.0f);
+    positions[4] = glm::vec3(-1.0f,  1.0f, 1.0f);
+    positions[5] = glm::vec3(-1.0f, -1.0f, 1.0f);
+    positions[6] = glm::vec3( 1.0f, -1.0f, 1.0f);
+    positions[7] = glm::vec3( 1.0f,  1.0f, 1.0f);
+    
+    
+    // Texture-koordinater. SAmme for hver side
+    glm::vec2 uv1(0.0f, 1.0f);
+    glm::vec2 uv2(0.0f, 0.0f);
+    glm::vec2 uv3(1.0f, 0.0f);
+    glm::vec2 uv4(1.0f, 1.0f);
+    
+    // Normal-koordinater. En per side
+    glm::vec3 normals[8];
+     normals[0] = glm::vec3( 0.0f, 0.0f, 1.0f);
+     normals[1] = glm::vec3( 0.0f, 0.0f,-1.0f);
+     normals[2] = glm::vec3(-1.0f, 0.0f, 0.0f);
+     normals[3] = glm::vec3( 1.0f, 0.0f, 0.0f);
+     normals[4] = glm::vec3( 0.0f,-1.0f, 0.0f);
+     normals[5] = glm::vec3( 0.0f, 1.0f, 0.0f);
+
+                            
+    // For å sette opp kantene i riktig rekkefølge!
+    int indices[] = {0,1,2,3,1,5,6,2,4,5,1,0,4,5,6,7,3,2,6,7,0,4,7,3};
+    
+    // Teller for å styre hvilken normal som skal brukes til en side
+    int sideCounter = 0;
+    
+    // Deklarerer en vector som skal holde på de ferdige verdiene til kuben
+    std::vector<GLfloat> cubeVertices;
+    
+    // Deklarer vec3 som skal holde på de 4 ulike posisjons-punktene til hver side
+    glm::vec3 pos1, pos2, pos3, pos4;
+    
+    // Deklarerer vec3 som skal holde på normalen til hver side
+    glm::vec3 nm;
+    
+    // Deklarerer vec3 som skal holde på tangent og bittangent for hver side
+    glm::vec3 tangent1, bitangent1;
+    glm::vec3 tangent2, bitangent2;
+     
+    // Løkka kjører 6 ganger - en gang for hver side.
+    for (int face = 0; face < 24; face = face + 4){
+        
+        // Henter ut de korrektene posisjons-koordinatene for denne siden
+        pos1 = positions[indices[face]];
+        pos2 = positions[indices[face + 1]];
+        pos3 = positions[indices[face + 2]];
+        pos4 = positions[indices[face + 3]];
+        
+        // Henter ut korrekt normal-verdi for denne siden
+        nm = normals[sideCounter];
+        // plusser på en slik at neste normal-verdi blir valgt for neste side
+        sideCounter++;
+                                
+    
+        /* Kalkulerer verdier for 1. trekant til denne siden */
+        glm::vec3 edge1 = pos2 - pos1;
+        glm::vec3 edge2 = pos3 - pos1;
+        glm::vec2 deltaUV1 = uv2 - uv1;
+        glm::vec2 deltaUV2 = uv3 - uv1;
+
+        GLfloat f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+        tangent1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+        tangent1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+        tangent1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+        tangent1 = glm::normalize(tangent1);
+
+        bitangent1.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+        bitangent1.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+        bitangent1.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+        bitangent1 = glm::normalize(bitangent1);
+
+        
+        /* Kalkulerer verdier for 2. trekant til denne siden */
+        edge1 = pos3 - pos1;
+        edge2 = pos4 - pos1;
+        deltaUV1 = uv3 - uv1;
+        deltaUV2 = uv4 - uv1;
+
+        f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
+
+        tangent2.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
+        tangent2.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
+        tangent2.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
+        tangent2 = glm::normalize(tangent2);
+
+
+        bitangent2.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
+        bitangent2.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
+        bitangent2.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
+        bitangent2 = glm::normalize(bitangent2);
+        
+        
+        // Har nå alt for å bygge en side. Legger dette til i en midlertidig array
+        std::vector<GLfloat> oneSideVertices = {
+            // positions            // normal         // texcoords  // tangent                          // bitangent
+            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+            pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+
+            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
+            pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z
+        };
+        
+        // Appender den ferdige siden til cubeVertices
+        for(int i = 0; i < 84; i++){
+            cubeVertices.push_back(oneSideVertices[i]);
+        }
+        
+        // Frigjør minnet. TODO: Må denne gjøres?
+        oneSideVertices.clear();
+        
+    }
+    
+     //Antall man ønsker å opprette, arrayen som skal benyttes.
+     glGenVertexArrays( 1, &cubeVAO );
+     //Forteller OpenGL hvilken vertex-array som skal brukes.
+     glBindVertexArray( cubeVAO );
+     
+     //Antall man ønsker å opprette, arrayen som skal benyttes.
+     glGenBuffers( 1, &cubeVBO );
+     //Forteller OpenGL at dette er current bufferen som skal brukes (Skal bufferen modifiseres senere er det denne som skal endres)
+     glBindBuffer( GL_ARRAY_BUFFER, cubeVBO );
+     
+
+     glBufferData( GL_ARRAY_BUFFER, 6 * 14 * 6 * sizeof( GL_FLOAT ), cubeVertices.data(), GL_STATIC_DRAW );
+     
+     glVertexAttribPointer(POSITION, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (GLvoid*)0);
+     glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (GLvoid*)(3 * sizeof(GLfloat)));
+     glVertexAttribPointer(COLOR, 2, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (const void*)(6 * sizeof(GLfloat)));
+     glVertexAttribPointer(TANGENT, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (const void*)(8 * sizeof(GLfloat)));
+     glVertexAttribPointer(BITANGENT, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (const void*)(11 * sizeof(GLfloat)));
+     
+     // Aktivere attributtene
+     glEnableVertexAttribArray(POSITION);
+     glEnableVertexAttribArray(COLOR);
+     glEnableVertexAttribArray(NORMAL);
+     glEnableVertexAttribArray(TANGENT);
+     glEnableVertexAttribArray(BITANGENT);
+
+
+}
+
+void generateSkyBoxVerticesAndSetArraysAndBuffers() {
+    
+    GLfloat skyboxVertices[] =
+    {
+        // Posisjon
+        -1.0f,  1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+        -1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f
+     };
+    
+    glGenVertexArrays( 1, &skyboxVAO );
+    glGenBuffers( 1, &skyboxVBO );
+    glBindVertexArray( skyboxVAO );
+    glBindBuffer( GL_ARRAY_BUFFER, skyboxVBO );
+    
+    //Fyller bufferen med data: Bufferen som skal brukes, størrelsen den på holde av, de vertices som skal lagres, og info at det skal tegnes.
+    glBufferData( GL_ARRAY_BUFFER, 108 * sizeof( GL_FLOAT ), skyboxVertices, GL_STATIC_DRAW );
+    
+    // Posisjon attribute
+    glVertexAttribPointer( POSITION, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( GLfloat ), ( GLvoid * ) 0 );
+    
+    // Aktivere attributten
+    glEnableVertexAttribArray(POSITION);
+}
+
+
+void drawSkybox() {
+    
+    skyboxShader.Use();
+    // Change depth function so depth test passes when values are equal to depth buffer's content
+    glDepthFunc( GL_LEQUAL );
+
+    // TODO: Tidligere. Hva gjør denne:  glm::mat4 viewSkybox = camera.GetViewMatrix();
+    glm::mat4 viewSkyboxValue = glm::mat4( glm::mat3( camera.GetViewMatrix( ) ) );
+    glUniformMatrix4fv( viewLocSkybox, 1, GL_FALSE, glm::value_ptr( viewSkyboxValue ) );
+
+    // Aktiverer vertex-arrayen for skyBox:
+    glBindVertexArray( skyboxVAO );
+    
+    glBindTexture( GL_TEXTURE_CUBE_MAP, cubemapTextureValue );
+    glDrawArrays( GL_TRIANGLES, 0, 36 );
+    glDepthFunc( GL_LESS ); // Setter dybdefunksjonen tilbake til default
+    
+    glUseProgram(0);
+    glBindVertexArray(0);
+}
+
+void drawCube() {
+    
+    float time = glfwGetTime();
+    
+    // Aktiverer programmet
+    cubeShader.Use();
+        
+    // Henter og setter texture som sendes til cube-fragshader
+    glActiveTexture( GL_TEXTURE0 );
+    glUniform1i(cubeTextureLoc , 0);
+    glBindTexture( GL_TEXTURE_2D, cubeTextureValue );
+    
+    // Henter og setter normalMap som sendes til cube-fragshader
+    glActiveTexture( GL_TEXTURE1 );
+    glUniform1i(cubeNormalMapLoc , 1);
+    glBindTexture( GL_TEXTURE_2D, cubeNormalMapValue );
+    
+    
+    
+    
+    // Setter view matrisen
+    glm::mat4 viewCubeValue = camera.GetViewMatrix();
+    // Sender view-matrise til cube-shaderen:
+    glUniformMatrix4fv( viewLoc, 1, GL_FALSE, glm::value_ptr( viewCubeValue ) );
+
+    // Setter model-matrise
+    glm::mat4 modelCubeValue = glm::mat4(1.0f);
+    //modelCubeValue = glm::rotate(modelCubeValue, time * 0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
+    // Sender model-matrise til cube-shaderen:
+    glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( modelCubeValue ) );
+    
+    
+    
+    // Sender resten av lys-matrisene til cube-shaderen:
+    glm::vec3 lightPositionValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
+    glUniform3f(lightPositionLoc, lightPositionValue.x, lightPositionValue.y, lightPositionValue.z);
+    
+    //glUniform3fv(lightPositionLoc, 1, lightPositionValue);
+    glUniform3fv(viewPositionLoc, 1, cameraPositionValue);
+     
+
+    // Aktiverer vertex-arrayen for kuben:
+    glBindVertexArray( cubeVAO );
+    // Deretter tegnes trianglene:
+    glDrawArrays( GL_TRIANGLES, 0, 36 );
+
+    glBindVertexArray(0);
+    // Deaktiverer shaderprogram som brukes og vertexarray
+    glUseProgram(0);
+}
+
+
+/* Error callback function for GLFW */
 static void glfwErrorCallback(int error, const char* description) {
     fprintf(stderr, "Error: %s\n", description);
 }
 
+/* Window size changed callback function for GLFW */
+void glfwWindowSizeCallback(GLFWwindow* window, int width, int height) {
+    resizeGL(width, height);
+}
+
 // Metode som kalles hver gang en tast presses ned eller slippes opp
-void KeyCallback( GLFWwindow *window, int key, int scancode, int action, int mode)
-{
+void KeyCallback( GLFWwindow *window, int key, int scancode, int action, int mode) {
     if ( GLFW_KEY_ESCAPE == key && GLFW_PRESS == action )
     {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
@@ -341,10 +598,10 @@ void KeyCallback( GLFWwindow *window, int key, int scancode, int action, int mod
             keys[key] = false;
         }
     }
+    
 }
 
-void MouseCallback( GLFWwindow *window, double xPos, double yPos )
-{
+void MouseCallback( GLFWwindow *window, double xPos, double yPos ) {
     if ( firstMouse )
     {
         lastX = xPos;
@@ -361,8 +618,7 @@ void MouseCallback( GLFWwindow *window, double xPos, double yPos )
     camera.ProcessMouseMovement( xOffset, yOffset );
 }
 
-void DoMovement( )
-{
+void DoMovement( ) {
     if ( keys[GLFW_KEY_W] || keys[GLFW_KEY_UP] )
     {
         camera.ProcessKeyboard( FORWARD, deltaTime );
@@ -384,286 +640,4 @@ void DoMovement( )
     }
 }
 
-/*
- * Window size changed callback function for GLFW
- */
-void glfwWindowSizeCallback(GLFWwindow* window, int width, int height) {
-    
-    resizeGL(width, height);
-    
-}
 
-
-void generateCubeVerticesAndSetArraysAndBuffers()
-{
-    
-    if (cubeVAO == 0)
-    {
-        
-
-        // positions
-        glm::vec3 pos1(-1.0f,  1.0f, 0.0f);
-        glm::vec3 pos2(-1.0f, -1.0f, 0.0f);
-        glm::vec3 pos3( 1.0f, -1.0f, 0.0f);
-        glm::vec3 pos4( 1.0f,  1.0f, 0.0f);
-        // texture coordinates
-        glm::vec2 uv1(0.0f, 1.0f);
-        glm::vec2 uv2(0.0f, 0.0f);
-        glm::vec2 uv3(1.0f, 0.0f);
-        glm::vec2 uv4(1.0f, 1.0f);
-        // normal vector
-        glm::vec3 nm(0.0f, 0.0f, 1.0f);
-        
-        // calculate tangent/bitangent vectors of both triangles
-        glm::vec3 tangent1, bitangent1;
-        glm::vec3 tangent2, bitangent2;
-        // triangle 1
-        // ----------
-        glm::vec3 edge1 = pos2 - pos1;
-        glm::vec3 edge2 = pos3 - pos1;
-        glm::vec2 deltaUV1 = uv2 - uv1;
-        glm::vec2 deltaUV2 = uv3 - uv1;
-
-        GLfloat f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-        tangent1.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
-        tangent1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
-        tangent1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
-        tangent1 = glm::normalize(tangent1);
-
-        bitangent1.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
-        bitangent1.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
-        bitangent1.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
-        bitangent1 = glm::normalize(bitangent1);
-
-        // triangle 2
-        // ----------
-        edge1 = pos3 - pos1;
-        edge2 = pos4 - pos1;
-        deltaUV1 = uv3 - uv1;
-        deltaUV2 = uv4 - uv1;
-
-        f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
-
-        tangent2.x = f * (deltaUV2.y * edge1.x - deltaUV1.y * edge2.x);
-        tangent2.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
-        tangent2.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
-        tangent2 = glm::normalize(tangent2);
-
-
-        bitangent2.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
-        bitangent2.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
-        bitangent2.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
-        bitangent2 = glm::normalize(bitangent2);
-
-
-        GLfloat cubeVertices[] = {
-            // positions            // normal         // texcoords  // tangent                          // bitangent
-            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-            pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-
-            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
-            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
-            pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z
-        };
-         
-        
-         //Antall man ønsker å opprette, arrayen som skal benyttes.
-         glGenVertexArrays( 1, &cubeVAO );
-         //Forteller OpenGL hvilken vertex-array som skal brukes.
-         glBindVertexArray( cubeVAO );
-         
-         //Antall man ønsker å opprette, arrayen som skal benyttes.
-         glGenBuffers( 1, &cubeVBO );
-         //Forteller OpenGL at dette er current bufferen som skal brukes (Skal bufferen modifiseres senere er det denne som skal endres)
-         glBindBuffer( GL_ARRAY_BUFFER, cubeVBO );
-         
-
-         glBufferData( GL_ARRAY_BUFFER, 6 * 14 * sizeof( GL_FLOAT ), cubeVertices, GL_STATIC_DRAW );
-         
-         glVertexAttribPointer(POSITION, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (GLvoid*)0);
-         glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (GLvoid*)(3 * sizeof(GLfloat)));
-         glVertexAttribPointer(COLOR, 2, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (const void*)(6 * sizeof(GLfloat)));
-         glVertexAttribPointer(TANGENT, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (const void*)(8 * sizeof(GLfloat)));
-         glVertexAttribPointer(BITANGENT, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (const void*)(11 * sizeof(GLfloat)));
-         
-         // Aktivere attributtene
-         glEnableVertexAttribArray(POSITION);
-         glEnableVertexAttribArray(COLOR);
-         glEnableVertexAttribArray(NORMAL);
-         glEnableVertexAttribArray(TANGENT);
-         glEnableVertexAttribArray(BITANGENT);
-   
-    }
-}
-
-void generateSkyBoxVerticesAndSetArraysAndBuffers() {
-    
-    
-    if (cubeVAO == 0)
-    {
-        
-        GLfloat skyboxVertices[] =
-        {
-            // Posisjon
-            -1.0f,  1.0f, -1.0f,
-            -1.0f, -1.0f, -1.0f,
-             1.0f, -1.0f, -1.0f,
-             1.0f, -1.0f, -1.0f,
-             1.0f,  1.0f, -1.0f,
-            -1.0f,  1.0f, -1.0f,
-
-            -1.0f, -1.0f,  1.0f,
-            -1.0f, -1.0f, -1.0f,
-            -1.0f,  1.0f, -1.0f,
-            -1.0f,  1.0f, -1.0f,
-            -1.0f,  1.0f,  1.0f,
-            -1.0f, -1.0f,  1.0f,
-
-             1.0f, -1.0f, -1.0f,
-             1.0f, -1.0f,  1.0f,
-             1.0f,  1.0f,  1.0f,
-             1.0f,  1.0f,  1.0f,
-             1.0f,  1.0f, -1.0f,
-             1.0f, -1.0f, -1.0f,
-
-            -1.0f, -1.0f,  1.0f,
-            -1.0f,  1.0f,  1.0f,
-             1.0f,  1.0f,  1.0f,
-             1.0f,  1.0f,  1.0f,
-             1.0f, -1.0f,  1.0f,
-            -1.0f, -1.0f,  1.0f,
-
-            -1.0f,  1.0f, -1.0f,
-             1.0f,  1.0f, -1.0f,
-             1.0f,  1.0f,  1.0f,
-             1.0f,  1.0f,  1.0f,
-            -1.0f,  1.0f,  1.0f,
-            -1.0f,  1.0f, -1.0f,
-
-            -1.0f, -1.0f, -1.0f,
-            -1.0f, -1.0f,  1.0f,
-             1.0f, -1.0f, -1.0f,
-             1.0f, -1.0f, -1.0f,
-            -1.0f, -1.0f,  1.0f,
-             1.0f, -1.0f,  1.0f
-         };
-        
-        glGenVertexArrays( 1, &skyboxVAO );
-        glGenBuffers( 1, &skyboxVBO );
-        glBindVertexArray( skyboxVAO );
-        glBindBuffer( GL_ARRAY_BUFFER, skyboxVBO );
-        
-        //Fyller bufferen med data: Bufferen som skal brukes, størrelsen den på holde av, de vertices som skal lagres, og info at det skal tegnes.
-        glBufferData( GL_ARRAY_BUFFER, 108 * sizeof( GL_FLOAT ), skyboxVertices, GL_STATIC_DRAW );
-        
-        // Posisjon attribute
-        glVertexAttribPointer( POSITION, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( GLfloat ), ( GLvoid * ) 0 );
-        
-        // Aktivere attributten
-        glEnableVertexAttribArray(POSITION);
-    }
-}
-
-
-
-/*
- * PROGRAMSTART
- */
-int main(void) {
-    
-    glfwSetErrorCallback(glfwErrorCallback);
-    
-    // Initialiserer GLWF og sjekker at det gikk OK
-    if (!glfwInit()) {
-        printf("Failed to initialize GLFW\n");
-        exit(EXIT_FAILURE);
-    }
-    
-       // GLFW benytter noe kalt windowHint. Disse forteller/spør GLFW om å sette visse versjoner
-    // av OpenGL + andre instillinger. - Dette er valgfritt, men Mac trenger noen!
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 3 ); //Ber her om OpenGL versjon 3
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
-    glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
-    glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
-    glfwWindowHint( GLFW_RESIZABLE, GL_TRUE );
-
-    // Opprette et GLFW-vindu + sjekker at det gikk ok
-    GLFWwindow* window = glfwCreateWindow(DEFAULT_WIDTH, DEFAULT_HEIGHT, "Datagrafikk 2019 - Prosjekt - Mette Strand Hornnes", NULL, NULL);
-    if (!window) {
-        printf("Failed to create GLFW window\n");
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    }
-    
-    // Setter callback-funksjoner som kalles om en tast er trykket ned, eller mus beveget på seg.
-    glfwSetKeyCallback( window, KeyCallback );
-    glfwSetCursorPosCallback( window, MouseCallback );
-    
-    // TODO: Trengs denne?
-    // glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
-    
-    // TODO: Trengs denne?
-    // glfwGetFramebufferSize( window, &SCREEN_WIDTH, &SCREEN_HEIGHT );
-    
-    // Setter endringer av vinduestørrelse
-    glfwSetWindowSizeCallback(window, glfwWindowSizeCallback);
-    
-    // Velger at det er dette vinduet OpenGL skal jobbe i
-    glfwMakeContextCurrent(window);
-    
-    // TODO: Trengs denne?
-    // glewExperimental = GL_TRUE;
-    
-    // Initialiserer GLEW og sjekker at det gikk ok
-    if (glewInit() != GLEW_OK) {
-        printf("Failed to initialize GLEW\n");
-        glfwDestroyWindow(window);
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    }
-    
-    // Sørge for at GLFW bytter buffere med en gang
-    glfwSwapInterval(0);
-    
-    // Initialize OpenGL
-    if (!initGL()) {
-        printf("Failed to initialize OpenGL\n");
-        glfwDestroyWindow(window);
-        glfwTerminate();
-        exit(EXIT_FAILURE);
-    }
-    
-    // Setter opp OpenGL-viewet
-    resizeGL(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-    
-    // Run a loop until the window is closed
-    while (!glfwWindowShouldClose(window)) {
-        
-        // Setter frame time (For å sikre smoothe bevegesler)
-        GLfloat currentFrame = glfwGetTime( );
-        deltaTime = currentFrame - lastFrame;
-        lastFrame = currentFrame;
-        
-        // Draw OpenGL screne
-        drawGLScene();
-        
-        // Swap buffers
-        glfwSwapBuffers(window);
-        
-        // Sjekker om noen eventer er aktivert (F.eks key trykker, musepeker flytter osv.)
-        glfwPollEvents( );
-        // Kaller deretter den tilhørende responsfunksjonen.
-        //DoMovement();
-        
-    }
-    
-    // Shutdown GLFW
-    glfwDestroyWindow(window);
-    glfwTerminate();
-    
-    // Exit
-    exit(EXIT_SUCCESS);
-    
-}

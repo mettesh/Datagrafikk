@@ -48,8 +48,10 @@ void main()
     mat3 TBN = transpose(mat3(tangent, biTangent, normal));
     TangentLightOnePos = TBN * lightOnePos;
     TangentLightTwoPos = TBN * lightTwoPos;
+    
     TangentViewOnePos  = TBN * viewOnePos;
-    TangentViewTwoPos  = TBN * viewOnePos;
+    TangentViewTwoPos  = TBN * viewTwoPos;
+    
     TangentFragPos  = TBN * FragPos;
     
     // Setter posisjonen til kuben i verden

@@ -104,10 +104,11 @@ GLint lightColorTwoLoc;
 
 // Light Uniforms values (For begge kubene!)
 GLfloat lightPositionOneValue[] { 0.5f, 1.0f, 0.3f };
-GLfloat lightPositionTwoValue[] { 0.5f, 1.0f, -0.3f };
+GLfloat lightPositionTwoValue[] { 0.5f, 1.0f, -1.3f };
 
-GLfloat cameraPositionValue[] { 1.0f, 0.0f, 4.0f };
-GLfloat cameraPositionTwoValue[] {1.0f, 0.0f, 4.0f };
+// Henter fra Camera
+//GLfloat cameraPositionValue[] { 1.0f, 0.0f, 4.0f };
+//GLfloat cameraPositionTwoValue[] {5.0f, 5.0f, 4.0f };
 
 GLfloat lightColorValue[] = {1.0f, 1.0f, 1.0f};
 GLfloat lightColorTwoValue[] = {0.996f, 0.164f, 0.164f};
@@ -285,7 +286,7 @@ int initGL() {
     cubeTextureLoc = glGetUniformLocation( cubeShader.Program, "cubeTexture" );
     cubeNormalMapLoc = glGetUniformLocation( cubeShader.Program, "cubeNormalMap" );
     // Lys 1
-    lightColorLoc = glGetUniformLocation(cubeShader.Program, "lightColor");
+    lightColorLoc = glGetUniformLocation(cubeShader.Program, "lightColorOne");
     lightPositionLoc = glGetUniformLocation( cubeShader.Program, "lightPos" );
     viewPositionLoc = glGetUniformLocation( cubeShader.Program, "viewPos" );
     // Lys 2
@@ -709,7 +710,7 @@ void drawCubeTwo() {
     
     glUniform3fv(lightColorLocCubeTwo, 1, lightColorValue);
     glUniform3fv(lightPositionLocCubeTwo, 1, lightPositionOneValue);
-    glUniform3fv(viewPositionLocCubeTwo, 1, cameraPositionValue);
+    glUniform3f(viewPositionLocCubeTwo, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
 
     // Aktiverer vertex-arrayen for kuben:
     glBindVertexArray( cubeTwoVAO );
@@ -760,14 +761,17 @@ void drawCube() {
     glUniform3f(lightPositionLoc, lightPositionOneValue.x, lightPositionOneValue.y, lightPositionOneValue.z);
     //glUniform3fv(lightPositionLoc, 1, lightPositionOneValue);
     glUniform3fv(lightColorLoc, 1, lightColorValue);
-    glUniform3fv(viewPositionLoc, 1, cameraPositionValue);
+    
+    glUniform3f(viewPositionLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
     
     //Lys 2:
     glm::vec3 lightPositionTwoValue(sinf(time * 2.0f), 2.0f, 0.8f);
     glUniform3f(lightPositionTwoLoc, lightPositionTwoValue.x, lightPositionTwoValue.y, lightPositionTwoValue.z);
     //glUniform3fv(lightPositionTwoLoc, 1, lightPositionTwoValue);
+    
     glUniform3fv(lightColorTwoLoc, 1, lightColorTwoValue);
-    glUniform3fv(viewPositionTwoLoc, 1, cameraPositionTwoValue);
+    
+    glUniform3f(viewPositionTwoLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
 
     
     

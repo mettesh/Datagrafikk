@@ -1,13 +1,8 @@
 #version 330 core
 
-vec3 normal;
-vec3 color;
+// Definerer metoden da jeg ønsker å ha main-funksjonen først.
+vec3 getFragColor(vec3 lightPos, vec3 lightColor, vec3 ViewPos, float ambientStrength, float specularStrength, float specularShininess);
 
-float DOne;
-float DTwo;
-
-
-// Sette tilhørende variabler i objekter  . .  Lys1{. . . }
 // Får inn koordinater fra cubeVertices
 in vec2 cubeTextureCoordinates;
 in vec3 TangentLightPos;
@@ -20,89 +15,65 @@ in vec3 TangentFragPos;
 uniform sampler2D cubeTexture;
 uniform sampler2D cubeNormalMap;
 
-uniform vec3 lightColor;
+uniform vec3 lightColorOne;
 uniform vec3 lightColorTwo;
 
 // Endelig resultat som sendes ut
-out vec4 FragColor;
-
-
-// Kan settes sammen i en metode: Sende lightPos, viewPos, fragPos og LightColor
-vec3 getLightOne() {
-    
-    // ambient
-    float ambientStrength = 0.3;
-    vec3 ambient = ambientStrength * color;
-    
-    // diffuse
-    vec3 lightDir = normalize(TangentLightPos - TangentFragPos);
-    float diff = max(dot(lightDir, normal), 0.0);
-    vec3 diffuse = diff * color;
-    
-    // Specular
-    float specularStrength = 1.0;
-    vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
-    vec3 relectDir = reflect(-lightDir, normal);
-    vec3 halfwayDir = normalize(lightDir + viewDir);
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
-    vec3 specular = vec3(specularStrength) * spec;
-
-    DOne = length(TangentLightPos - TangentFragPos);
-    
-    vec3 lightOne = (ambient + diffuse + specular) * lightColor;
-    
-    return lightOne;
-    
-}
-
-vec3 getLightTwo() {
-    
-    // ambient
-    float ambientStrength = 0.3;
-    vec3 ambient = ambientStrength * color;
-    
-    // diffuse
-    vec3 lightDir = normalize(TangentLightTwoPos - TangentFragPos);
-    float diff = max(dot(lightDir, normal), 0.0);
-    vec3 diffuse = diff * color;
-    
-    // Specular
-    float specularStrength = 1.0;
-    vec3 viewDir = normalize(TangentViewTwoPos - TangentFragPos);
-    vec3 relectDir = reflect(-lightDir, normal);
-    vec3 halfwayDir = normalize(lightDir + viewDir);
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
-    vec3 specular = vec3(specularStrength) * spec;
-    
-    DTwo = length(TangentLightTwoPos - TangentFragPos);
-    
-    vec3 lightTwo = (ambient + diffuse + specular) * lightColorTwo;
-    
-    return lightTwo;
-}
-
+out vec4 FragColorResult;
 
 void main()
 {
-    // Normalverdier
-    normal = texture(cubeNormalMap, cubeTextureCoordinates).rgb;
-    normal = normalize(normal * 2.0 - 1.0);
+    vec3 fragColorLightOne = getFragColor(TangentLightPos, lightColorOne, TangentViewPos, 0.1, 0.5, 64.0);
+    vec3 fragColorLightTwo = getFragColor(TangentLightTwoPos, lightColorTwo, TangentViewTwoPos, 0.1, 0.5, 32.0);
     
-    // diffuse-farge
-    color = texture(cubeTexture, cubeTextureCoordinates).rgb;
-      
-    vec3 lightOne = getLightOne();
-    vec3 lightTwo = getLightTwo();
+    float lightOneDistance = length(TangentLightPos - TangentFragPos);
+    float lightTwoDistance = length(TangentLightTwoPos - TangentFragPos);
     
-    vec3 colorOne = ( ( DOne / (DOne + DTwo ) ) * lightOne);
-    vec3 colorTwo = ( ( DTwo / (DOne + DTwo ) ) * lightTwo);
-    
+    vec3 colorOne = ( ( lightOneDistance / (lightOneDistance + lightTwoDistance ) ) * fragColorLightOne);
+    vec3 colorTwo = ( ( lightTwoDistance / (lightOneDistance + lightTwoDistance ) ) * fragColorLightTwo);
     
     // Hvorfor en svart side??
     vec3 result = colorOne + colorTwo;
     
-    FragColor = vec4(result, 1.0);
+    FragColorResult = vec4(result, 1.0);
 }
+
+// Kan settes sammen i en metode: Sende lightPos, viewPos, fragPos og LightColor
+vec3 getFragColor(vec3 lightPos, vec3 lightColor, vec3 viewPos, float ambientStrength, float specularStrength, float specularShininess) {
+    
+    // Normalverdier
+    vec3 normal = texture(cubeNormalMap, cubeTextureCoordinates).rgb;
+    normal = normalize(normal * 2.0 - 1.0);
+    
+    // diffuse-farge
+    vec3 objectColor = texture(cubeTexture, cubeTextureCoordinates).rgb;
+    
+    // ambient
+    // We take the light's color, multiply it with a small constant ambient factor,
+    // multiply this with the object's color and use it as the fragment's color:
+    vec3 ambient = ambientStrength * lightColor;
+    
+    // diffuse
+    vec3 lightDir = normalize(lightPos - TangentFragPos);
+    // We then need to measure at what angle the light ray touches the fragment.
+    // The angle between the two vectors can then easily be calculated with the dot product.
+    float diff = max(dot(lightDir, normal), 0.0);
+    vec3 diffuse = diff * lightColor;
+    
+    // Specular
+    vec3 viewDir = normalize(viewPos - TangentFragPos);
+    vec3 relectDir = reflect(-lightDir, normal);
+    //vec3 halfwayDir = normalize(lightDir + viewDir);
+    float spec = pow(max(dot(viewDir, relectDir), 0.0), specularShininess);
+    vec3 specular = specularStrength * spec * lightColor;
+
+    vec3 fragColor = (ambient + diffuse + specular) * objectColor;
+    
+    return fragColor;
+}
+
+
+
 
 
 

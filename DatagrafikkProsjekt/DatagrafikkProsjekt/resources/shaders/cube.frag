@@ -5,9 +5,9 @@ vec3 getFragColor(vec3 lightPos, vec3 lightColor, vec3 ViewPos, float ambientStr
 
 // Får inn koordinater fra cubeVertices
 in vec2 cubeTextureCoordinates;
-in vec3 TangentLightPos;
+in vec3 TangentLightOnePos;
 in vec3 TangentLightTwoPos;
-in vec3 TangentViewPos;
+in vec3 TangentViewOnePos;
 in vec3 TangentViewTwoPos;
 in vec3 TangentFragPos;
 
@@ -15,18 +15,18 @@ in vec3 TangentFragPos;
 uniform sampler2D cubeTexture;
 uniform sampler2D cubeNormalMap;
 
-uniform vec3 lightColorOne;
-uniform vec3 lightColorTwo;
+uniform vec3 lightOneColor;
+uniform vec3 lightTwoColor;
 
 // Endelig resultat som sendes ut
 out vec4 FragColorResult;
 
 void main()
 {
-    vec3 fragColorLightOne = getFragColor(TangentLightPos, lightColorOne, TangentViewPos, 0.1, 0.5, 64.0);
-    vec3 fragColorLightTwo = getFragColor(TangentLightTwoPos, lightColorTwo, TangentViewTwoPos, 0.1, 0.5, 32.0);
+    vec3 fragColorLightOne = getFragColor(TangentLightOnePos, lightOneColor, TangentViewOnePos, 0.1, 0.5, 64.0);
+    vec3 fragColorLightTwo = getFragColor(TangentLightTwoPos, lightTwoColor, TangentViewTwoPos, 0.1, 0.5, 32.0);
     
-    float lightOneDistance = length(TangentLightPos - TangentFragPos);
+    float lightOneDistance = length(TangentLightOnePos - TangentFragPos);
     float lightTwoDistance = length(TangentLightTwoPos - TangentFragPos);
     
     vec3 colorOne = ( ( lightOneDistance / (lightOneDistance + lightTwoDistance ) ) * fragColorLightOne);

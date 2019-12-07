@@ -11,19 +11,19 @@ uniform mat4 view;
 uniform mat4 projection;
 
 // Trenger 2 nye sånne for lys . . .
-uniform vec3 lightPos;
+uniform vec3 lightOnePos;
 uniform vec3 lightTwoPos;
 
-uniform vec3 viewPos;
+uniform vec3 viewOnePos;
 uniform vec3 viewTwoPos;
 
 // Output variables
 out vec2 cubeTextureCoordinates;
 
 // out - mapping
-out vec3 TangentLightPos;
+out vec3 TangentLightOnePos;
 out vec3 TangentLightTwoPos;
-out vec3 TangentViewPos;
+out vec3 TangentViewOnePos;
 out vec3 TangentViewTwoPos;
 out vec3 TangentFragPos;
 
@@ -46,10 +46,10 @@ void main()
     vec3 biTangent = cross(normal, tangent);
     
     mat3 TBN = transpose(mat3(tangent, biTangent, normal));
-    TangentLightPos = TBN * lightPos;
+    TangentLightOnePos = TBN * lightOnePos;
     TangentLightTwoPos = TBN * lightTwoPos;
-    TangentViewPos  = TBN * viewPos;
-    TangentViewTwoPos  = TBN * viewPos;
+    TangentViewOnePos  = TBN * viewOnePos;
+    TangentViewTwoPos  = TBN * viewOnePos;
     TangentFragPos  = TBN * FragPos;
     
     // Setter posisjonen til kuben i verden

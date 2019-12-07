@@ -22,9 +22,11 @@ out vec2 cubeTextureCoordinates;
 
 // out - mapping
 out vec3 TangentLightOnePos;
-out vec3 TangentLightTwoPos;
 out vec3 TangentViewOnePos;
+
+out vec3 TangentLightTwoPos;
 out vec3 TangentViewTwoPos;
+
 out vec3 TangentFragPos;
 
 
@@ -56,6 +58,5 @@ void main()
     
     // Setter posisjonen til kuben i verden
     gl_Position = projection * view * model * vec4(cubePosition, 1.0);
-    
     
 }

@@ -57,7 +57,7 @@ void drawCubeTwo();
 unsigned int loadTexture(const char *path);
 
 // Setter startposisjon til kamera
-Camera camera( glm::vec3( 1.0f, 0.0f, 3.0f ) );
+Camera camera( glm::vec3( 2.0f, 0.0f, 2.0f ) );
 
 GLfloat lastX = SCREEN_WIDTH / 2.0f;
 GLfloat lastY = SCREEN_WIDTH / 2.0f;
@@ -110,8 +110,8 @@ GLint viewLocSkybox;
 
 // Lys uniform values (For begge kubene)
 // Light Uniforms values (For begge kubene!)
-GLfloat lightPositionOneValue[] { 0.0f, 1.0f, -0.3f };
-GLfloat lightPositionTwoValue[] { 0.5f, 1.0f, -1.3f };
+GLfloat lightPositionOneValue[] { 8.0f, 0.0f, -0.5f };
+GLfloat lightPositionTwoValue[] { -4.0f, 0.0f, -0.5f };
 // Henter fra Camera
 //GLfloat cameraPositionValue[] { 1.0f, 0.0f, 4.0f };
 //GLfloat cameraPositionTwoValue[] {5.0f, 5.0f, 4.0f };

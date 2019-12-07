@@ -25,8 +25,8 @@ out vec4 FragColorResult;
 
 void main()
 {
-    vec3 fragColorLightOne = getFragColor(lightOnePos, lightOneColor, viewOnePos, 0.1, 0.5, 64.0);
-    vec3 fragColorLightTwo = getFragColor(lightTwoPos, lightTwoColor, viewTwoPos, 0.1, 0.5, 64.0);
+    vec3 fragColorLightOne = getFragColor(lightOnePos, lightOneColor, viewOnePos, 0.1, 0.2, 64.0);
+    vec3 fragColorLightTwo = getFragColor(lightTwoPos, lightTwoColor, viewTwoPos, 0.1, 0.2, 64.0);
     
     float lightOneDistance = length(lightOnePos - FragPos);
     float lightTwoDistance = length(lightTwoPos - FragPos);
@@ -34,8 +34,11 @@ void main()
     vec3 colorOne = ( ( lightOneDistance / (lightOneDistance + lightTwoDistance ) ) * fragColorLightOne);
     vec3 colorTwo = ( ( lightTwoDistance / (lightOneDistance + lightTwoDistance ) ) * fragColorLightTwo);
     
-    // Hvorfor en svart side??
-    vec3 result = colorOne + colorTwo;
+    
+    // TODO: Hva er riktig??
+    //vec3 result = colorOne + colorTwo;
+    
+    vec3 result = fragColorLightOne + fragColorLightTwo;
     
     FragColorResult = vec4(result, 1.0);
 }
@@ -52,22 +55,22 @@ vec3 getFragColor(vec3 lightPos, vec3 lightColor, vec3 viewPos, float ambientStr
     
     // ambient
     //float ambientStrength = 0.3;
-    vec3 ambient = ambientStrength * objectColor;
+    vec3 ambient = ambientStrength * lightColor;
 
     // diffuse
     vec3 lightDir = normalize(lightPos - FragPos);
     float diff = max(dot(lightDir, normal), 0.0);
-    vec3 diffuse = diff * objectColor;
+    vec3 diffuse = diff * lightColor;
 
     // Specular
     //float specularStrength = 1.0;
     vec3 viewDir = normalize(viewPos - FragPos);
     vec3 reflectDir = reflect(-lightDir, normal);
     vec3 halfwayDir = normalize(lightDir + viewDir);
-    float spec = pow(max(dot(normal, halfwayDir), 0.0), 32.0);
-    vec3 specular = vec3(specularStrength) * spec;
+    float spec = pow(max(dot(normal, halfwayDir), 0.0), specularShininess);
+    vec3 specular = specularStrength * spec * lightColor;
     
-    vec3 fragColor = (ambient + diffuse + specular) * lightColor;
+    vec3 fragColor = (ambient + diffuse + specular) * objectColor;
     return fragColor;
 
 }

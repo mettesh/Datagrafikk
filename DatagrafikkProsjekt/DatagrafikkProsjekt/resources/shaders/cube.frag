@@ -23,8 +23,8 @@ out vec4 FragColorResult;
 
 void main()
 {
-    vec3 fragColorLightOne = getFragColor(TangentLightOnePos, lightOneColor, TangentViewOnePos, 0.1, 0.5, 64.0);
-    vec3 fragColorLightTwo = getFragColor(TangentLightTwoPos, lightTwoColor, TangentViewTwoPos, 0.1, 0.5, 64.0);
+    vec3 fragColorLightOne = getFragColor(TangentLightOnePos, lightOneColor, TangentViewOnePos, 0.1, 0.2, 64.0);
+    vec3 fragColorLightTwo = getFragColor(TangentLightTwoPos, lightTwoColor, TangentViewTwoPos, 0.1, 0.2, 64.0);
     
     float lightOneDistance = length(TangentLightOnePos - TangentFragPos);
     float lightTwoDistance = length(TangentLightTwoPos - TangentFragPos);
@@ -32,8 +32,10 @@ void main()
     vec3 colorOne = ( ( lightOneDistance / (lightOneDistance + lightTwoDistance ) ) * fragColorLightOne);
     vec3 colorTwo = ( ( lightTwoDistance / (lightOneDistance + lightTwoDistance ) ) * fragColorLightTwo);
     
-    // Hvorfor en svart side??
-    vec3 result = colorOne + colorTwo;
+    // TODO: Hva er riktig?? En side er svart med denne
+    //vec3 result = colorOne + colorTwo;
+    
+    vec3 result = fragColorLightOne + fragColorLightTwo;
     
     FragColorResult = vec4(result, 1.0);
 }

@@ -112,9 +112,11 @@ GLint viewLocSkybox;
 // Light Uniforms values (For begge kubene!)
 GLfloat lightPositionOneValue[] { 8.0f, 0.0f, -0.5f };
 GLfloat lightPositionTwoValue[] { -4.0f, 0.0f, -0.5f };
+
 // Henter fra Camera
 //GLfloat cameraPositionValue[] { 1.0f, 0.0f, 4.0f };
 //GLfloat cameraPositionTwoValue[] {5.0f, 5.0f, 4.0f };
+
 GLfloat lightColorOneValue[] = {1.0f, 1.0f, 1.0f};
 GLfloat lightColorTwoValue[] = {0.996f, 0.164f, 0.164f};
 
@@ -350,14 +352,14 @@ void generateCubeTwoVerticesAndSetArraysAndBuffers() {
     
     // Punktene som tilsammen bygger kuben
     glm::vec3 positions[8];
-    positions[0] = glm::vec3( 3.0f,  1.0f, -1.0f);
-    positions[1] = glm::vec3( 3.0f, -1.0f, -1.0f);
-    positions[2] = glm::vec3( 5.0f, -1.0f, -1.0f);
-    positions[3] = glm::vec3( 5.0f,  1.0f, -1.0f);
-    positions[4] = glm::vec3( 3.0f,  1.0f, 1.0f);
-    positions[5] = glm::vec3( 3.0f, -1.0f, 1.0f);
-    positions[6] = glm::vec3( 5.0f, -1.0f, 1.0f);
-    positions[7] = glm::vec3( 5.0f,  1.0f, 1.0f);
+    positions[0] = glm::vec3( 3.0f,  1.0f, -3.0f);
+    positions[1] = glm::vec3( 3.0f, -1.0f, -3.0f);
+    positions[2] = glm::vec3( 5.0f, -1.0f, -3.0f);
+    positions[3] = glm::vec3( 5.0f,  1.0f, -3.0f);
+    positions[4] = glm::vec3( 3.0f,  1.0f, -1.0f);
+    positions[5] = glm::vec3( 3.0f, -1.0f, -1.0f);
+    positions[6] = glm::vec3( 5.0f, -1.0f, -1.0f);
+    positions[7] = glm::vec3( 5.0f,  1.0f, -1.0f);
     
     
     // Texture-koordinater. Samme for hver side
@@ -755,7 +757,7 @@ void drawCubeTwo() {
 
     // Setter model-matrise
     glm::mat4 modelCubeTwoValue = glm::mat4(1.0);
-    //model = glm::rotate(model, time * 0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
+    // modelCubeTwoValue = glm::rotate(modelCubeTwoValue, time * 0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
     // Sender model-matrise til cube-shaderen:
     glUniformMatrix4fv( modelLocCubeTwo, 1, GL_FALSE, glm::value_ptr( modelCubeTwoValue ) );
     

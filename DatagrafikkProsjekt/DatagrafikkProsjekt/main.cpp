@@ -48,14 +48,16 @@ void MouseCallback( GLFWwindow *window, double xPos, double yPos );
 void DoMovement( );
 void generateSkyBoxVerticesAndSetArraysAndBuffers();
 void generateCubeVerticesAndSetArraysAndBuffers();
+void generateCubeTwoVerticesAndSetArraysAndBuffers();
 
 void drawSkybox();
 void drawCube();
+void drawCubeTwo();
 
 unsigned int loadTexture(const char *path);
 
 // Setter startposisjon til kamera
-Camera camera( glm::vec3( 1.0f, 0.0f, 3.0f ) );
+Camera camera( glm::vec3( 2.0f, 0.0f, 2.0f ) );
 
 GLfloat lastX = SCREEN_WIDTH / 2.0f;
 GLfloat lastY = SCREEN_WIDTH / 2.0f;
@@ -68,11 +70,56 @@ GLfloat lastFrame = 0.0f;
 
 // Vertex-array og buffer -object for KUBE og SKYBOX
 GLuint cubeVAO, cubeVBO;
+GLuint cubeTwoVAO, cubeTwoVBO;
 GLuint skyboxVAO, skyboxVBO;
 
 // Shadere
 Shader cubeShader;
+Shader cubeTwoShader;
 Shader skyboxShader;
+
+// Uniform location kube 1:
+GLint modelLoc;
+GLint viewLoc;
+GLint projLoc;
+GLint cubeTextureLoc;
+GLint cubeNormalMapLoc;
+GLint lightPositionOneLoc;
+GLint lightPositionTwoLoc;
+GLint viewPositionOneLoc;
+GLint viewPositionTwoLoc;
+GLint lightColorOneLoc;
+GLint lightColorTwoLoc;
+
+// Uniform location kube 2:
+GLint viewLocCubeTwo;
+GLint projLocCubeTwo;
+GLint modelLocCubeTwo;
+GLint cubeTextureLocCubeTwo;
+GLint lightColorOneLocCubeTwo;
+GLint lightPositionOneLocCubeTwo;
+GLint viewPositionOneLocCubeTwo;
+GLint lightColorTwoLocCubeTwo;
+GLint lightPositionTwoLocCubeTwo;
+GLint viewPositionTwoLocCubeTwo;
+
+// Uniform locations Skybox
+GLint projLocSkybox;
+GLint viewLocSkybox;
+
+
+// Lys uniform values (For begge kubene)
+// Light Uniforms values (For begge kubene!)
+GLfloat lightPositionOneValue[] { 8.0f, 3.0f, 1.5f };
+GLfloat lightPositionTwoValue[] { -3.0f, 3.0f, -1.5f };
+
+// Henter fra Camera
+//GLfloat cameraPositionValue[] { 0.0f, 0.0f, 0.0f };
+//GLfloat cameraPositionTwoValue[] {0.0f, 0.0f, 0.0f };
+
+GLfloat lightColorOneValue[] = {1.0f, 1.0f, 1.0f};
+GLfloat lightColorTwoValue[] = {0.066f, 0.756f, 0.894f};
+
 
 // Textures
 GLuint cubemapTextureValue;
@@ -80,25 +127,6 @@ GLuint cubeTextureValue;
 GLuint cubeNormalMapValue;
 
 
-// Cube & light  Uniform locations
-GLint modelLoc;
-GLint viewLoc;
-GLint projLoc;
-
-GLint cubeTextureLoc;
-GLint cubeNormalMapLoc;
-
-// GLint lightColorLoc;
-GLint lightPositionLoc;
-GLint viewPositionLoc;
-
-// Skybox Uniform locations
-GLint projLocSkybox;
-GLint viewLocSkybox;
-
-// Uniforms values
-GLfloat lightPositionValue[] { 0.5f, 1.0f, 0.3f };
-GLfloat cameraPositionValue[] { 1.0f, 0.0f, 4.0f };
 
 
 /* PROGRAMSTART */
@@ -178,9 +206,13 @@ int main(void) {
         // Setter clear-farge og dybdebuffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
+        drawCubeTwo();
+        
         drawSkybox();
         
         drawCube();
+        
+        
         
         // This function swaps the front and back buffers of the specified window
         // Front buffer = Det som vises på skjermen (Forrige frame)
@@ -216,14 +248,17 @@ int initGL() {
     
     generateSkyBoxVerticesAndSetArraysAndBuffers();
     generateCubeVerticesAndSetArraysAndBuffers();
+    generateCubeTwoVerticesAndSetArraysAndBuffers();
     
     // Setup and compile our shaders
     cubeShader = Shader( "resources/shaders/cube.vert", "resources/shaders/cube.frag" );
+    cubeTwoShader = Shader( "resources/shaders/cubeTwo.vert", "resources/shaders/cubeTwo.frag" );
     skyboxShader = Shader( "resources/shaders/skybox.vert", "resources/shaders/skybox.frag" );
 
     //Laste inn texture til kuben:
-    cubeTextureValue = TextureLoading::LoadTexture("resources/img/cube/texture.jpg");
-    cubeNormalMapValue = TextureLoading::LoadTexture("resources/img/cube/texture_normal.jpg");
+    cubeTextureValue = TextureLoading::LoadTexture("resources/img/cube/grill.jpg");
+
+    cubeNormalMapValue = TextureLoading::LoadTexture("resources/img/cube/grill_normal.jpg");
     
     //Laste inn texture til skyboxen:
     std::vector<const GLchar*> skyBoxTextureFaces;
@@ -238,14 +273,43 @@ int initGL() {
 
     // Henter inn uniform-loactions fra cube-shadere
     cubeShader.Use();
+    // Kubeplassering
     viewLoc = glGetUniformLocation( cubeShader.Program, "view" );
     projLoc = glGetUniformLocation( cubeShader.Program, "projection" );
     modelLoc = glGetUniformLocation( cubeShader.Program, "model" );
+    // Texture
     cubeTextureLoc = glGetUniformLocation( cubeShader.Program, "cubeTexture" );
     cubeNormalMapLoc = glGetUniformLocation( cubeShader.Program, "cubeNormalMap" );
-    lightPositionLoc = glGetUniformLocation( cubeShader.Program, "lightPos" );
-    viewPositionLoc = glGetUniformLocation( cubeShader.Program, "viewPos" );
+    // Lys 1
+    lightColorOneLoc = glGetUniformLocation(cubeShader.Program, "lightOneColor");
+    lightPositionOneLoc = glGetUniformLocation( cubeShader.Program, "lightOnePos" );
+    viewPositionOneLoc = glGetUniformLocation( cubeShader.Program, "viewOnePos" );
+    // Lys 2
+    lightColorTwoLoc = glGetUniformLocation(cubeShader.Program, "lightTwoColor");
+    lightPositionTwoLoc = glGetUniformLocation( cubeShader.Program, "lightTwoPos" );
+    viewPositionTwoLoc = glGetUniformLocation( cubeShader.Program, "viewTwoPos" );
     
+    
+    
+    
+    cubeTwoShader.Use();
+    // Kubeplassering
+    viewLocCubeTwo = glGetUniformLocation( cubeTwoShader.Program, "view" );
+    projLocCubeTwo = glGetUniformLocation( cubeTwoShader.Program, "projection" );
+    modelLocCubeTwo = glGetUniformLocation( cubeTwoShader.Program, "model" );
+    // Texture
+    cubeTextureLocCubeTwo = glGetUniformLocation( cubeTwoShader.Program, "cubeTexture" );
+    // Lys 1
+    lightColorOneLocCubeTwo = glGetUniformLocation(cubeTwoShader.Program, "lightOneColor");
+    lightPositionOneLocCubeTwo = glGetUniformLocation( cubeTwoShader.Program, "lightOnePos" );
+    viewPositionOneLocCubeTwo = glGetUniformLocation( cubeTwoShader.Program, "viewOnePos" );
+    // Lys 2
+    lightColorTwoLocCubeTwo = glGetUniformLocation(cubeTwoShader.Program, "lightTwoColor");
+    lightPositionTwoLocCubeTwo = glGetUniformLocation( cubeTwoShader.Program, "lightTwoPos" );
+    viewPositionTwoLocCubeTwo = glGetUniformLocation( cubeTwoShader.Program, "viewTwoPos" );
+    
+
+
     // Henter inn uniform-loactions fra skybox-shader
     skyboxShader.Use();
     projLocSkybox = glGetUniformLocation( skyboxShader.Program, "projection" );
@@ -269,6 +333,10 @@ void resizeGL(int width, int height) {
     glm::mat4 projectionCubeValue = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 100.0f);
     glUniformMatrix4fv( projLoc, 1, GL_FALSE, glm::value_ptr( projectionCubeValue ) );
     
+    cubeTwoShader.Use();
+    glm::mat4 projectionCubeTwoValue = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 100.0f);
+    glUniformMatrix4fv( projLocCubeTwo, 1, GL_FALSE, glm::value_ptr( projectionCubeTwoValue ) );
+    
     skyboxShader.Use();
     glm::mat4 projectionSkyboxValue = glm::perspective(camera.GetZoom(), (float)width/height, 0.1f, 1000.0f );
     glUniformMatrix4fv( projLocSkybox, 1, GL_FALSE, glm::value_ptr( projectionSkyboxValue ) );
@@ -279,6 +347,114 @@ void resizeGL(int width, int height) {
     
 }
 
+void generateCubeTwoVerticesAndSetArraysAndBuffers() {
+ 
+    
+    // Punktene som tilsammen bygger kuben
+    glm::vec3 positions[8];
+    positions[0] = glm::vec3( 3.0f,  1.0f, -3.0f);
+    positions[1] = glm::vec3( 3.0f, -1.0f, -3.0f);
+    positions[2] = glm::vec3( 5.0f, -1.0f, -3.0f);
+    positions[3] = glm::vec3( 5.0f,  1.0f, -3.0f);
+    positions[4] = glm::vec3( 3.0f,  1.0f, -1.0f);
+    positions[5] = glm::vec3( 3.0f, -1.0f, -1.0f);
+    positions[6] = glm::vec3( 5.0f, -1.0f, -1.0f);
+    positions[7] = glm::vec3( 5.0f,  1.0f, -1.0f);
+    
+    
+    // Texture-koordinater. Samme for hver side
+    glm::vec2 uv1(0.0f, 1.0f);
+    glm::vec2 uv2(0.0f, 0.0f);
+    glm::vec2 uv3(1.0f, 0.0f);
+    glm::vec2 uv4(1.0f, 1.0f);
+    
+    // Normal-koordinater. En per side
+    glm::vec3 normals[8];
+     normals[0] = glm::vec3( 0.0f, 0.0f, 1.0f);
+     normals[1] = glm::vec3( 0.0f, 0.0f,-1.0f);
+     normals[2] = glm::vec3(-1.0f, 0.0f, 0.0f);
+     normals[3] = glm::vec3( 1.0f, 0.0f, 0.0f);
+     normals[4] = glm::vec3( 0.0f,-1.0f, 0.0f);
+     normals[5] = glm::vec3( 0.0f, 1.0f, 0.0f);
+
+                            
+    // For å sette opp kantene i riktig rekkefølge!
+    int indices[] = {0,1,2,3,1,5,6,2,4,5,1,0,4,5,6,7,3,2,6,7,0,4,7,3};
+    
+    // Teller for å styre hvilken normal som skal brukes til en side
+    int sideCounter = 0;
+    
+    // Deklarerer en vector som skal holde på de ferdige verdiene til kuben
+    std::vector<GLfloat> cubeTwoVertices;
+    
+    // Deklarer vec3 som skal holde på de 4 ulike posisjons-punktene til hver side
+    glm::vec3 pos1, pos2, pos3, pos4;
+    
+    // Deklarerer vec3 som skal holde på normalen til hver side
+    glm::vec3 nm;
+     
+    // Løkka kjører 6 ganger - en gang for hver side.
+    for (int face = 0; face < 24; face = face + 4){
+        
+        // Henter ut de korrektene posisjons-koordinatene for denne siden
+        pos1 = positions[indices[face]];
+        pos2 = positions[indices[face + 1]];
+        pos3 = positions[indices[face + 2]];
+        pos4 = positions[indices[face + 3]];
+        
+        // Henter ut korrekt normal-verdi for denne siden
+        nm = normals[sideCounter];
+        // plusser på en slik at neste normal-verdi blir valgt for neste side
+        sideCounter++;
+        
+        // Har nå alt for å bygge en side. Legger dette til i en midlertidig array
+        std::vector<GLfloat> oneSide = {
+            // positions            // normal         // texcoords
+            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y,
+            pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y,
+            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y,
+
+            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y,
+            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y,
+            pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y
+        };
+        
+        // Appender den ferdige siden til cubeVertices
+        for(int i = 0; i < 48; i++){
+            cubeTwoVertices.push_back(oneSide[i]);
+        }
+        
+        // Frigjør minnet. TODO: Må denne gjøres?
+        oneSide.clear();
+    }
+    
+    
+    //Antall man ønsker å opprette, arrayen som skal benyttes.
+    glGenVertexArrays( 1, &cubeTwoVAO );
+    //Forteller OpenGL hvilken vertex-array som skal brukes.
+    glBindVertexArray( cubeTwoVAO );
+    
+    //Antall man ønsker å opprette, arrayen som skal benyttes.
+    glGenBuffers( 1, &cubeTwoVBO );
+    //Forteller OpenGL at dette er current bufferen som skal brukes (Skal bufferen modifiseres senere er det denne som skal endres)
+    glBindBuffer( GL_ARRAY_BUFFER, cubeTwoVBO );
+    
+
+    glBufferData( GL_ARRAY_BUFFER, 6 * 8 * 6 * sizeof( GL_FLOAT ), cubeTwoVertices.data(), GL_STATIC_DRAW );
+    
+    glVertexAttribPointer(POSITION, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (GLvoid*)0);
+    glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (GLvoid*)(3 * sizeof(GLfloat)));
+    glVertexAttribPointer(COLOR, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (const void*)(6 * sizeof(GLfloat)));
+    
+    // Aktivere attributtene
+    glEnableVertexAttribArray(POSITION);
+    glEnableVertexAttribArray(NORMAL);
+    glEnableVertexAttribArray(COLOR);
+
+                                
+    
+    
+}
 
 void generateCubeVerticesAndSetArraysAndBuffers() {
     // Punktene som tilsammen bygger kuben
@@ -325,8 +501,8 @@ void generateCubeVerticesAndSetArraysAndBuffers() {
     glm::vec3 nm;
     
     // Deklarerer vec3 som skal holde på tangent og bittangent for hver side
-    glm::vec3 tangent1, bitangent1;
-    glm::vec3 tangent2, bitangent2;
+    glm::vec3 tangent1; //bitangent1;
+    glm::vec3 tangent2; //bitangent2;
      
     // Løkka kjører 6 ganger - en gang for hver side.
     for (int face = 0; face < 24; face = face + 4){
@@ -356,12 +532,6 @@ void generateCubeVerticesAndSetArraysAndBuffers() {
         tangent1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
         tangent1 = glm::normalize(tangent1);
 
-        bitangent1.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
-        bitangent1.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
-        bitangent1.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
-        bitangent1 = glm::normalize(bitangent1);
-
-        
         /* Kalkulerer verdier for 2. trekant til denne siden */
         edge1 = pos3 - pos1;
         edge2 = pos4 - pos1;
@@ -375,27 +545,21 @@ void generateCubeVerticesAndSetArraysAndBuffers() {
         tangent2.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
         tangent2 = glm::normalize(tangent2);
 
-
-        bitangent2.x = f * (-deltaUV2.x * edge1.x + deltaUV1.x * edge2.x);
-        bitangent2.y = f * (-deltaUV2.x * edge1.y + deltaUV1.x * edge2.y);
-        bitangent2.z = f * (-deltaUV2.x * edge1.z + deltaUV1.x * edge2.z);
-        bitangent2 = glm::normalize(bitangent2);
-        
         
         // Har nå alt for å bygge en side. Legger dette til i en midlertidig array
         std::vector<GLfloat> oneSideVertices = {
-            // positions            // normal         // texcoords  // tangent                          // bitangent
-            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-            pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
-            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent1.x, tangent1.y, tangent1.z, bitangent1.x, bitangent1.y, bitangent1.z,
+            // positions            // normal         // texcoords  // tangent
+            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent1.x, tangent1.y, tangent1.z,
+            pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y, tangent1.x, tangent1.y, tangent1.z,
+            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent1.x, tangent1.y, tangent1.z,
 
-            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
-            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z,
-            pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y, tangent2.x, tangent2.y, tangent2.z, bitangent2.x, bitangent2.y, bitangent2.z
+            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent2.x, tangent2.y, tangent2.z,
+            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent2.x, tangent2.y, tangent2.z,
+            pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y, tangent2.x, tangent2.y, tangent2.z
         };
         
         // Appender den ferdige siden til cubeVertices
-        for(int i = 0; i < 84; i++){
+        for(int i = 0; i < 66; i++){
             cubeVertices.push_back(oneSideVertices[i]);
         }
         
@@ -415,20 +579,18 @@ void generateCubeVerticesAndSetArraysAndBuffers() {
      glBindBuffer( GL_ARRAY_BUFFER, cubeVBO );
      
 
-     glBufferData( GL_ARRAY_BUFFER, 6 * 14 * 6 * sizeof( GL_FLOAT ), cubeVertices.data(), GL_STATIC_DRAW );
+     glBufferData( GL_ARRAY_BUFFER, 6 * 11 * 6 * sizeof( GL_FLOAT ), cubeVertices.data(), GL_STATIC_DRAW );
      
-     glVertexAttribPointer(POSITION, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (GLvoid*)0);
-     glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (GLvoid*)(3 * sizeof(GLfloat)));
-     glVertexAttribPointer(COLOR, 2, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (const void*)(6 * sizeof(GLfloat)));
-     glVertexAttribPointer(TANGENT, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (const void*)(8 * sizeof(GLfloat)));
-     glVertexAttribPointer(BITANGENT, 3, GL_FLOAT, GL_FALSE, 14 * sizeof(GL_FLOAT), (const void*)(11 * sizeof(GLfloat)));
+     glVertexAttribPointer(POSITION, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(GL_FLOAT), (GLvoid*)0);
+     glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(GL_FLOAT), (GLvoid*)(3 * sizeof(GLfloat)));
+     glVertexAttribPointer(COLOR, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(GL_FLOAT), (const void*)(6 * sizeof(GLfloat)));
+     glVertexAttribPointer(TANGENT, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(GL_FLOAT), (const void*)(8 * sizeof(GLfloat)));
      
      // Aktivere attributtene
      glEnableVertexAttribArray(POSITION);
      glEnableVertexAttribArray(COLOR);
      glEnableVertexAttribArray(NORMAL);
      glEnableVertexAttribArray(TANGENT);
-     glEnableVertexAttribArray(BITANGENT);
 
 
 }
@@ -549,16 +711,30 @@ void drawCube() {
     // Sender model-matrise til cube-shaderen:
     glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( modelCubeValue ) );
     
-    
-    
     // Sender resten av lys-matrisene til cube-shaderen:
-    glm::vec3 lightPositionValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
-    glUniform3f(lightPositionLoc, lightPositionValue.x, lightPositionValue.y, lightPositionValue.z);
     
-    //glUniform3fv(lightPositionLoc, 1, lightPositionValue);
-    glUniform3fv(viewPositionLoc, 1, cameraPositionValue);
-     
+    //Lys 1:
+    glm::vec3 lightPositionOneValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
+    glUniform3f(lightPositionOneLoc, lightPositionOneValue.x, lightPositionOneValue.y, lightPositionOneValue.z);
+    //glUniform3fv(lightPositionOneLoc, 1, lightPositionOneValue);
+    
+    glUniform3fv(lightColorOneLoc, 1, lightColorOneValue);
+    
+    //glUniform3fv(viewPositionTwoLoc, 1, cameraPositionValue);
+    glUniform3f(viewPositionOneLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
+    
+    //Lys 2:
+    //glm::vec3 lightPositionTwoValue(sinf(time * 2.0f), 2.0f, 0.8f);
+    //glUniform3f(lightPositionTwoLoc, lightPositionTwoValue.x, lightPositionTwoValue.y, lightPositionTwoValue.z);
+    glUniform3fv(lightPositionTwoLoc, 1, lightPositionTwoValue);
+    
+    glUniform3fv(lightColorTwoLoc, 1, lightColorTwoValue);
+    
+    //glUniform3fv(viewPositionTwoLoc, 1, cameraPositionTwoValue);
+    glUniform3f(viewPositionTwoLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
 
+    
+    
     // Aktiverer vertex-arrayen for kuben:
     glBindVertexArray( cubeVAO );
     // Deretter tegnes trianglene:
@@ -567,6 +743,63 @@ void drawCube() {
     glBindVertexArray(0);
     // Deaktiverer shaderprogram som brukes og vertexarray
     glUseProgram(0);
+}
+
+void drawCubeTwo() {
+    
+    float time = glfwGetTime();
+    
+    // Aktiverer programmet
+    cubeTwoShader.Use();
+        
+    // Henter og setter texture som sendes til cube-fragshader
+    // Samme texture som andre kuben
+    glActiveTexture( GL_TEXTURE0 );
+    glUniform1i(cubeTextureLocCubeTwo , 0);
+    glBindTexture( GL_TEXTURE_2D, cubeTextureValue );
+
+    // Setter view matrisen
+    glm::mat4 viewCubeTwoValue = camera.GetViewMatrix();
+    // Sender view-matrise til cube-shaderen:
+    glUniformMatrix4fv( viewLocCubeTwo, 1, GL_FALSE, glm::value_ptr( viewCubeTwoValue ) );
+
+    // Setter model-matrise
+    glm::mat4 modelCubeTwoValue = glm::mat4(1.0);
+    // modelCubeTwoValue = glm::rotate(modelCubeTwoValue, time * 0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
+    // Sender model-matrise til cube-shaderen:
+    glUniformMatrix4fv( modelLocCubeTwo, 1, GL_FALSE, glm::value_ptr( modelCubeTwoValue ) );
+    
+    
+    //Lys 1:
+    glm::vec3 lightPositionOneValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
+    glUniform3f(lightPositionOneLocCubeTwo, lightPositionOneValue.x, lightPositionOneValue.y, lightPositionOneValue.z);
+    //glUniform3fv(lightPositionOneLocCubeTwo, 1, lightPositionOneValue);
+    
+    glUniform3fv(lightColorOneLocCubeTwo, 1, lightColorOneValue);
+    
+    //glUniform3fv(viewPositionTwoLocCubeTwo, 1, cameraPositionValue);
+    glUniform3f(viewPositionOneLocCubeTwo, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
+    
+    //Lys 2:
+    //glm::vec3 lightPositionTwoValue(sinf(time * 2.0f), 2.0f, 0.8f);
+    //glUniform3f(lightPositionTwoLocCubeTwo, lightPositionTwoValue.x, lightPositionTwoValue.y, lightPositionTwoValue.z);
+    glUniform3fv(lightPositionTwoLocCubeTwo, 1, lightPositionTwoValue);
+    
+    glUniform3fv(lightColorTwoLocCubeTwo, 1, lightColorTwoValue);
+    
+    //glUniform3fv(viewPositionTwoLocCubeTwo, 1, cameraPositionTwoValue);
+    glUniform3f(viewPositionTwoLocCubeTwo, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
+    
+
+    // Aktiverer vertex-arrayen for kuben:
+    glBindVertexArray( cubeTwoVAO );
+       
+    // Deretter tegnes trianglene:
+    glDrawArrays( GL_TRIANGLES, 0, 36 );
+    
+    // Deaktiverer shaderprogram som brukes og vertexarray
+    glUseProgram(0);
+    glBindVertexArray(0);
 }
 
 

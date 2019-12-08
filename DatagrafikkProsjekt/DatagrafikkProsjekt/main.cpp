@@ -49,12 +49,12 @@ void DoMovement( );
 void generateSkyBoxVerticesAndSetArraysAndBuffers();
 void generateCubeVerticesAndSetArraysAndBuffers();
 void generateCubeTwoVerticesAndSetArraysAndBuffers();
-void generateTriangelVerticesAndSetArraysAndBuffers();
+void generatetriangleVerticesAndSetArraysAndBuffers();
 
 void drawSkybox();
 void drawCube();
 void drawCubeTwo();
-void drawTriangel();
+void drawtriangle();
 
 unsigned int loadTexture(const char *path);
 
@@ -73,11 +73,11 @@ GLfloat lastFrame = 0.0f;
 // Vertex-array og buffer -object for KUBE og SKYBOX
 GLuint cubeVAO, cubeVBO;
 GLuint cubeTwoVAO, cubeTwoVBO;
-GLuint triangelVAO, triangelVBO;
+GLuint triangleVAO, triangleVBO;
 GLuint skyboxVAO, skyboxVBO;
 
 // Shadere
-Shader cubeAndTriangelShader;
+Shader cubeAndtriangleShader;
 Shader cubeTwoShader;
 Shader skyboxShader;
 
@@ -87,6 +87,9 @@ GLint viewLoc;
 GLint projLoc;
 GLint cubeTextureLoc;
 GLint cubeNormalMapLoc;
+GLint cubeDepthMapLoc;
+
+GLint cubeHeighScaleLoc;
 GLint lightPositionOneLoc;
 GLint lightPositionTwoLoc;
 GLint viewPositionOneLoc;
@@ -113,15 +116,17 @@ GLint viewLocSkybox;
 
 // Lys uniform values (For begge kubene)
 // Light Uniforms values (For begge kubene!)
-GLfloat lightPositionOneValue[] { 8.0f, 3.0f, 1.5f };
-GLfloat lightPositionTwoValue[] { -3.0f, 3.0f, -1.5f };
+GLfloat lightPositionOneValue[] { 9.0f, 1.0f, -1.5f };
+GLfloat lightPositionTwoValue[] { -3.0f, 1.0f, -1.5f };
 
 // Henter fra Camera
 //GLfloat cameraPositionValue[] { 0.0f, 0.0f, 0.0f };
 //GLfloat cameraPositionTwoValue[] {0.0f, 0.0f, 0.0f };
 
 GLfloat lightColorOneValue[] = {1.0f, 1.0f, 1.0f};
-GLfloat lightColorTwoValue[] = {0.066f, 0.756f, 0.894f};
+GLfloat lightColorTwoValue[] = {0.976f, 0.282f, 0.376f}; // Rød
+
+float heightScale = 0.1;
 
 
 // Textures
@@ -129,8 +134,9 @@ GLuint cubemapTextureValue;
 GLuint cubeTextureValue;
 GLuint cubeNormalMapValue;
 GLuint cubeDepthMapValue;
-GLuint triangelTextureValue;
-GLuint triangelNormalMapValue;
+GLuint triangleTextureValue;
+GLuint triangleNormalMapValue;
+GLuint triangleDepthMapValue;
 
 
 
@@ -218,7 +224,7 @@ int main(void) {
         
         drawCube();
         
-        drawTriangel();
+        drawtriangle();
         
         
         
@@ -257,10 +263,10 @@ int initGL() {
     generateSkyBoxVerticesAndSetArraysAndBuffers();
     generateCubeVerticesAndSetArraysAndBuffers();
     generateCubeTwoVerticesAndSetArraysAndBuffers();
-    generateTriangelVerticesAndSetArraysAndBuffers();
+    generatetriangleVerticesAndSetArraysAndBuffers();
     
     // Setup and compile our shaders
-    cubeAndTriangelShader = Shader( "resources/shaders/cube.vert", "resources/shaders/cube.frag" );
+    cubeAndtriangleShader = Shader( "resources/shaders/cube.vert", "resources/shaders/cube.frag" );
     cubeTwoShader = Shader( "resources/shaders/cubeTwo.vert", "resources/shaders/cubeTwo.frag" );
     skyboxShader = Shader( "resources/shaders/skybox.vert", "resources/shaders/skybox.frag" );
 
@@ -269,37 +275,41 @@ int initGL() {
     cubeNormalMapValue = TextureLoading::LoadTexture("resources/img/cube/wood_normal.png");
     cubeDepthMapValue = TextureLoading::LoadTexture("resources/img/cube/wood_disp.png");
     
-    triangelTextureValue = TextureLoading::LoadTexture("resources/img/cube/rock.png");
-    triangelNormalMapValue = TextureLoading::LoadTexture("resources/img/cube/rock_normal.png");
+    triangleTextureValue = TextureLoading::LoadTexture("resources/img/cube/bricks.jpg");
+    triangleNormalMapValue = TextureLoading::LoadTexture("resources/img/cube/bricks_normal.jpg");
+    triangleDepthMapValue = TextureLoading::LoadTexture("resources/img/cube/bricks_depth.jpg");
     
     //Laste inn texture til skyboxen:
     std::vector<const GLchar*> skyBoxTextureFaces;
-    skyBoxTextureFaces.push_back( "resources/img/skybox/purplenebula_lf.tga" );
-    skyBoxTextureFaces.push_back( "resources/img/skybox/purplenebula_rt.tga" );
-    skyBoxTextureFaces.push_back( "resources/img/skybox/purplenebula_up.tga" );
-    skyBoxTextureFaces.push_back( "resources/img/skybox/purplenebula_dn.tga" );
-    skyBoxTextureFaces.push_back( "resources/img/skybox/purplenebula_ft.tga" );
-    skyBoxTextureFaces.push_back( "resources/img/skybox/purplenebula_bk.tga" );
+    skyBoxTextureFaces.push_back( "resources/img/skybox/iceflats_lf.tga" );
+    skyBoxTextureFaces.push_back( "resources/img/skybox/iceflats_rt.tga" );
+    skyBoxTextureFaces.push_back( "resources/img/skybox/iceflats_up.tga" );
+    skyBoxTextureFaces.push_back( "resources/img/skybox/iceflats_dn.tga" );
+    skyBoxTextureFaces.push_back( "resources/img/skybox/iceflats_ft.tga" );
+    skyBoxTextureFaces.push_back( "resources/img/skybox/iceflats_bk.tga" );
     cubemapTextureValue = TextureLoading::LoadCubemap( skyBoxTextureFaces );
 
 
     // Henter inn uniform-loactions fra cube-shadere
-    cubeAndTriangelShader.Use();
+    cubeAndtriangleShader.Use();
     // Kubeplassering
-    viewLoc = glGetUniformLocation( cubeAndTriangelShader.Program, "view" );
-    projLoc = glGetUniformLocation( cubeAndTriangelShader.Program, "projection" );
-    modelLoc = glGetUniformLocation( cubeAndTriangelShader.Program, "model" );
+    viewLoc = glGetUniformLocation( cubeAndtriangleShader.Program, "view" );
+    projLoc = glGetUniformLocation( cubeAndtriangleShader.Program, "projection" );
+    modelLoc = glGetUniformLocation( cubeAndtriangleShader.Program, "model" );
     // Texture
-    cubeTextureLoc = glGetUniformLocation( cubeAndTriangelShader.Program, "cubeTexture" );
-    cubeNormalMapLoc = glGetUniformLocation( cubeAndTriangelShader.Program, "cubeNormalMap" );
+    cubeTextureLoc = glGetUniformLocation( cubeAndtriangleShader.Program, "cubeTexture" );
+    cubeNormalMapLoc = glGetUniformLocation( cubeAndtriangleShader.Program, "cubeNormalMap" );
+    cubeDepthMapLoc = glGetUniformLocation( cubeAndtriangleShader.Program, "depthMap" );
+    
+    cubeHeighScaleLoc = glGetUniformLocation( cubeAndtriangleShader.Program, "heightScale" );
     // Lys 1
-    lightColorOneLoc = glGetUniformLocation(cubeAndTriangelShader.Program, "lightOneColor");
-    lightPositionOneLoc = glGetUniformLocation( cubeAndTriangelShader.Program, "lightOnePos" );
-    viewPositionOneLoc = glGetUniformLocation( cubeAndTriangelShader.Program, "viewOnePos" );
+    lightColorOneLoc = glGetUniformLocation(cubeAndtriangleShader.Program, "lightOneColor");
+    lightPositionOneLoc = glGetUniformLocation( cubeAndtriangleShader.Program, "lightOnePos" );
+    viewPositionOneLoc = glGetUniformLocation( cubeAndtriangleShader.Program, "viewOnePos" );
     // Lys 2
-    lightColorTwoLoc = glGetUniformLocation(cubeAndTriangelShader.Program, "lightTwoColor");
-    lightPositionTwoLoc = glGetUniformLocation( cubeAndTriangelShader.Program, "lightTwoPos" );
-    viewPositionTwoLoc = glGetUniformLocation( cubeAndTriangelShader.Program, "viewTwoPos" );
+    lightColorTwoLoc = glGetUniformLocation(cubeAndtriangleShader.Program, "lightTwoColor");
+    lightPositionTwoLoc = glGetUniformLocation( cubeAndtriangleShader.Program, "lightTwoPos" );
+    viewPositionTwoLoc = glGetUniformLocation( cubeAndtriangleShader.Program, "viewTwoPos" );
     
     
     
@@ -341,7 +351,7 @@ void resizeGL(int width, int height) {
     if (height == 0)
         height = 1;
     
-    cubeAndTriangelShader.Use();
+    cubeAndtriangleShader.Use();
     glm::mat4 projectionCubeValue = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 100.0f);
     glUniformMatrix4fv( projLoc, 1, GL_FALSE, glm::value_ptr( projectionCubeValue ) );
     
@@ -608,34 +618,34 @@ void generateCubeTwoVerticesAndSetArraysAndBuffers() {
     
 }
 
-void generateTriangelVerticesAndSetArraysAndBuffers() {
+void generatetriangleVerticesAndSetArraysAndBuffers() {
     // Punktene som tilsammen bygger kuben
     glm::vec3 positions[8];
-    positions[0] = glm::vec3(-4.0f,  1.0f, -0.0f);
-    positions[1] = glm::vec3(-4.0f, -1.0f, -1.0f);
-    positions[2] = glm::vec3(-5.0f, -1.0f,  1.0f);
+    positions[0] = glm::vec3(-4.0f,  1.0f, 0.0f);
+    positions[1] = glm::vec3(-4.0f, -1.0f,-1.0f);
+    positions[2] = glm::vec3(-5.0f, -1.0f, 1.0f);
     positions[3] = glm::vec3(-3.0f, -1.0f, 1.0f);
     
-    // Texture-koordinater. SAmme for hver side
+    // Texture-koordinater. Samme for hver side
     glm::vec2 uv1(0.0f, 1.0f);
     glm::vec2 uv2(0.0f, 0.0f);
     glm::vec2 uv3(1.0f, 0.0f);
     
     // Normal-koordinater. En per side
-    glm::vec3 normals[8];
-     normals[0] = glm::vec3( 0.0f, 0.0f, 1.0f);
+    glm::vec3 normals[4];
+     normals[0] = glm::vec3(-4.0f, 0.0f, 1.0f);
      normals[1] = glm::vec3( 0.0f, 0.0f,-1.0f);
      normals[2] = glm::vec3(-1.0f, 0.0f, 0.0f);
      normals[3] = glm::vec3( 1.0f, 0.0f, 0.0f);
 
-    // For å sette opp kantene i riktig rekkefølge!
-    int indices[] = {0,1,2,0,2,3,0,3,1,1,2,3};
+    //               Venstre - Front - Høyre -  Bunn
+    int indices[] = { 0,1,2,  0,2,3,   0,3,1,  1,2,3};
     
     // Teller for å styre hvilken normal som skal brukes til en side
     int sideCounter = 0;
     
     // Deklarerer en vector som skal holde på de ferdige verdiene til kuben
-    std::vector<GLfloat> triangelVertices;
+    std::vector<GLfloat> triangleVertices;
     
     // Deklarer vec3 som skal holde på de 4 ulike posisjons-punktene til hver side
     glm::vec3 pos1, pos2, pos3;//, pos4;
@@ -676,7 +686,7 @@ void generateTriangelVerticesAndSetArraysAndBuffers() {
         tangent1 = glm::normalize(tangent1);
         
         // Har nå alt for å bygge en side. Legger dette til i en midlertidig array
-        std::vector<GLfloat> oneTriangelSideVertices = {
+        std::vector<GLfloat> oneTriangleSideVertices = {
             // positions            // normal         // texcoords  // tangent
             pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent1.x, tangent1.y, tangent1.z,
             pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y, tangent1.x, tangent1.y, tangent1.z,
@@ -685,27 +695,27 @@ void generateTriangelVerticesAndSetArraysAndBuffers() {
         
         // Appender den ferdige siden til cubeVertices
         for(int i = 0; i < 33; i++){
-            triangelVertices.push_back(oneTriangelSideVertices[i]);
+            triangleVertices.push_back(oneTriangleSideVertices[i]);
         }
         
         // Frigjør minnet. TODO: Må denne gjøres?
-        oneTriangelSideVertices.clear();
+        oneTriangleSideVertices.clear();
         
     }
 
     
      //Antall man ønsker å opprette, arrayen som skal benyttes.
-     glGenVertexArrays( 1, &triangelVAO );
+     glGenVertexArrays( 1, &triangleVAO );
      //Forteller OpenGL hvilken vertex-array som skal brukes.
-     glBindVertexArray( triangelVAO );
+     glBindVertexArray( triangleVAO );
      
      //Antall man ønsker å opprette, arrayen som skal benyttes.
-     glGenBuffers( 1, &triangelVBO );
+     glGenBuffers( 1, &triangleVBO );
      //Forteller OpenGL at dette er current bufferen som skal brukes (Skal bufferen modifiseres senere er det denne som skal endres)
-     glBindBuffer( GL_ARRAY_BUFFER, triangelVBO );
+     glBindBuffer( GL_ARRAY_BUFFER, triangleVBO );
      
 
-     glBufferData( GL_ARRAY_BUFFER, 3 * 11 * 4 * sizeof( GL_FLOAT ), triangelVertices.data(), GL_STATIC_DRAW );
+     glBufferData( GL_ARRAY_BUFFER, 3 * 11 * 4 * sizeof( GL_FLOAT ), triangleVertices.data(), GL_STATIC_DRAW );
      
      glVertexAttribPointer(POSITION, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(GL_FLOAT), (GLvoid*)0);
      glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(GL_FLOAT), (GLvoid*)(3 * sizeof(GLfloat)));
@@ -811,7 +821,7 @@ void drawCube() {
     float time = glfwGetTime();
     
     // Aktiverer programmet
-    cubeAndTriangelShader.Use();
+    cubeAndtriangleShader.Use();
         
     // Henter og setter texture som sendes til cube-fragshader
     glActiveTexture( GL_TEXTURE0 );
@@ -822,6 +832,10 @@ void drawCube() {
     glActiveTexture( GL_TEXTURE1 );
     glUniform1i(cubeNormalMapLoc , 1);
     glBindTexture( GL_TEXTURE_2D, cubeNormalMapValue );
+    
+    glActiveTexture( GL_TEXTURE2 );
+    glUniform1i(cubeDepthMapLoc , 2);
+    glBindTexture( GL_TEXTURE_2D, cubeDepthMapValue );
     
     
     
@@ -836,6 +850,9 @@ void drawCube() {
     //modelCubeValue = glm::rotate(modelCubeValue, time * 0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
     // Sender model-matrise til cube-shaderen:
     glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( modelCubeValue ) );
+    
+    
+    glUniform1f(cubeHeighScaleLoc, heightScale);
     
     // Sender resten av lys-matrisene til cube-shaderen:
     
@@ -928,36 +945,41 @@ void drawCubeTwo() {
     glBindVertexArray(0);
 }
 
-void drawTriangel() {
+void drawtriangle() {
     
     float time = glfwGetTime();
     
     // Aktiverer programmet
-    cubeAndTriangelShader.Use();
+    cubeAndtriangleShader.Use();
         
     // Henter og setter texture som sendes til cube-fragshader
     glActiveTexture( GL_TEXTURE0 );
     glUniform1i(cubeTextureLoc , 0);
-    glBindTexture( GL_TEXTURE_2D, triangelTextureValue );
+    glBindTexture( GL_TEXTURE_2D, triangleTextureValue );
     
     // Henter og setter normalMap som sendes til cube-fragshader
     glActiveTexture( GL_TEXTURE1 );
     glUniform1i(cubeNormalMapLoc , 1);
-    glBindTexture( GL_TEXTURE_2D, triangelNormalMapValue );
+    glBindTexture( GL_TEXTURE_2D, triangleNormalMapValue );
+    
+    // Henter og setter normalMap som sendes til cube-fragshader
+    glActiveTexture( GL_TEXTURE2 );
+    glUniform1i(cubeDepthMapLoc , 2);
+    glBindTexture( GL_TEXTURE_2D, triangleDepthMapValue );
     
     
     
     
     // Setter view matrisen
-    glm::mat4 viewTriangelValue = camera.GetViewMatrix();
+    glm::mat4 viewtriangleValue = camera.GetViewMatrix();
     // Sender view-matrise til cube-shaderen:
-    glUniformMatrix4fv( viewLoc, 1, GL_FALSE, glm::value_ptr( viewTriangelValue ) );
+    glUniformMatrix4fv( viewLoc, 1, GL_FALSE, glm::value_ptr( viewtriangleValue ) );
 
     // Setter model-matrise
-    glm::mat4 modelTriangelValue = glm::mat4(1.0f);
+    glm::mat4 modeltriangleValue = glm::mat4(1.0f);
     //modelCubeValue = glm::rotate(modelCubeValue, time * 0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
     // Sender model-matrise til cube-shaderen:
-    glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( modelTriangelValue ) );
+    glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( modeltriangleValue ) );
     
     // Sender resten av lys-matrisene til cube-shaderen:
     
@@ -984,9 +1006,9 @@ void drawTriangel() {
     
     
     // Aktiverer vertex-arrayen for kuben:
-    glBindVertexArray( triangelVAO );
+    glBindVertexArray( triangleVAO );
     // Deretter tegnes trianglene:
-    glDrawArrays( GL_TRIANGLES, 0, 36 );
+    glDrawArrays( GL_TRIANGLES, 0, 12 );
 
     glBindVertexArray(0);
     // Deaktiverer shaderprogram som brukes og vertexarray

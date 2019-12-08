@@ -128,7 +128,6 @@ GLfloat lightColorTwoValue[] = {0.976f, 0.282f, 0.376f}; // Rød
 
 float heightScale = 0.1;
 
-
 // Textures
 GLuint cubemapTextureValue;
 GLuint cubeTextureValue;
@@ -137,8 +136,6 @@ GLuint cubeDepthMapValue;
 GLuint triangleTextureValue;
 GLuint triangleNormalMapValue;
 GLuint triangleDepthMapValue;
-
-
 
 
 /* PROGRAMSTART */
@@ -227,7 +224,6 @@ int main(void) {
         drawtriangle();
         
         
-        
         // This function swaps the front and back buffers of the specified window
         // Front buffer = Det som vises på skjermen (Forrige frame)
         // Back buffer = Det som nå tegnes (vurrent frame)
@@ -310,8 +306,6 @@ int initGL() {
     lightColorTwoLoc = glGetUniformLocation(cubeAndtriangleShader.Program, "lightTwoColor");
     lightPositionTwoLoc = glGetUniformLocation( cubeAndtriangleShader.Program, "lightTwoPos" );
     viewPositionTwoLoc = glGetUniformLocation( cubeAndtriangleShader.Program, "viewTwoPos" );
-    
-    
     
     
     cubeTwoShader.Use();
@@ -613,9 +607,6 @@ void generateCubeTwoVerticesAndSetArraysAndBuffers() {
     glEnableVertexAttribArray(NORMAL);
     glEnableVertexAttribArray(COLOR);
 
-                                
-    
-    
 }
 
 void generatetriangleVerticesAndSetArraysAndBuffers() {
@@ -730,7 +721,6 @@ void generatetriangleVerticesAndSetArraysAndBuffers() {
 
 }
 
-
 void generateSkyBoxVerticesAndSetArraysAndBuffers() {
     
     GLfloat skyboxVertices[] =
@@ -794,27 +784,6 @@ void generateSkyBoxVerticesAndSetArraysAndBuffers() {
     glEnableVertexAttribArray(POSITION);
 }
 
-
-void drawSkybox() {
-    
-    skyboxShader.Use();
-    // Change depth function so depth test passes when values are equal to depth buffer's content
-    glDepthFunc( GL_LEQUAL );
-
-    // TODO: Tidligere. Hva gjør denne:  glm::mat4 viewSkybox = camera.GetViewMatrix();
-    glm::mat4 viewSkyboxValue = glm::mat4( glm::mat3( camera.GetViewMatrix( ) ) );
-    glUniformMatrix4fv( viewLocSkybox, 1, GL_FALSE, glm::value_ptr( viewSkyboxValue ) );
-
-    // Aktiverer vertex-arrayen for skyBox:
-    glBindVertexArray( skyboxVAO );
-    
-    glBindTexture( GL_TEXTURE_CUBE_MAP, cubemapTextureValue );
-    glDrawArrays( GL_TRIANGLES, 0, 36 );
-    glDepthFunc( GL_LESS ); // Setter dybdefunksjonen tilbake til default
-    
-    glUseProgram(0);
-    glBindVertexArray(0);
-}
 
 void drawCube() {
     
@@ -1013,6 +982,27 @@ void drawtriangle() {
     glBindVertexArray(0);
     // Deaktiverer shaderprogram som brukes og vertexarray
     glUseProgram(0);
+}
+
+void drawSkybox() {
+    
+    skyboxShader.Use();
+    // Change depth function so depth test passes when values are equal to depth buffer's content
+    glDepthFunc( GL_LEQUAL );
+
+    // TODO: Tidligere. Hva gjør denne:  glm::mat4 viewSkybox = camera.GetViewMatrix();
+    glm::mat4 viewSkyboxValue = glm::mat4( glm::mat3( camera.GetViewMatrix( ) ) );
+    glUniformMatrix4fv( viewLocSkybox, 1, GL_FALSE, glm::value_ptr( viewSkyboxValue ) );
+
+    // Aktiverer vertex-arrayen for skyBox:
+    glBindVertexArray( skyboxVAO );
+    
+    glBindTexture( GL_TEXTURE_CUBE_MAP, cubemapTextureValue );
+    glDrawArrays( GL_TRIANGLES, 0, 36 );
+    glDepthFunc( GL_LESS ); // Setter dybdefunksjonen tilbake til default
+    
+    glUseProgram(0);
+    glBindVertexArray(0);
 }
 
 

@@ -25,8 +25,8 @@ out vec4 FragColorResult;
 
 void main()
 {
-    vec3 fragColorLightOne = getFragColor(lightOnePos, lightOneColor, viewOnePos, 0.1, 0.2, 64.0);
-    vec3 fragColorLightTwo = getFragColor(lightTwoPos, lightTwoColor, viewTwoPos, 0.1, 0.2, 64.0);
+    vec3 fragColorLightOne = getFragColor(lightOnePos, lightOneColor, viewOnePos, 0.1, 0.6, 64.0);
+    vec3 fragColorLightTwo = getFragColor(lightTwoPos, lightTwoColor, viewTwoPos, 0.1, 0.6, 64.0);
     
     float lightOneDistance = length(lightOnePos - FragPos);
     float lightTwoDistance = length(lightTwoPos - FragPos);
@@ -54,7 +54,6 @@ vec3 getFragColor(vec3 lightPos, vec3 lightColor, vec3 viewPos, float ambientStr
     vec3 objectColor = texture(cubeTexture, cubeTextureCoordinates).rgb;
     
     // ambient
-    //float ambientStrength = 0.3;
     vec3 ambient = ambientStrength * lightColor;
 
     // diffuse
@@ -63,7 +62,6 @@ vec3 getFragColor(vec3 lightPos, vec3 lightColor, vec3 viewPos, float ambientStr
     vec3 diffuse = diff * lightColor;
 
     // Specular
-    //float specularStrength = 1.0;
     vec3 viewDir = normalize(viewPos - FragPos);
     vec3 reflectDir = reflect(-lightDir, normal);
     vec3 halfwayDir = normalize(lightDir + viewDir);

@@ -23,8 +23,8 @@ out vec4 FragColorResult;
 
 void main()
 {
-    vec3 fragColorLightOne = getFragColor(TangentLightOnePos, lightOneColor, TangentViewOnePos, 0.1, 0.2, 64.0);
-    vec3 fragColorLightTwo = getFragColor(TangentLightTwoPos, lightTwoColor, TangentViewTwoPos, 0.1, 0.2, 64.0);
+    vec3 fragColorLightOne = getFragColor(TangentLightOnePos, lightOneColor, TangentViewOnePos, 0.1, 0.6, 64.0);
+    vec3 fragColorLightTwo = getFragColor(TangentLightTwoPos, lightTwoColor, TangentViewTwoPos, 0.1, 0.6, 64.0);
     
     float lightOneDistance = length(TangentLightOnePos - TangentFragPos);
     float lightTwoDistance = length(TangentLightTwoPos - TangentFragPos);

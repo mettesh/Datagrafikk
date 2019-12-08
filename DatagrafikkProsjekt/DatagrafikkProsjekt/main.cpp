@@ -110,15 +110,15 @@ GLint viewLocSkybox;
 
 // Lys uniform values (For begge kubene)
 // Light Uniforms values (For begge kubene!)
-GLfloat lightPositionOneValue[] { 8.0f, 0.0f, -0.5f };
-GLfloat lightPositionTwoValue[] { -4.0f, 0.0f, -0.5f };
+GLfloat lightPositionOneValue[] { 8.0f, 3.0f, 1.5f };
+GLfloat lightPositionTwoValue[] { -3.0f, 3.0f, -1.5f };
 
 // Henter fra Camera
-//GLfloat cameraPositionValue[] { 1.0f, 0.0f, 4.0f };
-//GLfloat cameraPositionTwoValue[] {5.0f, 5.0f, 4.0f };
+//GLfloat cameraPositionValue[] { 0.0f, 0.0f, 0.0f };
+//GLfloat cameraPositionTwoValue[] {0.0f, 0.0f, 0.0f };
 
 GLfloat lightColorOneValue[] = {1.0f, 1.0f, 1.0f};
-GLfloat lightColorTwoValue[] = {0.996f, 0.164f, 0.164f};
+GLfloat lightColorTwoValue[] = {0.066f, 0.756f, 0.894f};
 
 
 // Textures
@@ -256,9 +256,9 @@ int initGL() {
     skyboxShader = Shader( "resources/shaders/skybox.vert", "resources/shaders/skybox.frag" );
 
     //Laste inn texture til kuben:
-    cubeTextureValue = TextureLoading::LoadTexture("resources/img/cube/rock.png");
+    cubeTextureValue = TextureLoading::LoadTexture("resources/img/cube/grill.jpg");
 
-    cubeNormalMapValue = TextureLoading::LoadTexture("resources/img/cube/rock_normal.png");
+    cubeNormalMapValue = TextureLoading::LoadTexture("resources/img/cube/grill_normal.jpg");
     
     //Laste inn texture til skyboxen:
     std::vector<const GLchar*> skyBoxTextureFaces;
@@ -714,19 +714,27 @@ void drawCube() {
     // Sender resten av lys-matrisene til cube-shaderen:
     
     //Lys 1:
-    //glm::vec3 lightPositionOneValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
-    //glUniform3f(lightPositionOneLoc, lightPositionOneValue.x, lightPositionOneValue.y, lightPositionOneValue.z);
-    glUniform3fv(lightPositionOneLoc, 1, lightPositionOneValue);
+    glm::vec3 lightPositionOneValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
+    glUniform3f(lightPositionOneLoc, lightPositionOneValue.x, lightPositionOneValue.y, lightPositionOneValue.z);
+    //glUniform3fv(lightPositionOneLoc, 1, lightPositionOneValue);
+    
     glUniform3fv(lightColorOneLoc, 1, lightColorOneValue);
+    
+    //glUniform3fv(viewPositionTwoLoc, 1, cameraPositionValue);
     glUniform3f(viewPositionOneLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
     
     //Lys 2:
     //glm::vec3 lightPositionTwoValue(sinf(time * 2.0f), 2.0f, 0.8f);
     //glUniform3f(lightPositionTwoLoc, lightPositionTwoValue.x, lightPositionTwoValue.y, lightPositionTwoValue.z);
     glUniform3fv(lightPositionTwoLoc, 1, lightPositionTwoValue);
+    
     glUniform3fv(lightColorTwoLoc, 1, lightColorTwoValue);
+    
+    //glUniform3fv(viewPositionTwoLoc, 1, cameraPositionTwoValue);
     glUniform3f(viewPositionTwoLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
 
+    
+    
     // Aktiverer vertex-arrayen for kuben:
     glBindVertexArray( cubeVAO );
     // Deretter tegnes trianglene:
@@ -763,17 +771,23 @@ void drawCubeTwo() {
     
     
     //Lys 1:
-    //glm::vec3 lightPositionOneValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
-    //glUniform3f(lightPositionOneLocCubeTwo, lightPositionOneValue.x, lightPositionOneValue.y, lightPositionOneValue.z);
-    glUniform3fv(lightPositionOneLocCubeTwo, 1, lightPositionOneValue);
+    glm::vec3 lightPositionOneValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
+    glUniform3f(lightPositionOneLocCubeTwo, lightPositionOneValue.x, lightPositionOneValue.y, lightPositionOneValue.z);
+    //glUniform3fv(lightPositionOneLocCubeTwo, 1, lightPositionOneValue);
+    
     glUniform3fv(lightColorOneLocCubeTwo, 1, lightColorOneValue);
+    
+    //glUniform3fv(viewPositionTwoLocCubeTwo, 1, cameraPositionValue);
     glUniform3f(viewPositionOneLocCubeTwo, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
     
     //Lys 2:
     //glm::vec3 lightPositionTwoValue(sinf(time * 2.0f), 2.0f, 0.8f);
     //glUniform3f(lightPositionTwoLocCubeTwo, lightPositionTwoValue.x, lightPositionTwoValue.y, lightPositionTwoValue.z);
     glUniform3fv(lightPositionTwoLocCubeTwo, 1, lightPositionTwoValue);
+    
     glUniform3fv(lightColorTwoLocCubeTwo, 1, lightColorTwoValue);
+    
+    //glUniform3fv(viewPositionTwoLocCubeTwo, 1, cameraPositionTwoValue);
     glUniform3f(viewPositionTwoLocCubeTwo, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
     
 

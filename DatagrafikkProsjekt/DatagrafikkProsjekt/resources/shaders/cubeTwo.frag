@@ -34,11 +34,7 @@ void main()
     vec3 colorOne = ( ( lightOneDistance / (lightOneDistance + lightTwoDistance ) ) * fragColorLightOne);
     vec3 colorTwo = ( ( lightTwoDistance / (lightOneDistance + lightTwoDistance ) ) * fragColorLightTwo);
     
-    
-    // TODO: Hva er riktig??
-    //vec3 result = colorOne + colorTwo;
-    
-    vec3 result = fragColorLightOne + fragColorLightTwo;
+    vec3 result = colorOne + colorTwo;
     
     FragColorResult = vec4(result, 1.0);
 }

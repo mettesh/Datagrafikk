@@ -128,6 +128,7 @@ GLfloat lightColorTwoValue[] = {0.066f, 0.756f, 0.894f};
 GLuint cubemapTextureValue;
 GLuint cubeTextureValue;
 GLuint cubeNormalMapValue;
+GLuint cubeDepthMapValue;
 GLuint triangelTextureValue;
 GLuint triangelNormalMapValue;
 
@@ -264,8 +265,9 @@ int initGL() {
     skyboxShader = Shader( "resources/shaders/skybox.vert", "resources/shaders/skybox.frag" );
 
     //Laste inn texture til kuben:
-    cubeTextureValue = TextureLoading::LoadTexture("resources/img/cube/grill.jpg");
-    cubeNormalMapValue = TextureLoading::LoadTexture("resources/img/cube/grill_normal.jpg");
+    cubeTextureValue = TextureLoading::LoadTexture("resources/img/cube/wood.png");
+    cubeNormalMapValue = TextureLoading::LoadTexture("resources/img/cube/wood_normal.png");
+    cubeDepthMapValue = TextureLoading::LoadTexture("resources/img/cube/wood_disp.png");
     
     triangelTextureValue = TextureLoading::LoadTexture("resources/img/cube/rock.png");
     triangelNormalMapValue = TextureLoading::LoadTexture("resources/img/cube/rock_normal.png");
@@ -377,17 +379,18 @@ void generateCubeVerticesAndSetArraysAndBuffers() {
     glm::vec2 uv4(1.0f, 1.0f);
     
     // Normal-koordinater. En per side
-    glm::vec3 normals[8];
-     normals[0] = glm::vec3( 0.0f, 0.0f, 1.0f);
-     normals[1] = glm::vec3( 0.0f, 0.0f,-1.0f);
+    glm::vec3 normals[6];
+     normals[0] = glm::vec3( 0.0f, 0.0f,-1.0f);
+     normals[1] = glm::vec3( 0.0f,-1.0f, 0.0f);
      normals[2] = glm::vec3(-1.0f, 0.0f, 0.0f);
-     normals[3] = glm::vec3( 1.0f, 0.0f, 0.0f);
-     normals[4] = glm::vec3( 0.0f,-1.0f, 0.0f);
+     normals[3] = glm::vec3( 0.0f, 0.0f, 1.0f);
+     normals[4] = glm::vec3( 1.0f, 0.0f, 0.0f);
      normals[5] = glm::vec3( 0.0f, 1.0f, 0.0f);
 
                             
     // For å sette opp kantene i riktig rekkefølge!
-    int indices[] = {0,1,2,3,1,5,6,2,4,5,1,0,4,5,6,7,3,2,6,7,0,4,7,3};
+    //                 Bak   -  Bunn   - Venstre -  Front  -  Høyre  -  Topp
+    int indices[] = {0,1,2,3,  1,5,6,2,  4,5,1,0,  4,5,6,7,  3,2,6,7,  0,4,7,3};
     
     // Teller for å styre hvilken normal som skal brukes til en side
     int sideCounter = 0;
@@ -518,17 +521,17 @@ void generateCubeTwoVerticesAndSetArraysAndBuffers() {
     glm::vec2 uv4(1.0f, 1.0f);
     
     // Normal-koordinater. En per side
-    glm::vec3 normals[8];
-     normals[0] = glm::vec3( 0.0f, 0.0f, 1.0f);
-     normals[1] = glm::vec3( 0.0f, 0.0f,-1.0f);
+    glm::vec3 normals[6];
+     normals[0] = glm::vec3( 0.0f, 0.0f,-1.0f);
+     normals[1] = glm::vec3( 0.0f,-1.0f, 0.0f);
      normals[2] = glm::vec3(-1.0f, 0.0f, 0.0f);
-     normals[3] = glm::vec3( 1.0f, 0.0f, 0.0f);
-     normals[4] = glm::vec3( 0.0f,-1.0f, 0.0f);
+     normals[3] = glm::vec3( 0.0f, 0.0f, 1.0f);
+     normals[4] = glm::vec3( 1.0f, 0.0f, 0.0f);
      normals[5] = glm::vec3( 0.0f, 1.0f, 0.0f);
 
                             
-    // For å sette opp kantene i riktig rekkefølge!
-    int indices[] = {0,1,2,3,1,5,6,2,4,5,1,0,4,5,6,7,3,2,6,7,0,4,7,3};
+    //                 Bak   -  Bunn   - Venstre -  Front  -  Høyre  -  Topp
+    int indices[] = {0,1,2,3,  1,5,6,2,  4,5,1,0,  4,5,6,7,  3,2,6,7,  0,4,7,3};
     
     // Teller for å styre hvilken normal som skal brukes til en side
     int sideCounter = 0;

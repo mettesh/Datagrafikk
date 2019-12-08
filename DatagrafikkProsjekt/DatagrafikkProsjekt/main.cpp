@@ -14,6 +14,9 @@
 #include "shader.h"
 #include "camera.h"
 #include "texture.h"
+#include "tiny_obj_loader.h"
+
+#include "stb_image.h"
 
 #define DEFAULT_WIDTH 1024
 #define DEFAULT_HEIGHT 768
@@ -50,11 +53,13 @@ void generateSkyBoxVerticesAndSetArraysAndBuffers();
 void generateCubeVerticesAndSetArraysAndBuffers();
 void generateCubeTwoVerticesAndSetArraysAndBuffers();
 void generatetriangleVerticesAndSetArraysAndBuffers();
+void loadObj();
 
 void drawSkybox();
 void drawCube();
 void drawCubeTwo();
 void drawtriangle();
+void drawObject();
 
 unsigned int loadTexture(const char *path);
 
@@ -79,6 +84,7 @@ GLuint skyboxVAO, skyboxVBO;
 // Shadere
 Shader cubeAndtriangleShader;
 Shader cubeTwoShader;
+Shader objectShader;
 Shader skyboxShader;
 
 // Uniform location kube 1:
@@ -137,6 +143,32 @@ GLuint cubeDepthMapValue;
 GLuint triangleTextureValue;
 GLuint triangleNormalMapValue;
 GLuint triangleDepthMapValue;
+
+
+
+// Object
+
+/*
+ * A structure for storing mesh data
+ */
+typedef struct {
+    GLuint bufferName;
+    GLuint arrayName;
+    GLuint textureName;
+    GLsizei numVertices;
+} Mesh;
+
+// A vector of mesh instances
+std::vector<Mesh> meshes;
+
+
+GLint lightPositionOneLocObject;
+GLint lightColorOneLocObject;
+GLint viewPositionOneLocObject;
+
+GLint projLocObject;
+GLint viewLocObject;
+GLint modelLocObject;
 
 
 
@@ -226,6 +258,8 @@ int main(void) {
         
         drawtriangle();
         
+        drawObject();
+        
         
         
         // This function swaps the front and back buffers of the specified window
@@ -265,9 +299,12 @@ int initGL() {
     generateCubeTwoVerticesAndSetArraysAndBuffers();
     generatetriangleVerticesAndSetArraysAndBuffers();
     
+    loadObj();
+    
     // Setup and compile our shaders
     cubeAndtriangleShader = Shader( "resources/shaders/cube.vert", "resources/shaders/cube.frag" );
     cubeTwoShader = Shader( "resources/shaders/cubeTwo.vert", "resources/shaders/cubeTwo.frag" );
+    objectShader = Shader( "resources/shaders/object.vert", "resources/shaders/object.frag" );
     skyboxShader = Shader( "resources/shaders/skybox.vert", "resources/shaders/skybox.frag" );
 
     //Laste inn texture til kuben:
@@ -331,6 +368,19 @@ int initGL() {
     viewPositionTwoLocCubeTwo = glGetUniformLocation( cubeTwoShader.Program, "viewTwoPos" );
     
 
+    objectShader.Use();
+    // Get uniform locations
+    projLocObject = glGetUniformLocation(objectShader.Program, "projection");
+    viewLocObject = glGetUniformLocation(objectShader.Program, "view");
+    modelLocObject = glGetUniformLocation(objectShader.Program, "model");
+    
+    lightPositionOneLocObject = glGetUniformLocation(objectShader.Program, "lightOnePos");
+    lightColorOneLocObject = glGetUniformLocation(objectShader.Program, "lightOneColor");
+    viewPositionOneLocObject = glGetUniformLocation(objectShader.Program, "viewOnePos");
+    
+ 
+    
+    
 
     // Henter inn uniform-loactions fra skybox-shader
     skyboxShader.Use();
@@ -358,6 +408,10 @@ void resizeGL(int width, int height) {
     cubeTwoShader.Use();
     glm::mat4 projectionCubeTwoValue = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 100.0f);
     glUniformMatrix4fv( projLocCubeTwo, 1, GL_FALSE, glm::value_ptr( projectionCubeTwoValue ) );
+    
+    objectShader.Use();
+    glm::mat4 projectionCubeObject = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 1000.0f);
+    glUniformMatrix4fv( projLocObject, 1, GL_FALSE, glm::value_ptr( projectionCubeObject ) );
     
     skyboxShader.Use();
     glm::mat4 projectionSkyboxValue = glm::perspective(camera.GetZoom(), (float)width/height, 0.1f, 1000.0f );
@@ -1013,6 +1067,209 @@ void drawtriangle() {
     glBindVertexArray(0);
     // Deaktiverer shaderprogram som brukes og vertexarray
     glUseProgram(0);
+}
+
+
+void drawObject() {
+    
+    float time = glfwGetTime();
+    
+    // Aktiverer programmet
+    objectShader.Use();
+        
+ 
+    
+    
+    
+    // Setter view matrisen
+    glm::mat4 viewObjectValue = camera.GetViewMatrix();
+    // Sender view-matrise til cube-shaderen:
+    glUniformMatrix4fv( viewLocObject, 1, GL_FALSE, glm::value_ptr( viewObjectValue ) );
+
+    // Setter model-matrise
+    glm::mat4 modelObjectValue = glm::mat4(1.0f);
+    //modelCubeValue = glm::rotate(modelCubeValue, time * 0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
+    // Sender model-matrise til cube-shaderen:
+    glUniformMatrix4fv( modelLocObject, 1, GL_FALSE, glm::value_ptr( modelObjectValue ) );
+    
+    // Sender resten av lys-matrisene til cube-shaderen:
+    
+    //Lys 1:
+    glm::vec3 lightPositionOneValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
+    glUniform3f(lightPositionOneLocObject, lightPositionOneValue.x, lightPositionOneValue.y, lightPositionOneValue.z);
+    //glUniform3fv(lightPositionOneLoc, 1, lightPositionOneValue);
+    
+    glUniform3fv(lightColorOneLocObject, 1, lightColorOneValue);
+    
+    //glUniform3fv(viewPositionTwoLoc, 1, cameraPositionValue);
+    glUniform3f(viewPositionOneLocObject, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
+    
+    //Lys 2:
+    //glm::vec3 lightPositionTwoValue(sinf(time * 2.0f), 2.0f, 0.8f);
+    //glUniform3f(lightPositionTwoLoc, lightPositionTwoValue.x, lightPositionTwoValue.y, lightPositionTwoValue.z);
+    //glUniform3fv(lightPositionTwoLoc, 1, lightPositionTwoValue);
+    
+    //glUniform3fv(lightColorTwoLoc, 1, lightColorTwoValue);
+    
+    //glUniform3fv(viewPositionTwoLoc, 1, cameraPositionTwoValue);
+    //glUniform3f(viewPositionTwoLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
+
+    
+    // Loop through all the meshes loaded from the OBJ-file
+    for (int m=0; m<meshes.size(); ++m) {
+
+        // Bind the vertex array and texture of the mesh
+        glBindVertexArray(meshes[m].arrayName);
+        glBindTexture(GL_TEXTURE_2D, meshes[m].textureName);
+
+        // Draw the vertex array
+        glDrawArrays(GL_TRIANGLES, 0, meshes[m].numVertices);
+
+        // Disable vertex array and texture
+        glBindTexture(GL_TEXTURE_2D, 0);
+        glBindVertexArray(0);
+
+    }
+    
+    // Deaktiverer shaderprogram som brukes og vertexarray
+    glUseProgram(0);
+}
+
+
+/*
+ * Load a model from the specified obj-file. This is a highly specialized implementation, meaning
+ * that certain shortcuts have been taken. The data is stored in the global variables.
+ * WARNING This function will cause memory leaks on the GPU if called multiple times.
+ */
+void loadObj() {
+
+    // Variables for storing the data in the OBJ-data
+    tinyobj::attrib_t attributes;
+    std::vector<tinyobj::shape_t> shapes;
+    std::vector<tinyobj::material_t> materials;
+
+    // String used to return an error message from tiny_obj_loader
+    std::string errorString;
+
+    // Load the file, or return FALSE if an error occured
+    if (!tinyobj::LoadObj(&attributes, &shapes, &materials, &errorString, "resources/WoodenCabinObj.obj", ".")){
+        exit(EXIT_FAILURE);
+    }
+    // Loop through all the shapes in the OBJ-data
+    for(int m=0; m<shapes.size(); ++m) {
+
+        // Create a new Mesh instance and store a local ponter for easy access
+        meshes.push_back(Mesh());
+        Mesh *mesh = &meshes[meshes.size()-1];
+
+        // Store a pointer to the mesh of the current shape
+        tinyobj::mesh_t *objMesh = &shapes[m].mesh;
+
+        // Get the texture of the first face in the mesh. This is used for the entire mesh.
+        std::string texture_filename = materials[objMesh->material_ids[0]].diffuse_texname;
+
+        // Read the texture image
+        int width, height, channels;
+        GLubyte *imageData = stbi_load("resources/WoodCabinSM.jpg", &width, &height, &channels, STBI_default);
+        if (!imageData){
+            exit(EXIT_FAILURE);
+        }
+
+        // Generate a new texture name and activate it
+        glGenTextures(1, &mesh->textureName);
+        glBindTexture(GL_TEXTURE_2D, mesh->textureName);
+
+        // Set sampler properties
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        if (channels == 3)
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imageData);
+        else if (channels == 4)
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageData);
+        else
+            exit(EXIT_FAILURE);
+
+        // Generate mip map images
+        glGenerateMipmap(GL_TEXTURE_2D);
+
+        // Deactivate the texture and free the image data
+        glBindTexture(GL_TEXTURE_2D, 0);
+        stbi_image_free(imageData);
+
+        // Store the number of uique vertices and faces in the mesh
+        int numVertices = mesh->numVertices = objMesh->indices.size();
+        int numFaces = numVertices / 3;
+
+        // Create a vector for storing the vector data
+        std::vector<GLfloat> vertices;
+
+        // Loop through all the faces in the mesh
+        for (int f=0; f<numFaces; ++f) {
+
+            // Store the indices of the current triangle
+            tinyobj::index_t idx1 = objMesh->indices[f * 3];
+            tinyobj::index_t idx2 = objMesh->indices[f * 3 + 1];
+            tinyobj::index_t idx3 = objMesh->indices[f * 3 + 2];
+
+            // Store the first vertex (POSITION NORMAL UV)
+            vertices.push_back(attributes.vertices[idx1.vertex_index*3]);
+            vertices.push_back(attributes.vertices[idx1.vertex_index*3+1]);
+            vertices.push_back(attributes.vertices[idx1.vertex_index*3+2]);
+            vertices.push_back(attributes.normals[idx1.normal_index*3]);
+            vertices.push_back(attributes.normals[idx1.normal_index*3+1]);
+            vertices.push_back(attributes.normals[idx1.normal_index*3+2]);
+            vertices.push_back(attributes.texcoords[idx1.texcoord_index*2]);
+            vertices.push_back(1.0f - attributes.texcoords[idx1.texcoord_index*2+1]);
+            // Store the second vertex
+            vertices.push_back(attributes.vertices[idx2.vertex_index*3]);
+            vertices.push_back(attributes.vertices[idx2.vertex_index*3+1]);
+            vertices.push_back(attributes.vertices[idx2.vertex_index*3+2]);
+            vertices.push_back(attributes.normals[idx2.normal_index*3]);
+            vertices.push_back(attributes.normals[idx2.normal_index*3+1]);
+            vertices.push_back(attributes.normals[idx2.normal_index*3+2]);
+            vertices.push_back(attributes.texcoords[idx2.texcoord_index*2]);
+            vertices.push_back(1.0f - attributes.texcoords[idx2.texcoord_index*2+1]);
+            // Store the third vertex
+            vertices.push_back(attributes.vertices[idx3.vertex_index*3]);
+            vertices.push_back(attributes.vertices[idx3.vertex_index*3+1]);
+            vertices.push_back(attributes.vertices[idx3.vertex_index*3+2]);
+            vertices.push_back(attributes.normals[idx3.normal_index*3]);
+            vertices.push_back(attributes.normals[idx3.normal_index*3+1]);
+            vertices.push_back(attributes.normals[idx3.normal_index*3+2]);
+            vertices.push_back(attributes.texcoords[idx3.texcoord_index*2]);
+            vertices.push_back(1.0f - attributes.texcoords[idx3.texcoord_index*2+1]);
+
+        }
+
+        // Create buffer name for the vertex data
+        glGenBuffers(1, &mesh->bufferName); // 2.0
+
+        // Allocate storage for the vertex array buffers
+        glBindBuffer(GL_ARRAY_BUFFER, mesh->bufferName); // 2.0
+        glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(GLfloat), &vertices[0], GL_STATIC_DRAW); // 2.0
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        // Create and initialize a vertex array object
+        glGenVertexArrays(1, &mesh->arrayName);
+        glBindVertexArray(mesh->arrayName);
+
+        // Specify the format of the attributes
+        glBindBuffer(GL_ARRAY_BUFFER, mesh->bufferName);
+        glVertexAttribPointer(POSITION, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), 0); // 3.0
+        glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (void *)(3 * sizeof(GL_FLOAT))); // 3.0
+        glVertexAttribPointer(COLOR, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (void *)(6 * sizeof(GL_FLOAT))); // 3.0
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+        // Enable the attributes
+        glEnableVertexAttribArray(POSITION); // 2.0
+        glEnableVertexAttribArray(NORMAL);
+        glEnableVertexAttribArray(COLOR);
+
+        glBindVertexArray(0);
+
+    }
 }
 
 

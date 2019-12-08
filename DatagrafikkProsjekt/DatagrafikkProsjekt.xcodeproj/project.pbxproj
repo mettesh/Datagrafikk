@@ -14,6 +14,8 @@
 		094ED81123572B75007A9B65 /* resources in CopyFiles */ = {isa = PBXBuildFile; fileRef = 094ED80F23572B56007A9B65 /* resources */; };
 		094ED818235738F1007A9B65 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 094ED816235738F1007A9B65 /* main.cpp */; };
 		096BE198238E9F3D006FAD6D /* libgio-2.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 096BE197238E9F3D006FAD6D /* libgio-2.0.0.dylib */; };
+		09778A89239D9ED5007EAE64 /* libgio-2.0.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 096BE197238E9F3D006FAD6D /* libgio-2.0.0.dylib */; };
+		09778A8A239D9ED5007EAE64 /* libgio-2.0.0.dylib in Embed Libraries */ = {isa = PBXBuildFile; fileRef = 096BE197238E9F3D006FAD6D /* libgio-2.0.0.dylib */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		09E4D85623630CF800415536 /* image_helper.c in Sources */ = {isa = PBXBuildFile; fileRef = 09E4D84123630CF800415536 /* image_helper.c */; };
 		09E4D85723630CF800415536 /* image_DXT.c in Sources */ = {isa = PBXBuildFile; fileRef = 09E4D84423630CF800415536 /* image_DXT.c */; };
 		09E4D85823630CF800415536 /* SOIL2.c in Sources */ = {isa = PBXBuildFile; fileRef = 09E4D84723630CF800415536 /* SOIL2.c */; };
@@ -50,6 +52,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
+				09778A8A239D9ED5007EAE64 /* libgio-2.0.0.dylib in Embed Libraries */,
 				09F75F62237C3842007E8916 /* libGLEW.2.1.0.dylib in Embed Libraries */,
 				09E4D85E23632A9100415536 /* libassimp.4.1.0.dylib in Embed Libraries */,
 			);
@@ -479,6 +482,7 @@
 				094ED80E23572575007A9B65 /* glm.hpp in Frameworks */,
 				094ED69023572534007A9B65 /* libgio-2.0.0.dylib in Frameworks */,
 				09E4D85D23632A9100415536 /* libassimp.4.1.0.dylib in Frameworks */,
+				09778A89239D9ED5007EAE64 /* libgio-2.0.0.dylib in Frameworks */,
 				094ED68E2357251B007A9B65 /* libglfw.3.3.dylib in Frameworks */,
 				094ED68A235724E1007A9B65 /* OpenGL.framework in Frameworks */,
 			);

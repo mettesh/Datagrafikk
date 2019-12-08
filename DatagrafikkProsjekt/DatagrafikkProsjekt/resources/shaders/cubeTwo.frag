@@ -25,8 +25,8 @@ out vec4 FragColorResult;
 
 void main()
 {
-    vec3 fragColorLightOne = getFragColor(lightOnePos, lightOneColor, viewOnePos, 0.1, 0.6, 64.0);
-    vec3 fragColorLightTwo = getFragColor(lightTwoPos, lightTwoColor, viewTwoPos, 0.1, 0.6, 64.0);
+    vec3 fragColorLightOne = getFragColor(lightOnePos, lightOneColor, viewOnePos, 0.2, 0.9, 64.0);
+    vec3 fragColorLightTwo = getFragColor(lightTwoPos, lightTwoColor, viewTwoPos, 0.2, 0.3, 64.0);
     
     float lightOneDistance = length(lightOnePos - FragPos);
     float lightTwoDistance = length(lightTwoPos - FragPos);

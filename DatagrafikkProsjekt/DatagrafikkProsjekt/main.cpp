@@ -1,134 +1,108 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+// BIBLIOTEK
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
-#include <glm/ext.hpp>
-
-#include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "SOIL2.h"
 
-// Egne includes
+// EGNE INCLUDES
 #include "shader.h"
 #include "camera.h"
 #include "texture.h"
 
-#define DEFAULT_WIDTH 1024
-#define DEFAULT_HEIGHT 768
-
-// Vertex Buffer Identifiers
-#define VERTICES 0
-
-// Vertex Array attributes
-#define POSITION 0
-#define NORMAL 1
-#define COLOR 2
-#define TANGENT 3
-#define BITANGENT 4
-
-// GLSL Uniform indices
-#define TRANSFORM0 0
-#define TRANSFORM1 1
-#define LIGHT 2
-#define MATERIAL 3
-#define CAMERA 4
-
-// Dimensjonene til vinduet
-int SCREEN_WIDTH, SCREEN_HEIGHT;
-
-// Definerer alle funksjoner da C++ krever dette om de ikke kommer før kallet i koden.
+// FUNKSJONER
+// Definerer alle funksjonene da C++ krever dette om de ikke kommer før kallet i koden.
 int initGL();
 static void glfwErrorCallback(int error, const char* description);
 void glfwWindowSizeCallback(GLFWwindow* window, int width, int height);
 void resizeGL(int width, int height);
 void KeyCallback( GLFWwindow *window, int key, int scancode, int action, int mode );
 void MouseCallback( GLFWwindow *window, double xPos, double yPos );
-void DoMovement( );
+void DoMovement();
 void generateSkyBoxVerticesAndSetArraysAndBuffers();
 void generateCubeVerticesAndSetArraysAndBuffers();
-void generateCubeTwoVerticesAndSetArraysAndBuffers();
+void generatehexPrismVerticesAndSetArraysAndBuffers();
 void generatePyramidVerticesAndSetArraysAndBuffers();
-
 void drawSkybox();
 void drawCube();
-void drawCubeTwo();
+void drawHexPrism();
 void drawPyramid();
 
-unsigned int loadTexture(const char *path);
+// VINDUEDIMENSJONER
+#define DEFAULT_WIDTH 1024
+#define DEFAULT_HEIGHT 768
+int SCREEN_WIDTH, SCREEN_HEIGHT;
 
+// KAMERA OG BEVEGELSE
 // Setter startposisjon til kamera
 Camera camera( glm::vec3( 0.0f, 0.0f, 5.0f ) );
-
 GLfloat lastX = SCREEN_WIDTH / 2.0f;
 GLfloat lastY = SCREEN_WIDTH / 2.0f;
-
+// Deklarer variabel for å holde på tastatur-keys
 bool keys[1024];
 bool firstMouse = true;
-
+// For å sikre jevne bevegelser regnes dette ut
 GLfloat deltaTime = 0.0f;
 GLfloat lastFrame = 0.0f;
 
-// Vertex-array og buffer -object for KUBE og SKYBOX
+// VERTEX ARRAY ATTRIBUTTER
+#define POSITION 0
+#define NORMAL 1
+#define COLOR 2
+#define TANGENT 3
+
+// VERTEXARRAY- OG BUFFERE
 GLuint cubeVAO, cubeVBO;
-GLuint cubeTwoVAO, cubeTwoVBO;
+GLuint hexPrismVAO, hexPrismVBO;
 GLuint pyramidVAO, pyramidVBO;
 GLuint skyboxVAO, skyboxVBO;
 
-// Shadere
+// SHADERE
 Shader cubeAndPyramidShader;
-Shader cubeTwoShader;
+Shader hexPrismShader;
 Shader skyboxShader;
 
-// Uniform location kube 1:
+// UNIFORM LOCATIONS FOR KUBE OG PYRAMIDE:
 GLint modelLoc;
 GLint viewLoc;
 GLint projLoc;
 GLint cubeTextureLoc;
-GLint cubeNormalMapLoc;
-GLint cubeDepthMapLoc;
-
-GLint cubeHeighScaleLoc;
+GLint normalMapLoc;
+GLint depthMapLoc;
+GLint heighScaleLoc;
 GLint lightPositionOneLoc;
 GLint lightPositionTwoLoc;
-GLint viewPositionOneLoc;
-GLint viewPositionTwoLoc;
 GLint lightColorOneLoc;
 GLint lightColorTwoLoc;
+GLint viewPositionLoc;
 
-// Uniform location kube 2:
-GLint viewLocCubeTwo;
-GLint projLocCubeTwo;
-GLint modelLocCubeTwo;
-GLint cubeTextureLocCubeTwo;
-GLint lightColorOneLocCubeTwo;
-GLint lightPositionOneLocCubeTwo;
-GLint viewPositionOneLocCubeTwo;
-GLint lightColorTwoLocCubeTwo;
-GLint lightPositionTwoLocCubeTwo;
-GLint viewPositionTwoLocCubeTwo;
+// UNIFORM LOCATIONS FOR PRISME:
+GLint viewLochexPrism;
+GLint projLochexPrism;
+GLint modelLochexPrism;
+GLint textureLochexPrism;
+GLint lightColorOneLochexPrism;
+GLint lightPositionOneLochexPrism;
+GLint lightColorTwoLochexPrism;
+GLint lightPositionTwoLochexPrism;
+GLint viewPositionLochexPrism;
 
-// Uniform locations Skybox
+// UNIFORM LOCATIONS FOR SKYBOX:
 GLint projLocSkybox;
 GLint viewLocSkybox;
 
-
-// Lys uniform values (For begge kubene)
-// Light Uniforms values (For begge kubene!)
+// LYS VALUES (For alle objektene)
 GLfloat lightPositionOneValue[] { 9.0f, 1.0f, -1.5f };
 GLfloat lightPositionTwoValue[] { -3.0f, 1.0f, -1.5f };
-
 GLfloat lightColorOneValue[] = {1.0f, 1.0f, 1.0f};
 GLfloat lightColorTwoValue[] = {0.976f, 0.282f, 0.376f}; // Rød
 
-float heightScale = 0.1;
-
-// Textures
+// TEXTURES
 GLuint cubemapTextureValue;
 GLuint cubeTextureValue;
 GLuint cubeNormalMapValue;
 GLuint cubeDepthMapValue;
+GLuint hexPrismTextureValue;
 GLuint pyramidTextureValue;
 GLuint pyramidNormalMapValue;
 GLuint pyramidDepthMapValue;
@@ -147,7 +121,7 @@ int main(void) {
     }
     
     // GLFW benytter noe kalt windowHint. Disse forteller/spør GLFW om å sette visse versjoner
-    // av OpenGL + andre instillinger. - Dette er valgfritt, men Mac trenger noen!
+    // av OpenGL + andre instillinger. - Dette er valgfritt, men Mac trenger noen ekstra!
     glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 3 ); //Ber her om OpenGL versjon 3
     glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
     glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
@@ -169,19 +143,14 @@ int main(void) {
     // Setter en input-mode for vinduet. I dette tilfellet settes musepeker til å ikke syntes (heller ikke utenfor vinduet)
     glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
     
-
     // Henter inn størrelse på vinduet og lagrere dette på plassen til SCREEN_WIDTH - og _HEIGHT
     glfwGetFramebufferSize( window, &SCREEN_WIDTH, &SCREEN_HEIGHT );
     
-    // Setter endringer av vinduestørrelse
-    // This function sets the size callback of the specified window, which is called when the window is resized. The callback is provided with the size, in screen coordinates, of the content area of the window.
+    // Setter endringer av vinduestørrelse. Denne kalles hver gang vinduets størrelse justeres
     glfwSetWindowSizeCallback(window, glfwWindowSizeCallback);
     
     // Velger at det er dette vinduet OpenGL skal jobbe i
     glfwMakeContextCurrent(window);
-    
-    // TODO: Trengs denne? Kun for eldre versjoner??
-    // glewExperimental = GL_TRUE;
     
     // Initialiserer GLEW og sjekker at det gikk ok
     if (glewInit() != GLEW_OK) {
@@ -211,7 +180,7 @@ int main(void) {
         // Setter clear-farge og dybdebuffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
-        drawCubeTwo();
+        drawHexPrism();
         
         drawSkybox();
         
@@ -219,8 +188,7 @@ int main(void) {
         
         drawPyramid();
         
-        
-        // This function swaps the front and back buffers of the specified window
+        // Svapper front- og backbuffere til vinduet
         // Front buffer = Det som vises på skjermen (Forrige frame)
         // Back buffer = Det som nå tegnes (current frame)
         glfwSwapBuffers(window);
@@ -228,13 +196,11 @@ int main(void) {
         // Sjekker om noen eventer er aktivert (F.eks key trykker, musepeker flytter osv.)
         glfwPollEvents( );
         
-        
         // For å bestemme hvor lenge hver frame (bilde) skal vises på skjermen. For å sikre smoothe bevegelser.
         // Brukes i doMovement()
         GLfloat currentFrame = glfwGetTime( );
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
-        
         // Kaller deretter den tilhørende responsfunksjonen.
         DoMovement();
         
@@ -252,21 +218,22 @@ int main(void) {
 /* Initiliaserer OpenGL */
 int initGL() {
     
-    generateSkyBoxVerticesAndSetArraysAndBuffers();
-    generateCubeVerticesAndSetArraysAndBuffers();
-    generateCubeTwoVerticesAndSetArraysAndBuffers();
-    generatePyramidVerticesAndSetArraysAndBuffers();
-    
-    // Setup and compile our shaders
+    // Setter opp og kompilerer shaderne
     cubeAndPyramidShader = Shader( "resources/shaders/cubeAndPyramid.vert", "resources/shaders/cubeAndPyramid.frag" );
-    cubeTwoShader = Shader( "resources/shaders/cubeTwo.vert", "resources/shaders/cubeTwo.frag" );
+    hexPrismShader = Shader( "resources/shaders/hexPrism.vert", "resources/shaders/hexPrism.frag" );
     skyboxShader = Shader( "resources/shaders/skybox.vert", "resources/shaders/skybox.frag" );
-
-    //Laste inn texture til kuben:
-    cubeTextureValue = TextureLoading::LoadTexture("resources/img/cube/wood.png");
-    cubeNormalMapValue = TextureLoading::LoadTexture("resources/img/cube/wood_normal.png");
-    cubeDepthMapValue = TextureLoading::LoadTexture("resources/img/cube/wood_disp.png");
     
+    // Generer vertecies til de ulike objektene
+    generateCubeVerticesAndSetArraysAndBuffers();
+    generatehexPrismVerticesAndSetArraysAndBuffers();
+    generatePyramidVerticesAndSetArraysAndBuffers();
+    generateSkyBoxVerticesAndSetArraysAndBuffers();
+    
+    //Laste inn diffuse, normal og depth-texture til kube og prisme. Kun diffse texture til pyramide:
+    cubeTextureValue = TextureLoading::LoadTexture("resources/img/cube/wood.jpg");
+    cubeNormalMapValue = TextureLoading::LoadTexture("resources/img/cube/wood_normal.jpg");
+    cubeDepthMapValue = TextureLoading::LoadTexture("resources/img/cube/wood_disp.jpg");
+    hexPrismTextureValue = TextureLoading::LoadTexture("resources/img/cube/bricks.jpg");
     pyramidTextureValue = TextureLoading::LoadTexture("resources/img/cube/bricks.jpg");
     pyramidNormalMapValue = TextureLoading::LoadTexture("resources/img/cube/bricks_normal.jpg");
     pyramidDepthMapValue = TextureLoading::LoadTexture("resources/img/cube/bricks_depth.jpg");
@@ -280,48 +247,46 @@ int initGL() {
     skyBoxTextureFaces.push_back( "resources/img/skybox/iceflats_ft.tga" );
     skyBoxTextureFaces.push_back( "resources/img/skybox/iceflats_bk.tga" );
     cubemapTextureValue = TextureLoading::LoadCubemap( skyBoxTextureFaces );
-
-
-    // Henter inn uniform-loactions fra cube-shadere
+    
+    // Henter inn uniform-loactions fra kube- og pyramideshader
     cubeAndPyramidShader.Use();
-    // Kubeplassering
     viewLoc = glGetUniformLocation( cubeAndPyramidShader.Program, "view" );
     projLoc = glGetUniformLocation( cubeAndPyramidShader.Program, "projection" );
     modelLoc = glGetUniformLocation( cubeAndPyramidShader.Program, "model" );
     // Texture
     cubeTextureLoc = glGetUniformLocation( cubeAndPyramidShader.Program, "cubeTexture" );
-    cubeNormalMapLoc = glGetUniformLocation( cubeAndPyramidShader.Program, "cubeNormalMap" );
-    cubeDepthMapLoc = glGetUniformLocation( cubeAndPyramidShader.Program, "depthMap" );
-    
-    cubeHeighScaleLoc = glGetUniformLocation( cubeAndPyramidShader.Program, "heightScale" );
+    normalMapLoc = glGetUniformLocation( cubeAndPyramidShader.Program, "cubeNormalMap" );
+    depthMapLoc = glGetUniformLocation( cubeAndPyramidShader.Program, "depthMap" );
+    // Dypbde (til parallax mapping)
+    heighScaleLoc = glGetUniformLocation( cubeAndPyramidShader.Program, "heightScale" );
     // Lys 1
     lightColorOneLoc = glGetUniformLocation(cubeAndPyramidShader.Program, "lightOneColor");
     lightPositionOneLoc = glGetUniformLocation( cubeAndPyramidShader.Program, "lightOnePos" );
-    viewPositionOneLoc = glGetUniformLocation( cubeAndPyramidShader.Program, "viewOnePos" );
     // Lys 2
     lightColorTwoLoc = glGetUniformLocation(cubeAndPyramidShader.Program, "lightTwoColor");
     lightPositionTwoLoc = glGetUniformLocation( cubeAndPyramidShader.Program, "lightTwoPos" );
-    viewPositionTwoLoc = glGetUniformLocation( cubeAndPyramidShader.Program, "viewTwoPos" );
+    
+    viewPositionLoc = glGetUniformLocation( cubeAndPyramidShader.Program, "viewPos" );
     
     
-    cubeTwoShader.Use();
-    // Kubeplassering
-    viewLocCubeTwo = glGetUniformLocation( cubeTwoShader.Program, "view" );
-    projLocCubeTwo = glGetUniformLocation( cubeTwoShader.Program, "projection" );
-    modelLocCubeTwo = glGetUniformLocation( cubeTwoShader.Program, "model" );
+    // Henter inn uniform-loactions fra hexagon prisme-shader
+    hexPrismShader.Use();
+    // Prismeplassering
+    viewLochexPrism = glGetUniformLocation( hexPrismShader.Program, "view" );
+    projLochexPrism = glGetUniformLocation( hexPrismShader.Program, "projection" );
+    modelLochexPrism = glGetUniformLocation( hexPrismShader.Program, "model" );
     // Texture
-    cubeTextureLocCubeTwo = glGetUniformLocation( cubeTwoShader.Program, "cubeTexture" );
+    textureLochexPrism = glGetUniformLocation( hexPrismShader.Program, "cubeTexture" );
     // Lys 1
-    lightColorOneLocCubeTwo = glGetUniformLocation(cubeTwoShader.Program, "lightOneColor");
-    lightPositionOneLocCubeTwo = glGetUniformLocation( cubeTwoShader.Program, "lightOnePos" );
-    viewPositionOneLocCubeTwo = glGetUniformLocation( cubeTwoShader.Program, "viewOnePos" );
+    lightColorOneLochexPrism = glGetUniformLocation(hexPrismShader.Program, "lightOneColor");
+    lightPositionOneLochexPrism = glGetUniformLocation( hexPrismShader.Program, "lightOnePos" );
     // Lys 2
-    lightColorTwoLocCubeTwo = glGetUniformLocation(cubeTwoShader.Program, "lightTwoColor");
-    lightPositionTwoLocCubeTwo = glGetUniformLocation( cubeTwoShader.Program, "lightTwoPos" );
-    viewPositionTwoLocCubeTwo = glGetUniformLocation( cubeTwoShader.Program, "viewTwoPos" );
+    lightColorTwoLochexPrism = glGetUniformLocation(hexPrismShader.Program, "lightTwoColor");
+    lightPositionTwoLochexPrism = glGetUniformLocation( hexPrismShader.Program, "lightTwoPos" );
     
-
-
+    viewPositionLochexPrism = glGetUniformLocation( hexPrismShader.Program, "viewTwoPos" );
+    
+    
     // Henter inn uniform-loactions fra skybox-shader
     skyboxShader.Use();
     projLocSkybox = glGetUniformLocation( skyboxShader.Program, "projection" );
@@ -345,31 +310,31 @@ void resizeGL(int width, int height) {
     glm::mat4 projectionCubeValue = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 100.0f);
     glUniformMatrix4fv( projLoc, 1, GL_FALSE, glm::value_ptr( projectionCubeValue ) );
     
-    cubeTwoShader.Use();
-    glm::mat4 projectionCubeTwoValue = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 100.0f);
-    glUniformMatrix4fv( projLocCubeTwo, 1, GL_FALSE, glm::value_ptr( projectionCubeTwoValue ) );
+    hexPrismShader.Use();
+    glm::mat4 projectionhexPrismValue = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 100.0f);
+    glUniformMatrix4fv( projLochexPrism, 1, GL_FALSE, glm::value_ptr( projectionhexPrismValue ) );
     
     skyboxShader.Use();
     glm::mat4 projectionSkyboxValue = glm::perspective(camera.GetZoom(), (float)width/height, 0.1f, 1000.0f );
     glUniformMatrix4fv( projLocSkybox, 1, GL_FALSE, glm::value_ptr( projectionSkyboxValue ) );
     
     // Definerer viewport-dimensjonene
-    // Denne blir kalt hver gang vinduet starter.
     glViewport(0, 0, width, height); // 2.0
     
 }
 
 void generateCubeVerticesAndSetArraysAndBuffers() {
+    
     // Punktene som tilsammen bygger kuben
     glm::vec3 positions[8];
-    positions[0] = glm::vec3(-1.0f,  1.0f, -1.0f);
-    positions[1] = glm::vec3(-1.0f, -1.0f, -1.0f);
-    positions[2] = glm::vec3( 1.0f, -1.0f, -1.0f);
-    positions[3] = glm::vec3( 1.0f,  1.0f, -1.0f);
-    positions[4] = glm::vec3(-1.0f,  1.0f, 1.0f);
-    positions[5] = glm::vec3(-1.0f, -1.0f, 1.0f);
-    positions[6] = glm::vec3( 1.0f, -1.0f, 1.0f);
-    positions[7] = glm::vec3( 1.0f,  1.0f, 1.0f);
+    positions[0] = glm::vec3(-1.0f,  1.0f, -1.0f);  // Oppe bak venstre
+    positions[1] = glm::vec3(-1.0f, -1.0f, -1.0f);  // Nede bak venstre
+    positions[2] = glm::vec3( 1.0f, -1.0f, -1.0f);  // Nede bak høyre
+    positions[3] = glm::vec3( 1.0f,  1.0f, -1.0f);  // Oppe bak høyre
+    positions[4] = glm::vec3(-1.0f,  1.0f, 1.0f);   // Oppe frem venstre
+    positions[5] = glm::vec3(-1.0f, -1.0f, 1.0f);   // Nede frem venstre
+    positions[6] = glm::vec3( 1.0f, -1.0f, 1.0f);   // Nede frem høyre
+    positions[7] = glm::vec3( 1.0f,  1.0f, 1.0f);   // Oppe frem høyre
     
     // Texture-koordinater. Samme for hver side
     glm::vec2 uv1(0.0f, 1.0f);
@@ -436,10 +401,9 @@ void generateCubeVerticesAndSetArraysAndBuffers() {
         tangent2.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
         tangent2 = glm::normalize(tangent2);
 
-        
         // Har nå alt for å bygge en side. Legger dette til i en midlertidig array
         std::vector<GLfloat> oneSideVertices = {
-            // positions            // normal         // texcoords  // tangent
+            // posisjoner            // normal         // texture  // tangent
             pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y, tangent1.x, tangent1.y, tangent1.z,
             pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y, tangent1.x, tangent1.y, tangent1.z,
             pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent1.x, tangent1.y, tangent1.z,
@@ -453,57 +417,55 @@ void generateCubeVerticesAndSetArraysAndBuffers() {
         for (auto &vertex : oneSideVertices) cubeVertices.push_back(vertex);
     }
     
-     //Antall man ønsker å opprette, arrayen som skal benyttes.
-     glGenVertexArrays( 1, &cubeVAO );
-     //Forteller OpenGL hvilken vertex-array som skal brukes.
-     glBindVertexArray( cubeVAO );
+    
+    // Oppretter en vertex-array for kuben
+    glGenVertexArrays( 1, &cubeVAO );
+    // Forteller OpenGL at denne vertex-array skal brukes.
+    glBindVertexArray( cubeVAO );
      
-     //Antall man ønsker å opprette, arrayen som skal benyttes.
-     glGenBuffers( 1, &cubeVBO );
-     //Forteller OpenGL at dette er current bufferen som skal brukes (Skal bufferen modifiseres senere er det denne som skal endres)
-     glBindBuffer( GL_ARRAY_BUFFER, cubeVBO );
+    // Oppretter en buffer for kuben
+    glGenBuffers( 1, &cubeVBO );
+    // Forteller OpenGL at dette er bufferen som skal brukes (Skal bufferen modifiseres senere er det denne som skal endres)
+    glBindBuffer( GL_ARRAY_BUFFER, cubeVBO );
+    
+    // Setter data til bufferen. Forteller hvor mye plass det tar
+    glBufferData( GL_ARRAY_BUFFER, 6 * 11 * 6 * sizeof( GL_FLOAT ), cubeVertices.data(), GL_STATIC_DRAW );
+    // Spesifiserer attributtene (Slik at man vet hvilke vertices som er for de ulike attributtene)
+    glVertexAttribPointer(POSITION, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(GL_FLOAT), (GLvoid*)0);
+    glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(GL_FLOAT), (GLvoid*)(3 * sizeof(GLfloat)));
+    glVertexAttribPointer(COLOR, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(GL_FLOAT), (const void*)(6 * sizeof(GLfloat)));
+    glVertexAttribPointer(TANGENT, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(GL_FLOAT), (const void*)(8 * sizeof(GLfloat)));
      
-
-     glBufferData( GL_ARRAY_BUFFER, 6 * 11 * 6 * sizeof( GL_FLOAT ), cubeVertices.data(), GL_STATIC_DRAW );
-     glVertexAttribPointer(POSITION, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(GL_FLOAT), (GLvoid*)0);
-     glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(GL_FLOAT), (GLvoid*)(3 * sizeof(GLfloat)));
-     glVertexAttribPointer(COLOR, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(GL_FLOAT), (const void*)(6 * sizeof(GLfloat)));
-     glVertexAttribPointer(TANGENT, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(GL_FLOAT), (const void*)(8 * sizeof(GLfloat)));
-     
-     // Aktivere attributtene
-     glEnableVertexAttribArray(POSITION);
-     glEnableVertexAttribArray(COLOR);
-     glEnableVertexAttribArray(NORMAL);
-     glEnableVertexAttribArray(TANGENT);
-
+    // Aktiverer attributtene
+    glEnableVertexAttribArray(POSITION);
+    glEnableVertexAttribArray(COLOR);
+    glEnableVertexAttribArray(NORMAL);
+    glEnableVertexAttribArray(TANGENT);
 }
 
-void generateCubeTwoVerticesAndSetArraysAndBuffers() {
+void generatehexPrismVerticesAndSetArraysAndBuffers() {
  
-    
-    // Punktene som tilsammen bygger kuben
+    // Punktene som tilsammen bygger hexagon prismen
     glm::vec3 positions[16];
-    positions[0] = glm::vec3(-0.5f, -1.0f, -1.0f);  //Bakerst venstre nede
-    positions[1] = glm::vec3( 0.5f, -1.0f, -1.0f);  // Bakerst høyre nede
-    positions[2] = glm::vec3(-1.0f, -1.0f, -0.5f);  // Bak venstre nede
-    positions[3] = glm::vec3( 1.0f, -1.0f, -0.5f);  // Bak høyre nede
+    positions[0]  = glm::vec3(-0.5f, -1.0f, -1.0f); // Bakerst venstre nede
+    positions[1]  = glm::vec3( 0.5f, -1.0f, -1.0f); // Bakerst høyre nede
+    positions[2]  = glm::vec3(-1.0f, -1.0f, -0.5f); // Bak venstre nede
+    positions[3]  = glm::vec3( 1.0f, -1.0f, -0.5f); // Bak høyre nede
     
-    positions[4] = glm::vec3(-1.0f, -1.0f, 0.5f);   // Forann venstre nede
-    positions[5] = glm::vec3( 1.0f, -1.0f, 0.5f);   // Forann høyre nede
-    positions[6] = glm::vec3(-0.5f, -1.0f, 1.0f);   // Fremst venstre nede
-    positions[7] = glm::vec3( 0.5f, -1.0f, 1.0f);   // Fremst høyre nede
+    positions[4]  = glm::vec3(-1.0f, -1.0f,  0.5f); // Forann venstre nede
+    positions[5]  = glm::vec3( 1.0f, -1.0f,  0.5f); // Forann høyre nede
+    positions[6]  = glm::vec3(-0.5f, -1.0f,  1.0f); // Fremst venstre nede
+    positions[7]  = glm::vec3( 0.5f, -1.0f,  1.0f); // Fremst høyre nede
     
-    positions[8] = glm::vec3(-0.5f, 1.0f, -1.0f);  //Bakerst venstre oppe
-    positions[9] = glm::vec3( 0.5f, 1.0f, -1.0f);  // Bakerst høyre oppe
-    positions[10] = glm::vec3(-1.0f, 1.0f, -0.5f);  // Bak venstre oppe
-    positions[11] = glm::vec3( 1.0f, 1.0f, -0.5f);  // Bak høyre oppe
+    positions[8]  = glm::vec3(-0.5f,  1.0f, -1.0f); // Bakerst venstre oppe
+    positions[9]  = glm::vec3( 0.5f,  1.0f, -1.0f); // Bakerst høyre oppe
+    positions[10] = glm::vec3(-1.0f,  1.0f, -0.5f); // Bak venstre oppe
+    positions[11] = glm::vec3( 1.0f,  1.0f, -0.5f); // Bak høyre oppe
     
-    positions[12] = glm::vec3(-1.0f, 1.0f, 0.5f);   // Forann venstre oppe
-    positions[13] = glm::vec3( 1.0f, 1.0f, 0.5f);   // Forann høyre oppe
-    positions[14] = glm::vec3(-0.5f, 1.0f, 1.0f);   // Fremst venstre oppe
-    positions[15] = glm::vec3( 0.5f, 1.0f, 1.0f);   // Fremst høyre oppe
-    
-    
+    positions[12] = glm::vec3(-1.0f,  1.0f,  0.5f); // Forann venstre oppe
+    positions[13] = glm::vec3( 1.0f,  1.0f,  0.5f); // Forann høyre oppe
+    positions[14] = glm::vec3(-0.5f,  1.0f,  1.0f); // Fremst venstre oppe
+    positions[15] = glm::vec3( 0.5f,  1.0f,  1.0f); // Fremst høyre oppe
     
     // Texture-koordinater. Samme for hver side
     glm::vec2 uv1(0.0f, 1.0f);
@@ -512,31 +474,27 @@ void generateCubeTwoVerticesAndSetArraysAndBuffers() {
     glm::vec2 uv4(1.0f, 1.0f);
     
                             
-    //                 Bakerst  bakvenstre  bakhøyre   venstre    Høyre       -forannVenstre   Forannhøyre - Forann
     int indices[] = {
-        1,9,8,0,
-        0,8,10,2,
-        3,11,9,1,
-        2,10,12,4,
-        5,13,11,3,
-        4,12,14,6,
-        7,15,13,5,
-        6,14,15,7,
-        // Topp
+        1,9,8,0,    // Bakerst
+        0,8,10,2,   // Bak venstre
+        3,11,9,1,   // Bak høyre
+        2,10,12,4,  // Venstre
+        5,13,11,3,  // Høyre
+        4,12,14,6,  // Frem venstre
+        7,15,13,5,  // Frem høyre
+        6,14,15,7,  // Front
+        // Topp:
         8,10,12,14,
         9,8,14,15,
         11,9,15,13,
-        //Bunn:
+        // Bunn:
         4,6,7,5,
         2,4,5,3,
         0,2,3,1
     };
         
-    
-    
-    
-    // Deklarerer en vector som skal holde på de ferdige verdiene til kuben
-    std::vector<GLfloat> cubeTwoVertices;
+    // Deklarerer en vector som skal holde på de ferdige verdiene til prismen
+    std::vector<GLfloat> hexPrismVertices;
     
     // Deklarer vec3 som skal holde på de 4 ulike posisjons-punktene til hver side
     glm::vec3 pos1, pos2, pos3, pos4;
@@ -544,7 +502,7 @@ void generateCubeTwoVerticesAndSetArraysAndBuffers() {
     // Deklarerer vec3 som skal holde på normalen til hver side
     glm::vec3 nm;
      
-    // Løkka kjører 6 ganger - en gang for hver side.
+    // Løkka kjører 14 ganger - Prismen blir bygget av totalt 14 firkanter
     for (int face = 0; face < 56; face = face + 4){
         
         // Henter ut de korrektene posisjons-koordinatene for denne siden
@@ -553,13 +511,13 @@ void generateCubeTwoVerticesAndSetArraysAndBuffers() {
         pos3 = positions[indices[face + 2]];
         pos4 = positions[indices[face + 3]];
         
-        // Normal-koordinater. En per side
+        // Tar kryssproduktet av sider av triangelen for å finne normalverdien
         glm::vec3 normalFirstTriangel = normalize(cross(pos1 - pos2, pos1 - pos4));
         glm::vec3 normalSecondTriangel = normalize(cross(pos2 - pos3, pos3 - pos4));
         nm = normalize(normalFirstTriangel + normalSecondTriangel);
         
         // Har nå alt for å bygge en side. Legger dette til i en midlertidig array
-        std::vector<GLfloat> oneSide = {
+        std::vector<GLfloat> oneSideVertices = {
             // positions            // normal         // texcoords
             pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y,
             pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y,
@@ -570,29 +528,23 @@ void generateCubeTwoVerticesAndSetArraysAndBuffers() {
             pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y
         };
         
-        // Appender den ferdige siden til cubeVertices
-        for(int i = 0; i < 48; i++){
-            cubeTwoVertices.push_back(oneSide[i]);
-        }
-        
-        // Frigjør minnet. TODO: Må denne gjøres?
-        oneSide.clear();
+        // Appender den ferdige siden til hexPrismVertices
+        for (auto &vertex : oneSideVertices) hexPrismVertices.push_back(vertex);
     }
     
+    // Oppretter en vertex-array for prismen
+    glGenVertexArrays( 1, &hexPrismVAO );
+    // Forteller OpenGL at denne vertex-array skal brukes.
+    glBindVertexArray( hexPrismVAO );
     
-    //Antall man ønsker å opprette, arrayen som skal benyttes.
-    glGenVertexArrays( 1, &cubeTwoVAO );
-    //Forteller OpenGL hvilken vertex-array som skal brukes.
-    glBindVertexArray( cubeTwoVAO );
+    // Oppretter en buffer for prismen
+    glGenBuffers( 1, &hexPrismVBO );
+    // Forteller OpenGL at dette er bufferen som skal brukes (Skal bufferen modifiseres senere er det denne som skal endres)
+    glBindBuffer( GL_ARRAY_BUFFER, hexPrismVBO );
     
-    //Antall man ønsker å opprette, arrayen som skal benyttes.
-    glGenBuffers( 1, &cubeTwoVBO );
-    //Forteller OpenGL at dette er current bufferen som skal brukes (Skal bufferen modifiseres senere er det denne som skal endres)
-    glBindBuffer( GL_ARRAY_BUFFER, cubeTwoVBO );
-    
-
-    glBufferData( GL_ARRAY_BUFFER, 6 * 8 * 14 * sizeof( GL_FLOAT ), cubeTwoVertices.data(), GL_STATIC_DRAW );
-    
+    // Setter data til bufferen. Forteller hvor mye plass det tar
+    glBufferData( GL_ARRAY_BUFFER, 6 * 8 * 14 * sizeof( GL_FLOAT ), hexPrismVertices.data(), GL_STATIC_DRAW );
+    // Spesifiserer attributtene (Slik at man vet hvilke vertices som er for de ulike attributtene)
     glVertexAttribPointer(POSITION, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (GLvoid*)0);
     glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (GLvoid*)(3 * sizeof(GLfloat)));
     glVertexAttribPointer(COLOR, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (const void*)(6 * sizeof(GLfloat)));
@@ -601,11 +553,11 @@ void generateCubeTwoVerticesAndSetArraysAndBuffers() {
     glEnableVertexAttribArray(POSITION);
     glEnableVertexAttribArray(NORMAL);
     glEnableVertexAttribArray(COLOR);
-
 }
 
 void generatePyramidVerticesAndSetArraysAndBuffers() {
-    // Punktene som tilsammen bygger kuben
+    
+    // Punktene som tilsammen bygger pyramiden
     glm::vec3 positions[5];
     positions[0] = glm::vec3( 0.0f,  1.0f, 0.0f); // Toppunkt
     positions[1] = glm::vec3(-1.0f,-1.0f, -1.0f);  // Nede bakerst til venstre
@@ -618,26 +570,24 @@ void generatePyramidVerticesAndSetArraysAndBuffers() {
     glm::vec2 uv2(1.0f, 1.0f);
     glm::vec2 uv3(0.0f, 1.0f);
     
-    //               Venstre - Høyre - Front  - Bak -  Bunn1  Bunn2
-    int indices[] = { 0,1,3,  0,4,2,   0,3,4,   0,2,1,  1,2,3,   4,3,2};
+    //               Venstre - Høyre  - Front  -  Bak  -  Bunn1  - Bunn2
+    int indices[] = { 0,1,3,   0,4,2,   0,3,4,   0,2,1,   1,2,3,   4,3,2};
     
-    // Teller for å styre hvilken normal som skal brukes til en side
-    int sideCounter = 0;
     
     // Deklarerer en vector som skal holde på de ferdige verdiene til kuben
     std::vector<GLfloat> pyramidVertices;
     
-    // Deklarer vec3 som skal holde på de 4 ulike posisjons-punktene til hver side
-    glm::vec3 pos1, pos2, pos3;//, pos4;
+    // Deklarer vec3 som skal holde på de 3 ulike posisjons-punktene til hver side
+    glm::vec3 pos1, pos2, pos3;
     
     // Deklarerer vec3 som skal holde på normalen til hver side
     glm::vec3 nm;
     
-    // Deklarerer vec3 som skal holde på tangent og bittangent for hver side
+    // Deklarerer vec3 som skal holde på tangent
     glm::vec3 tangent1;
     glm::vec3 tangent2;
      
-    // Løkka kjører 6 ganger - en gang for hver side.
+    // Løkka kjører 6 ganger - en gang for hver trekant.
     for (int face = 0; face < 18; face = face + 3){
         
         // Henter ut de korrektene posisjons-koordinatene for denne siden
@@ -645,15 +595,15 @@ void generatePyramidVerticesAndSetArraysAndBuffers() {
         pos2 = positions[indices[face + 1]];
         pos3 = positions[indices[face + 2]];
         
-        // Finner normalverdi for siden ved å ta kryssproduktet av kantene
+        // Finner normalverdi for trekanten ved å ta kryssproduktet av kantene
         glm::vec3 nm = normalize(cross(pos1 - pos2, pos1 - pos3));
         
-        // For å få satt texture riktig for bunnen som skal utgjøre en firkant
+        // Om face er mer enn 11, vet jeg at bunnen nå skal bygges. Denne må få satt texture annerledes da det skal utgjøre en firkant
         if(face > 11){
             uv1 = glm::vec2(1.0f, 0.0f);
         }
 
-        /* Kalkulerer verdier for 1. trekant til denne siden */
+        /* Kalkulerer verdier for trekant til denne siden */
         glm::vec3 edge1 = pos2 - pos1;
         glm::vec3 edge2 = pos3 - pos1;
         glm::vec2 deltaUV1 = uv2 - uv1;
@@ -674,40 +624,84 @@ void generatePyramidVerticesAndSetArraysAndBuffers() {
             pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y, tangent1.x, tangent1.y, tangent1.z,
         };
         
-        // Appender den ferdige siden til cubeVertices
+        // Appender den ferdige siden til pyramidVertices
         for (auto &vertex : onePyramidSideVertices) pyramidVertices.push_back(vertex);
-                
     }
-
     
-     //Antall man ønsker å opprette, arrayen som skal benyttes.
-     glGenVertexArrays( 1, &pyramidVAO );
-     //Forteller OpenGL hvilken vertex-array som skal brukes.
-     glBindVertexArray( pyramidVAO );
+    // Oppretter en vertex-array for pyramiden
+    glGenVertexArrays( 1, &pyramidVAO );
+    // Forteller OpenGL at denne vertex-array skal brukes.
+    glBindVertexArray( pyramidVAO );
      
-     //Antall man ønsker å opprette, arrayen som skal benyttes.
-     glGenBuffers( 1, &pyramidVBO );
-     //Forteller OpenGL at dette er current bufferen som skal brukes (Skal bufferen modifiseres senere er det denne som skal endres)
-     glBindBuffer( GL_ARRAY_BUFFER, pyramidVBO );
+    // Oppretter en buffer for pyramiden
+    glGenBuffers( 1, &pyramidVBO );
+    // Forteller OpenGL at dette er bufferen som skal brukes
+    glBindBuffer( GL_ARRAY_BUFFER, pyramidVBO );
      
-
-     glBufferData( GL_ARRAY_BUFFER, 3 * 11 * 6 * sizeof( GL_FLOAT ), pyramidVertices.data(), GL_STATIC_DRAW );
+    // Setter data til bufferen. Forteller hvor mye plass det tar
+    glBufferData( GL_ARRAY_BUFFER, 3 * 11 * 6 * sizeof( GL_FLOAT ), pyramidVertices.data(), GL_STATIC_DRAW );
+    // Spesifiserer attributtene (Slik at man vet hvilke vertices som er for de ulike attributtene)
+    glVertexAttribPointer(POSITION, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(GL_FLOAT), (GLvoid*)0);
+    glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(GL_FLOAT), (GLvoid*)(3 * sizeof(GLfloat)));
+    glVertexAttribPointer(COLOR, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(GL_FLOAT), (const void*)(6 * sizeof(GLfloat)));
+    glVertexAttribPointer(TANGENT, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(GL_FLOAT), (const void*)(8 * sizeof(GLfloat)));
      
-     glVertexAttribPointer(POSITION, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(GL_FLOAT), (GLvoid*)0);
-     glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(GL_FLOAT), (GLvoid*)(3 * sizeof(GLfloat)));
-     glVertexAttribPointer(COLOR, 2, GL_FLOAT, GL_FALSE, 11 * sizeof(GL_FLOAT), (const void*)(6 * sizeof(GLfloat)));
-     glVertexAttribPointer(TANGENT, 3, GL_FLOAT, GL_FALSE, 11 * sizeof(GL_FLOAT), (const void*)(8 * sizeof(GLfloat)));
-     
-     // Aktivere attributtene
-     glEnableVertexAttribArray(POSITION);
-     glEnableVertexAttribArray(COLOR);
-     glEnableVertexAttribArray(NORMAL);
-     glEnableVertexAttribArray(TANGENT);
-
+    // Aktivere attributtene
+    glEnableVertexAttribArray(POSITION);
+    glEnableVertexAttribArray(COLOR);
+    glEnableVertexAttribArray(NORMAL);
+    glEnableVertexAttribArray(TANGENT);
 }
 
 void generateSkyBoxVerticesAndSetArraysAndBuffers() {
     
+    // Punktene som tilsammen bygger kuben
+     glm::vec3 skyBoxPositions[8];
+     skyBoxPositions[0] = glm::vec3(-1.0f,  1.0f, -1.0f);  // Oppe bak venstre
+     skyBoxPositions[1] = glm::vec3(-1.0f, -1.0f, -1.0f);  // Nede bak venstre
+     skyBoxPositions[2] = glm::vec3( 1.0f, -1.0f, -1.0f);  // Nede bak høyre
+     skyBoxPositions[3] = glm::vec3( 1.0f,  1.0f, -1.0f);  // Oppe bak høyre
+     skyBoxPositions[4] = glm::vec3(-1.0f,  1.0f, 1.0f);   // Oppe frem venstre
+     skyBoxPositions[5] = glm::vec3(-1.0f, -1.0f, 1.0f);   // Nede frem venstre
+     skyBoxPositions[6] = glm::vec3( 1.0f, -1.0f, 1.0f);   // Nede frem høyre
+     skyBoxPositions[7] = glm::vec3( 1.0f,  1.0f, 1.0f);   // Oppe frem høyre
+    
+    // For å sette opp kantene i riktig rekkefølge!
+    //                 Bak   -  Bunn   - Venstre -  Front  -  Høyre  -  Topp
+    int indices[] = {0,3,2,1,  6,5,1,2,  1,5,4,0,  4,5,6,7,  3,7,6,2,  0,4,7,3};
+     
+    // Deklarerer en vector som skal holde på de ferdige verdiene til kuben
+    std::vector<GLfloat> skyBoxVertices;
+     
+     // Deklarer vec3 som skal holde på de 4 ulike posisjons-punktene til hver side
+     glm::vec3 pos1, pos2, pos3, pos4;
+      
+     // Løkka kjører 6 ganger - en gang for hver side.
+     for (int face = 0; face < 24; face = face + 4){
+         
+         // Henter ut de korrektene posisjons-koordinatene for denne siden
+         pos1 = skyBoxPositions[indices[face]];
+         pos2 = skyBoxPositions[indices[face + 1]];
+         pos3 = skyBoxPositions[indices[face + 2]];
+         pos4 = skyBoxPositions[indices[face + 3]];
+         
+         // Har nå alt for å bygge en side. Legger dette til i en midlertidig array
+         std::vector<GLfloat> oneSideVertices = {
+             // posisjoner
+             pos1.x, pos1.y, pos1.z,
+             pos2.x, pos2.y, pos2.z,
+             pos3.x, pos3.y, pos3.z,
+
+             pos1.x, pos1.y, pos1.z,
+             pos3.x, pos3.y, pos3.z,
+             pos4.x, pos4.y, pos4.z,
+         };
+         
+         // Appender den ferdige siden til cubeVertices
+         for (auto &vertex : oneSideVertices) skyBoxVertices.push_back(vertex);
+     }
+    
+    /*  // Brukte tidligere denne men har videreutviklet!
     GLfloat skyboxVertices[] =
     {
         // Posisjon
@@ -753,18 +747,20 @@ void generateSkyBoxVerticesAndSetArraysAndBuffers() {
         -1.0f, -1.0f,  1.0f,
          1.0f, -1.0f,  1.0f
      };
-    
+     */
+
+    // Oppretter en vertex-array for skyBoxen og forteller bruker denne
     glGenVertexArrays( 1, &skyboxVAO );
-    glGenBuffers( 1, &skyboxVBO );
     glBindVertexArray( skyboxVAO );
+    
+    // Oppretter en buffer for skyBoxen og forteller OpenGL at dette er bufferen som skal brukes
+    glGenBuffers( 1, &skyboxVBO );
     glBindBuffer( GL_ARRAY_BUFFER, skyboxVBO );
     
     //Fyller bufferen med data: Bufferen som skal brukes, størrelsen den på holde av, de vertices som skal lagres, og info at det skal tegnes.
-    glBufferData( GL_ARRAY_BUFFER, 108 * sizeof( GL_FLOAT ), skyboxVertices, GL_STATIC_DRAW );
-    
-    // Posisjon attribute
+    glBufferData( GL_ARRAY_BUFFER, 108 * sizeof( GL_FLOAT ), skyBoxVertices.data(), GL_STATIC_DRAW );
+    // Spesifiserer attributtene (Slik at man vet hvilke vertices som er for de ulike attributtene)
     glVertexAttribPointer( POSITION, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( GLfloat ), ( GLvoid * ) 0 );
-    
     // Aktivere attributten
     glEnableVertexAttribArray(POSITION);
 }
@@ -774,24 +770,21 @@ void drawCube() {
     
     float time = glfwGetTime();
     
-    // Aktiverer programmet
+    // Aktiverer shader-programmet
     cubeAndPyramidShader.Use();
         
-    // Henter og setter texture som sendes til cube-fragshader
+    // Henter og setter diffuse, normal og depth-texture som sendes til cube-fragshader
     glActiveTexture( GL_TEXTURE0 );
     glUniform1i(cubeTextureLoc , 0);
     glBindTexture( GL_TEXTURE_2D, cubeTextureValue );
     
-    // Henter og setter normalMap som sendes til cube-fragshader
     glActiveTexture( GL_TEXTURE1 );
-    glUniform1i(cubeNormalMapLoc , 1);
+    glUniform1i(normalMapLoc , 1);
     glBindTexture( GL_TEXTURE_2D, cubeNormalMapValue );
     
     glActiveTexture( GL_TEXTURE2 );
-    glUniform1i(cubeDepthMapLoc , 2);
+    glUniform1i(depthMapLoc , 2);
     glBindTexture( GL_TEXTURE_2D, cubeDepthMapValue );
-    
-    
     
     
     // Setter view matrisen
@@ -800,98 +793,76 @@ void drawCube() {
     glUniformMatrix4fv( viewLoc, 1, GL_FALSE, glm::value_ptr( viewCubeValue ) );
 
     // Setter model-matrise
-    glm::mat4 model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::vec3(-4.0, 0.0, 0.0));
-    //modelCubeValue = glm::rotate(modelCubeValue, time * 0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
-    // Sender model-matrise til cube-shaderen:
-    glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( model ) );
+    glm::mat4 modelCubeValue = glm::mat4(1.0f);
+    // Flytter kubens origo 4 punkter til venstre
+    modelCubeValue = glm::translate(modelCubeValue, glm::vec3(-4.0, 0.0, 0.0));
+    // Sender model-matrise til shaderen:
+    glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( modelCubeValue ) );
     
+    // Sender høydeskaleringen på parallax-mappingen til shaderen
+    float heightScale = 0.1;
+    glUniform1f(heighScaleLoc, heightScale);
     
-    glUniform1f(cubeHeighScaleLoc, heightScale);
-    
-    // Sender resten av lys-matrisene til cube-shaderen:
-    
+    // Sender lys-matrisene til cube-shaderen:
     //Lys 1:
     glm::vec3 lightPositionOneValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
     glUniform3f(lightPositionOneLoc, lightPositionOneValue.x, lightPositionOneValue.y, lightPositionOneValue.z);
-    //glUniform3fv(lightPositionOneLoc, 1, lightPositionOneValue);
-    
     glUniform3fv(lightColorOneLoc, 1, lightColorOneValue);
-    
-    //glUniform3fv(viewPositionTwoLoc, 1, cameraPositionValue);
-    glUniform3f(viewPositionOneLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
-    
     //Lys 2:
-    //glm::vec3 lightPositionTwoValue(sinf(time * 2.0f), 2.0f, 0.8f);
-    //glUniform3f(lightPositionTwoLoc, lightPositionTwoValue.x, lightPositionTwoValue.y, lightPositionTwoValue.z);
     glUniform3fv(lightPositionTwoLoc, 1, lightPositionTwoValue);
-    
     glUniform3fv(lightColorTwoLoc, 1, lightColorTwoValue);
     
-    //glUniform3fv(viewPositionTwoLoc, 1, cameraPositionTwoValue);
-    glUniform3f(viewPositionTwoLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
+    glUniform3f(viewPositionLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
 
-    
-    
     // Aktiverer vertex-arrayen for kuben:
     glBindVertexArray( cubeVAO );
     // Deretter tegnes trianglene:
-    glDrawArrays( GL_TRIANGLES, 0, 36 );
+    glDrawArrays( GL_TRIANGLES, 0, 36 ); // 12 trekanter - 3 punkter
 
+    // Deaktiverer shaderprogram og vertexarray som brukes
     glBindVertexArray(0);
-    // Deaktiverer shaderprogram som brukes og vertexarray
     glUseProgram(0);
 }
 
-void drawCubeTwo() {
+void drawHexPrism() {
     
     float time = glfwGetTime();
     
-    // Aktiverer programmet
-    cubeTwoShader.Use();
+    // Aktiverer shader-programmet
+    hexPrismShader.Use();
         
-    // Henter og setter texture som sendes til cube-fragshader
-    // Samme texture som andre kuben
+    // Setter texture for prismen og sender til shader
     glActiveTexture( GL_TEXTURE0 );
-    glUniform1i(cubeTextureLocCubeTwo , 0);
-    glBindTexture( GL_TEXTURE_2D, cubeTextureValue );
+    glUniform1i(textureLochexPrism , 0);
+    glBindTexture( GL_TEXTURE_2D, hexPrismTextureValue );
 
     // Setter view matrisen
-    glm::mat4 viewCubeTwoValue = camera.GetViewMatrix();
+    glm::mat4 viewhexPrismValue = camera.GetViewMatrix();
     // Sender view-matrise til cube-shaderen:
-    glUniformMatrix4fv( viewLocCubeTwo, 1, GL_FALSE, glm::value_ptr( viewCubeTwoValue ) );
+    glUniformMatrix4fv( viewLochexPrism, 1, GL_FALSE, glm::value_ptr( viewhexPrismValue ) );
 
     // Setter model-matrise
-    glm::mat4 modelCubeTwoValue = glm::mat4(1.0);
-    modelCubeTwoValue = glm::translate(modelCubeTwoValue, glm::vec3(4.0, 0.0, 0.0));
-    // modelCubeTwoValue = glm::rotate(modelCubeTwoValue, time * 0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
+    glm::mat4 modelhexPrismValue = glm::mat4(1.0);
+    // Flytter kubens origo 4 punkter til høyre
+    modelhexPrismValue = glm::translate(modelhexPrismValue, glm::vec3(4.0, 0.0, 0.0));
     // Sender model-matrise til cube-shaderen:
-    glUniformMatrix4fv( modelLocCubeTwo, 1, GL_FALSE, glm::value_ptr( modelCubeTwoValue ) );
+    glUniformMatrix4fv( modelLochexPrism, 1, GL_FALSE, glm::value_ptr( modelhexPrismValue ) );
     
-    
+    // Sender lys-matrisene til cube-shaderen:
     //Lys 1:
     glm::vec3 lightPositionOneValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
-    glUniform3f(lightPositionOneLocCubeTwo, lightPositionOneValue.x, lightPositionOneValue.y, lightPositionOneValue.z);
-    //glUniform3fv(lightPositionOneLocCubeTwo, 1, lightPositionOneValue);
-    
-    glUniform3fv(lightColorOneLocCubeTwo, 1, lightColorOneValue);
-    
-    //glUniform3fv(viewPositionTwoLocCubeTwo, 1, cameraPositionValue);
-    glUniform3f(viewPositionOneLocCubeTwo, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
-    
+    glUniform3f(lightPositionOneLochexPrism, lightPositionOneValue.x, lightPositionOneValue.y, lightPositionOneValue.z);
+    glUniform3fv(lightColorOneLochexPrism, 1, lightColorOneValue);
+
     //Lys 2:
-    //glm::vec3 lightPositionTwoValue(sinf(time * 2.0f), 2.0f, 0.8f);
-    //glUniform3f(lightPositionTwoLocCubeTwo, lightPositionTwoValue.x, lightPositionTwoValue.y, lightPositionTwoValue.z);
-    glUniform3fv(lightPositionTwoLocCubeTwo, 1, lightPositionTwoValue);
+    glUniform3fv(lightPositionTwoLochexPrism, 1, lightPositionTwoValue);
+    glUniform3fv(lightColorTwoLochexPrism, 1, lightColorTwoValue);
     
-    glUniform3fv(lightColorTwoLocCubeTwo, 1, lightColorTwoValue);
-    
-    //glUniform3fv(viewPositionTwoLocCubeTwo, 1, cameraPositionTwoValue);
-    glUniform3f(viewPositionTwoLocCubeTwo, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
+    glUniform3f(viewPositionLochexPrism, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
     
 
     // Aktiverer vertex-arrayen for kuben:
-    glBindVertexArray( cubeTwoVAO );
+    glBindVertexArray( hexPrismVAO );
        
     // Deretter tegnes trianglene:
     glDrawArrays( GL_TRIANGLES, 0, 84 ); // 22 trekanter a 3 punkter
@@ -915,17 +886,15 @@ void drawPyramid() {
     
     // Henter og setter normalMap som sendes til cube-fragshader
     glActiveTexture( GL_TEXTURE1 );
-    glUniform1i(cubeNormalMapLoc , 1);
+    glUniform1i(normalMapLoc , 1);
     glBindTexture( GL_TEXTURE_2D, pyramidNormalMapValue );
     
     // Henter og setter normalMap som sendes til cube-fragshader
     glActiveTexture( GL_TEXTURE2 );
-    glUniform1i(cubeDepthMapLoc , 2);
+    glUniform1i(depthMapLoc , 2);
     glBindTexture( GL_TEXTURE_2D, pyramidDepthMapValue );
     
-    
-    
-    
+
     // Setter view matrisen
     glm::mat4 viewtriangleValue = camera.GetViewMatrix();
     // Sender view-matrise til cube-shaderen:
@@ -933,77 +902,74 @@ void drawPyramid() {
 
     // Setter model-matrise
     glm::mat4 modeltriangleValue = glm::mat4(1.0f);
-    //modelCubeValue = glm::rotate(modelCubeValue, time * 0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
+    modeltriangleValue = glm::rotate(modeltriangleValue, time * 0.5f, glm::vec3(0.0f, 1.0f,  0.0f));
     // Sender model-matrise til cube-shaderen:
     glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( modeltriangleValue ) );
     
-    // Sender resten av lys-matrisene til cube-shaderen:
-    
-    //Lys 1:
+    // Sender resten av lys-matrisene til shaderen:
+    // Lys 1:
     glm::vec3 lightPositionOneValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
     glUniform3f(lightPositionOneLoc, lightPositionOneValue.x, lightPositionOneValue.y, lightPositionOneValue.z);
-    //glUniform3fv(lightPositionOneLoc, 1, lightPositionOneValue);
-    
     glUniform3fv(lightColorOneLoc, 1, lightColorOneValue);
     
-    //glUniform3fv(viewPositionTwoLoc, 1, cameraPositionValue);
-    glUniform3f(viewPositionOneLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
-    
-    //Lys 2:
-    //glm::vec3 lightPositionTwoValue(sinf(time * 2.0f), 2.0f, 0.8f);
-    //glUniform3f(lightPositionTwoLoc, lightPositionTwoValue.x, lightPositionTwoValue.y, lightPositionTwoValue.z);
+    // Lys 2:
     glUniform3fv(lightPositionTwoLoc, 1, lightPositionTwoValue);
-    
     glUniform3fv(lightColorTwoLoc, 1, lightColorTwoValue);
     
-    //glUniform3fv(viewPositionTwoLoc, 1, cameraPositionTwoValue);
-    glUniform3f(viewPositionTwoLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
+    glUniform3f(viewPositionLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
 
     
-    
-    // Aktiverer vertex-arrayen for kuben:
+    // Aktiverer vertex-arrayen for kuben
     glBindVertexArray( pyramidVAO );
-    // Deretter tegnes trianglene:
-    glDrawArrays( GL_TRIANGLES, 0, 18 );
+    // Deretter tegnes trianglene
+    glDrawArrays( GL_TRIANGLES, 0, 18 );  // 6 trekanter - 3 punkter
 
-    glBindVertexArray(0);
     // Deaktiverer shaderprogram som brukes og vertexarray
+    glBindVertexArray(0);
     glUseProgram(0);
 }
 
 void drawSkybox() {
     
     skyboxShader.Use();
-    // Change depth function so depth test passes when values are equal to depth buffer's content
+    
+    // Henter inn og setter texture som sendes til shaderen
+    glBindTexture( GL_TEXTURE_CUBE_MAP, cubemapTextureValue );
+    
+    // Endrer depth-funksjonen. Sjekker at verdien er lik depth-buffer
     glDepthFunc( GL_LEQUAL );
 
-    // TODO: Tidligere. Hva gjør denne:  glm::mat4 viewSkybox = camera.GetViewMatrix();
-    glm::mat4 viewSkyboxValue = glm::mat4( glm::mat3( camera.GetViewMatrix( ) ) );
+    // Setter model-matrise
+    glm::mat4 viewSkyboxValue = glm::mat3( camera.GetViewMatrix( ));
+    // Sender model-matrise til shaderen:
     glUniformMatrix4fv( viewLocSkybox, 1, GL_FALSE, glm::value_ptr( viewSkyboxValue ) );
 
     // Aktiverer vertex-arrayen for skyBox:
     glBindVertexArray( skyboxVAO );
     
-    glBindTexture( GL_TEXTURE_CUBE_MAP, cubemapTextureValue );
+    // Tegner trianglene som bygger kuben
     glDrawArrays( GL_TRIANGLES, 0, 36 );
-    glDepthFunc( GL_LESS ); // Setter dybdefunksjonen tilbake til default
     
+    // Setter dybdefunksjonen tilbake til default
+    glDepthFunc( GL_LESS );
+    
+    // Deaktiverer shaderprogram som brukes og vertexarray
     glUseProgram(0);
     glBindVertexArray(0);
 }
 
 
-/* Error callback function for GLFW */
+/* Error callback-funksjon for GLFW */
 static void glfwErrorCallback(int error, const char* description) {
     fprintf(stderr, "Error: %s\n", description);
 }
 
-/* Window size changed callback function for GLFW */
+/* Window size changed callback-funksjon for GLFW */
 void glfwWindowSizeCallback(GLFWwindow* window, int width, int height) {
     resizeGL(width, height);
 }
 
-// Metode som kalles hver gang en tast presses ned eller slippes opp
+// Funksjon som kalles hver gang en tast presses ned eller slippes opp
 void KeyCallback( GLFWwindow *window, int key, int scancode, int action, int mode) {
     if ( GLFW_KEY_ESCAPE == key && GLFW_PRESS == action )
     {
@@ -1024,6 +990,7 @@ void KeyCallback( GLFWwindow *window, int key, int scancode, int action, int mod
     
 }
 
+// Funksjon som kalles hver gang musen beveger seg
 void MouseCallback( GLFWwindow *window, double xPos, double yPos ) {
     if ( firstMouse )
     {
@@ -1041,6 +1008,7 @@ void MouseCallback( GLFWwindow *window, double xPos, double yPos ) {
     camera.ProcessMouseMovement( xOffset, yOffset );
 }
 
+// Funksjon som setter kamera riktig etter hvilke knapper som er presset ned
 void DoMovement( ) {
     if ( keys[GLFW_KEY_W] || keys[GLFW_KEY_UP] )
     {
@@ -1062,5 +1030,3 @@ void DoMovement( ) {
         camera.ProcessKeyboard( RIGHT, deltaTime );
     }
 }
-
-

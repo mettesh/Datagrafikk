@@ -14,18 +14,15 @@ uniform mat4 projection;
 uniform vec3 lightOnePos;
 uniform vec3 lightTwoPos;
 
-uniform vec3 viewOnePos;
-uniform vec3 viewTwoPos;
+uniform vec3 viewPos;
 
 // Output variables
 out vec2 cubeTextureCoordinates;
 
 // out - mapping
 out vec3 TangentLightOnePos;
-out vec3 TangentViewOnePos;
-
 out vec3 TangentLightTwoPos;
-out vec3 TangentViewTwoPos;
+out vec3 TangentViewPos;
 
 out vec3 TangentFragPos;
 
@@ -51,8 +48,7 @@ void main()
     TangentLightOnePos = TBN * lightOnePos;
     TangentLightTwoPos = TBN * lightTwoPos;
     
-    TangentViewOnePos  = TBN * viewOnePos;
-    TangentViewTwoPos  = TBN * viewTwoPos;
+    TangentViewPos  = TBN * viewPos;
     
     TangentFragPos  = TBN * FragPos;
     

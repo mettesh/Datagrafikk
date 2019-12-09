@@ -1,15 +1,14 @@
 #version 330 core
 
 // Definerer metoden da jeg ønsker å ha main-funksjonen først.
-vec3 getFragColor(vec3 lightPos, vec3 lightColor, vec3 ViewPos, float ambientStrength, float specularStrength, float specularShininess);
+vec3 getFragColor(vec3 lightPos, vec3 lightColor, float ambientStrength, float specularStrength, float specularShininess);
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir);
 
 // Får inn koordinater fra cubeVertices
 in vec2 cubeTextureCoordinates;
 in vec3 TangentLightOnePos;
 in vec3 TangentLightTwoPos;
-in vec3 TangentViewOnePos;
-in vec3 TangentViewTwoPos;
+in vec3 TangentViewPos;
 in vec3 TangentFragPos;
 
 // Henter inn texture og normal-texture
@@ -27,8 +26,8 @@ out vec4 FragColorResult;
 
 void main()
 {
-    vec3 fragColorLightOne = getFragColor(TangentLightOnePos, lightOneColor, TangentViewOnePos, 0.2, 0.3, 256.0);
-    vec3 fragColorLightTwo = getFragColor(TangentLightTwoPos, lightTwoColor, TangentViewTwoPos, 0.2, 0.3, 64.0);
+    vec3 fragColorLightOne = getFragColor(TangentLightOnePos, lightOneColor, 0.2, 0.3, 256.0);
+    vec3 fragColorLightTwo = getFragColor(TangentLightTwoPos, lightTwoColor, 0.2, 0.3, 64.0);
     
     float lightOneDistance = length(TangentLightOnePos - TangentFragPos);
     float lightTwoDistance = length(TangentLightTwoPos - TangentFragPos);
@@ -41,10 +40,10 @@ void main()
     FragColorResult = vec4(result, 1.0);
 }
 
-// Kan settes sammen i en metode: Sende lightPos, viewPos, fragPos og LightColor
-vec3 getFragColor(vec3 lightPos, vec3 lightColor, vec3 viewPos, float ambientStrength, float specularStrength, float specularShininess) {
+// Kan settes sammen i en metode: Sende lightPos, fragPos og LightColor
+vec3 getFragColor(vec3 lightPos, vec3 lightColor, float ambientStrength, float specularStrength, float specularShininess) {
     
-    vec3 viewDir = normalize(viewPos - TangentFragPos);
+    vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
     vec2 parallaxTextureCoords = cubeTextureCoordinates;
     
     parallaxTextureCoords = ParallaxMapping(cubeTextureCoordinates,  viewDir);

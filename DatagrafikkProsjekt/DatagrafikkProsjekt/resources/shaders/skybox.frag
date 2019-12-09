@@ -2,14 +2,13 @@
 // Mottar TexCoords som ble sendt ut fra vertex-shaderen
 in vec3 TexCoords;
 
-// Sender color videre i neste steg i pipeline
-out vec4 color;
-
-// Henter inn data fra koden (samplerCube brukes til skyboxes)
+// Henter inn texture fra koden (samplerCube brukes til skyboxes)
 uniform samplerCube cubemapTexture;
 
-void main()
-{
-    // Finner color utifra verdiene som ligger i skybox og TexCoords
-    color = texture(cubemapTexture, TexCoords);
+// Sender color videre i neste steg i pipeline
+out vec4 finalFragmentColor;
+
+void main() {
+    // Finner fragmentFarge verdiene som ligger i skybox og TexCoords
+    finalFragmentColor = texture(cubemapTexture, TexCoords);
 }

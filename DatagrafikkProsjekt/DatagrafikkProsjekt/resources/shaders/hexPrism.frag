@@ -11,45 +11,42 @@ in vec3 FragPos;
 // Henter inn cube-texturen
 uniform sampler2D cubeTexture;
 
-// Får inn matriser fra main.cpp
+// Får inn lys-matriser
 uniform vec3 lightOnePos;
 uniform vec3 lightOneColor;
-
 uniform vec3 lightTwoPos;
 uniform vec3 lightTwoColor;
-
 uniform vec3 viewPos;
 
 // Endelig resultat som sendes ut
 out vec4 FragColorResult;
 
-void main()
-{
+void main() {
+    // Får endelig fragmentfarge med begge lysene
     vec3 fragColorLightOne = getFragColor(lightOnePos, lightOneColor, 0.2, 0.9, 64.0);
     vec3 fragColorLightTwo = getFragColor(lightTwoPos, lightTwoColor, 0.2, 0.3, 64.0);
     
+    // Finner distansen fra begge lys og fragment
     float lightOneDistance = length(lightOnePos - FragPos);
     float lightTwoDistance = length(lightTwoPos - FragPos);
     
+    // Finner endelig farge basert på begge lysene
     vec3 colorOne = ( ( lightOneDistance / (lightOneDistance + lightTwoDistance ) ) * fragColorLightOne);
     vec3 colorTwo = ( ( lightTwoDistance / (lightOneDistance + lightTwoDistance ) ) * fragColorLightTwo);
     
+    // Legger de to fragmentFargene sammen og sender det ut
     vec3 result = colorOne + colorTwo;
-    
     FragColorResult = vec4(result, 1.0);
 }
 
-// Kan settes sammen i en metode: Sende lightPos, viewPos, fragPos og LightColor
-vec3 getFragColor(vec3 lightPos, vec3 lightColor, float ambientStrength, float specularStrength, float specularShininess)
-{
-    
+vec3 getFragColor(vec3 lightPos, vec3 lightColor, float ambientStrength, float specularStrength, float specularShininess) {
     // Normalverdier
     vec3 normal = normalize(normalCoordinates);
     
-    // diffuse-farge
+    // Får TextureFarge til fragmentet (Diffuse)
     vec3 objectColor = texture(cubeTexture, cubeTextureCoordinates).rgb;
     
-    // ambient
+    // Ambient
     vec3 ambient = ambientStrength * lightColor;
 
     // diffuse

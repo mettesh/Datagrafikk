@@ -11,85 +11,89 @@ in vec3 TangentLightTwoPos;
 in vec3 TangentViewPos;
 in vec3 TangentFragPos;
 
-// Henter inn texture og normal-texture
+// Får inn diffuse, normal og depth-texture
 uniform sampler2D cubeTexture;
 uniform sampler2D cubeNormalMap;
 uniform sampler2D depthMap;
 
+// Får inn dybden på parallexmappingen
+uniform float heightScale;
+
+// Får inn farge på lysene
 uniform vec3 lightOneColor;
 uniform vec3 lightTwoColor;
-
-uniform float heightScale;
 
 // Endelig resultat som sendes ut
 out vec4 FragColorResult;
 
-void main()
-{
+void main() {
+    // Får endelig fragmentfarge med begge lysene
     vec3 fragColorLightOne = getFragColor(TangentLightOnePos, lightOneColor, 0.2, 0.3, 256.0);
     vec3 fragColorLightTwo = getFragColor(TangentLightTwoPos, lightTwoColor, 0.2, 0.3, 64.0);
     
+    // Finner distansen fra begge lys og fragment
     float lightOneDistance = length(TangentLightOnePos - TangentFragPos);
     float lightTwoDistance = length(TangentLightTwoPos - TangentFragPos);
     
+    // Finner endelig farge basert på begge lysene
     vec3 colorOne = ( ( lightOneDistance / (lightOneDistance + lightTwoDistance ) ) * fragColorLightOne);
     vec3 colorTwo = ( ( lightTwoDistance / (lightOneDistance + lightTwoDistance ) ) * fragColorLightTwo);
     
+    // Legger de to fragmentFargene sammen og sender det ut
     vec3 result = colorOne + colorTwo;
-    
     FragColorResult = vec4(result, 1.0);
 }
 
-// Kan settes sammen i en metode: Sende lightPos, fragPos og LightColor
 vec3 getFragColor(vec3 lightPos, vec3 lightColor, float ambientStrength, float specularStrength, float specularShininess) {
     
+    // Finner view-retning
     vec3 viewDir = normalize(TangentViewPos - TangentFragPos);
-    vec2 parallaxTextureCoords = cubeTextureCoordinates;
     
+    // Får Depth-textureFarge til fragmentet
+    vec2 parallaxTextureCoords = cubeTextureCoordinates;
     parallaxTextureCoords = ParallaxMapping(cubeTextureCoordinates,  viewDir);
     if(parallaxTextureCoords.x > 1.0 || parallaxTextureCoords.y > 1.0 || parallaxTextureCoords.x < 0.0 || parallaxTextureCoords.y < 0.0)
         discard;
     
-    // Normalverdier
+    // Får Normal-textureFarge til fragmentet
     vec3 normal = texture(cubeNormalMap, parallaxTextureCoords).rgb;
     normal = normalize(normal * 2.0 - 1.0);
     
-    // diffuse-farge
+    // Får TextureFarge til fragmentet (Diffuse)
     vec3 objectColor = texture(cubeTexture, parallaxTextureCoords).rgb;
     
-    // ambient
-    // We take the light's color, multiply it with a small constant ambient factor,
-    // multiply this with the object's color and use it as the fragment's color:
+    /* Ambient */
+    // Ganger styrken med fargen sendt inn
     vec3 ambient = ambientStrength * lightColor;
     
-    // diffuse
+    /* Diffuse */
+    // Regner ut vinkelen lyset treffer fragmentet. Gjør dette ved å bruke dot.
     vec3 lightDir = normalize(lightPos - TangentFragPos);
-    // We then need to measure at what angle the light ray touches the fragment.
-    // The angle between the two vectors can then easily be calculated with the dot product.
     float diff = max(dot(lightDir, normal), 0.0);
+    // Ganger denne med fargen på lyset
     vec3 diffuse = diff * lightColor;
     
-    // Specular
-    
-    vec3 relectDir = reflect(-lightDir, normal);
-    //vec3 halfwayDir = normalize(lightDir + viewDir);
-    float spec = pow(max(dot(viewDir, relectDir), 0.0), specularShininess);
+    /* Specular */
+    // Regner ut refleksjonen
+    vec3 reflectDir = reflect(-lightDir, normal);
+    float spec = pow(max(dot(viewDir, reflectDir), 0.0), specularShininess);
+    // Ganger dette med valgt styrke og farge
     vec3 specular = specularStrength * spec * lightColor;
+    
+    // Legger sammen de 3 lystypene og ganger med fragmentFargen
     vec3 fragColor = (ambient + diffuse + specular) * objectColor;
     
     return fragColor;
 }
 
-
-vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir)
-{
+vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir) {
     // number of depth layers
     const float minLayers = 8;
     const float maxLayers = 32;
     float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));
-    // calculate the size of each layer
+    // Kalkulerer størrelsen til hvert lag
     float layerDepth = 1.0 / numLayers;
-    // depth of current layer
+    // Dypbe til laget
     float currentLayerDepth = 0.0;
     // the amount to shift the texture coordinates per layer (from vector P)
     vec2 P = viewDir.xy / viewDir.z * heightScale;

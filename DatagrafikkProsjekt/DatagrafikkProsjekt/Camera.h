@@ -11,18 +11,20 @@ enum Camera_Movement
     FORWARD,
     BACKWARD,
     LEFT,
-    RIGHT
+    RIGHT,
+    UP,
+    DOWN
 };
 
 // Forhåndsdefinerte kameraverdier.
-const GLfloat YAW        = -100.0f;  // Retning kamera skal peke
+const GLfloat YAW        = -90.0f; // Retning kamera skal peke
 const GLfloat PITCH      =  0.0f;   // Vinkel
 const GLfloat SPEED      =  6.0f;   // Hvor fort kameraet skal bevege seg
 const GLfloat SENSITIVTY =  0.25f;  // Hvor sensitiv bevegelsene skal være
 const GLfloat ZOOM       =  45.0f;  // Hvor inn-zoomet kamera skal starte
 
 
-// Oppretter en kamera-klasse som skal motta input og regne ut vinkler, vectorer og matriser som skal rukes i OpenGL
+// Oppretter en kamera-klasse som skal motta input og regne ut vinkler, vectorer og matriser som skal brukes i OpenGL
 class Camera
 {
 public:
@@ -31,16 +33,6 @@ public:
     {
         this->position = position;
         this->worldUp = up;
-        this->yaw = yaw;
-        this->pitch = pitch;
-        this->updateCameraVectors( );
-    }
-    
-    // Konstruktør for scalar-verdier (Mer informasjon om vektorene - hastighet osv)
-    Camera( GLfloat posX, GLfloat posY, GLfloat posZ, GLfloat upX, GLfloat upY, GLfloat upZ, GLfloat yaw, GLfloat pitch ) : front( glm::vec3( 0.0f, 0.0f, -1.0f ) ), movementSpeed( SPEED ), mouseSensitivity( SENSITIVTY ), zoom( ZOOM )
-    {
-        this->position = glm::vec3( posX, posY, posZ );
-        this->worldUp = glm::vec3( upX, upY, upZ );
         this->yaw = yaw;
         this->pitch = pitch;
         this->updateCameraVectors( );
@@ -55,26 +47,35 @@ public:
     // Prosesserer input den mottar fra tastatur: (deltaTime brukes for å sørge for en jevn bevegelse)
     void ProcessKeyboard( Camera_Movement direction, GLfloat deltaTime )
     {
-        GLfloat velocity = this->movementSpeed * deltaTime;
+        GLfloat speed = this->movementSpeed * deltaTime;
         
         if ( direction == FORWARD )
         {
-            this->position += this->front * velocity;
+            this->position += this->front * speed;
         }
         
         if ( direction == BACKWARD )
         {
-            this->position -= this->front * velocity;
+            this->position -= this->front * speed;
         }
         
         if ( direction == LEFT )
         {
-            this->position -= this->right * velocity;
+            this->position -= this->right * speed;
         }
         
         if ( direction == RIGHT )
         {
-            this->position += this->right * velocity;
+            this->position += this->right * speed;
+        }
+        if ( direction == DOWN )
+            
+        {
+            this->position -= this->up * speed;
+        }
+        if ( direction == UP )
+        {
+            this->position += this->up * speed;
         }
     }
     
@@ -87,7 +88,7 @@ public:
         this->yaw   += xOffset;
         this->pitch += yOffset;
         
-        // Sørger for at universet ikke "snus" om man går utenfor grensene til skjermen (Skal snurre rundt)
+        // Sørger for at universet ikke "snus" om man går utenfor grensene til skjermen
         if ( constrainPitch )
         {
             if ( this->pitch > 89.0f )

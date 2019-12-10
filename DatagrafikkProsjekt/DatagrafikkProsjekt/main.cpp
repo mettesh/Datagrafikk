@@ -897,6 +897,7 @@ void drawPyramid() {
 
     // Setter view matrisen
     glm::mat4 viewtriangleValue = camera.GetViewMatrix();
+    viewtriangleValue = glm::scale(viewtriangleValue, glm::vec3(2.0f, 2.0f, 2.0f));
     // Sender view-matrise til cube-shaderen:
     glUniformMatrix4fv( viewLoc, 1, GL_FALSE, glm::value_ptr( viewtriangleValue ) );
 
@@ -1028,5 +1029,13 @@ void DoMovement( ) {
     if ( keys[GLFW_KEY_D] || keys[GLFW_KEY_RIGHT] )
     {
         camera.ProcessKeyboard( RIGHT, deltaTime );
+    }
+    if ( keys[GLFW_KEY_Z] )
+    {
+        camera.ProcessKeyboard( DOWN, deltaTime );
+    }
+    if ( keys[GLFW_KEY_X] )
+    {
+        camera.ProcessKeyboard( UP, deltaTime );
     }
 }

@@ -26,7 +26,7 @@ out vec3 TangentFragPos;
 void main()
 {
 
-    // Setter posisjonen til kben for å kunne kalkulere lusets retning
+    // Setter posisjonen til kben for å kunne kalkulere lysets retning
     vec3 FragPos = vec3(model * vec4(cubePosition, 1.0));
     
     // Texture-Koordinater skal kun sendes videre til fragmentShaderen

@@ -16,9 +16,6 @@ uniform sampler2D cubeTexture;
 uniform sampler2D cubeNormalMap;
 uniform sampler2D depthMap;
 
-// Får inn dybden på parallexmappingen
-uniform float heightScale;
-
 // Får inn farge på lysene
 uniform vec3 lightOneColor;
 uniform vec3 lightTwoColor;
@@ -96,6 +93,7 @@ vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir) {
     // Dypbe til laget
     float currentLayerDepth = 0.0;
     // the amount to shift the texture coordinates per layer (from vector P)
+    float heightScale = 0.1;
     vec2 P = viewDir.xy / viewDir.z * heightScale;
     vec2 deltaTexCoords = P / numLayers;
   

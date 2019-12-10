@@ -27,6 +27,7 @@ void drawSkybox();
 void drawCube();
 void drawHexPrism();
 void drawPyramid();
+void setLightMatricesForCubeAndPyramide();
 
 // VINDUEDIMENSJONER
 #define DEFAULT_WIDTH 1024
@@ -98,7 +99,7 @@ GLfloat lightColorOneValue[] = {1.0f, 1.0f, 1.0f};
 GLfloat lightColorTwoValue[] = {0.976f, 0.282f, 0.376f}; // Rød
 
 // TEXTURES
-GLuint cubemapTextureValue;
+GLuint skyBoxTextureValue;
 GLuint cubeTextureValue;
 GLuint cubeNormalMapValue;
 GLuint cubeDepthMapValue;
@@ -246,7 +247,7 @@ int initGL() {
     skyBoxTextureFaces.push_back( "resources/img/skybox/iceflats_dn.tga" );
     skyBoxTextureFaces.push_back( "resources/img/skybox/iceflats_ft.tga" );
     skyBoxTextureFaces.push_back( "resources/img/skybox/iceflats_bk.tga" );
-    cubemapTextureValue = TextureLoading::LoadCubemap( skyBoxTextureFaces );
+    skyBoxTextureValue = TextureLoading::LoadSkyBox( skyBoxTextureFaces );
     
     // Henter inn uniform-loactions fra kube- og pyramideshader
     cubeAndPyramidShader.Use();
@@ -292,8 +293,7 @@ int initGL() {
     projLocSkybox = glGetUniformLocation( skyboxShader.Program, "projection" );
     viewLocSkybox = glGetUniformLocation( skyboxShader.Program, "view" );
     
-    
-    // Implementerer Depth i applikasjonen ?????
+
     glEnable(GL_DEPTH_TEST);
     
     return 1;
@@ -306,17 +306,16 @@ void resizeGL(int width, int height) {
     if (height == 0)
         height = 1;
     
+    glm::mat4 projectionValue = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 100.0f);
+    
     cubeAndPyramidShader.Use();
-    glm::mat4 projectionCubeValue = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 100.0f);
-    glUniformMatrix4fv( projLoc, 1, GL_FALSE, glm::value_ptr( projectionCubeValue ) );
+    glUniformMatrix4fv( projLoc, 1, GL_FALSE, glm::value_ptr( projectionValue ) );
     
     hexPrismShader.Use();
-    glm::mat4 projectionhexPrismValue = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 100.0f);
-    glUniformMatrix4fv( projLochexPrism, 1, GL_FALSE, glm::value_ptr( projectionhexPrismValue ) );
+    glUniformMatrix4fv( projLochexPrism, 1, GL_FALSE, glm::value_ptr( projectionValue ) );
     
     skyboxShader.Use();
-    glm::mat4 projectionSkyboxValue = glm::perspective(camera.GetZoom(), (float)width/height, 0.1f, 1000.0f );
-    glUniformMatrix4fv( projLocSkybox, 1, GL_FALSE, glm::value_ptr( projectionSkyboxValue ) );
+    glUniformMatrix4fv( projLocSkybox, 1, GL_FALSE, glm::value_ptr( projectionValue ) );
     
     // Definerer viewport-dimensjonene
     glViewport(0, 0, width, height); // 2.0
@@ -767,9 +766,7 @@ void generateSkyBoxVerticesAndSetArraysAndBuffers() {
 
 
 void drawCube() {
-    
-    float time = glfwGetTime();
-    
+        
     // Aktiverer shader-programmet
     cubeAndPyramidShader.Use();
         
@@ -799,21 +796,8 @@ void drawCube() {
     // Sender model-matrise til shaderen:
     glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( modelCubeValue ) );
     
-    // Sender høydeskaleringen på parallax-mappingen til shaderen
-    float heightScale = 0.1;
-    glUniform1f(heighScaleLoc, heightScale);
+    setLightMatricesForCubeAndPyramide();
     
-    // Sender lys-matrisene til cube-shaderen:
-    //Lys 1:
-    glm::vec3 lightPositionOneValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
-    glUniform3f(lightPositionOneLoc, lightPositionOneValue.x, lightPositionOneValue.y, lightPositionOneValue.z);
-    glUniform3fv(lightColorOneLoc, 1, lightColorOneValue);
-    //Lys 2:
-    glUniform3fv(lightPositionTwoLoc, 1, lightPositionTwoValue);
-    glUniform3fv(lightColorTwoLoc, 1, lightColorTwoValue);
-    
-    glUniform3f(viewPositionLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
-
     // Aktiverer vertex-arrayen for kuben:
     glBindVertexArray( cubeVAO );
     // Deretter tegnes trianglene:
@@ -823,6 +807,7 @@ void drawCube() {
     glBindVertexArray(0);
     glUseProgram(0);
 }
+
 
 void drawHexPrism() {
     
@@ -848,19 +833,19 @@ void drawHexPrism() {
     // Sender model-matrise til cube-shaderen:
     glUniformMatrix4fv( modelLochexPrism, 1, GL_FALSE, glm::value_ptr( modelhexPrismValue ) );
     
-    // Sender lys-matrisene til cube-shaderen:
+
+        // Sender lys-matrisene til cube-shaderen:
     //Lys 1:
     glm::vec3 lightPositionOneValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
     glUniform3f(lightPositionOneLochexPrism, lightPositionOneValue.x, lightPositionOneValue.y, lightPositionOneValue.z);
     glUniform3fv(lightColorOneLochexPrism, 1, lightColorOneValue);
-
     //Lys 2:
     glUniform3fv(lightPositionTwoLochexPrism, 1, lightPositionTwoValue);
     glUniform3fv(lightColorTwoLochexPrism, 1, lightColorTwoValue);
     
     glUniform3f(viewPositionLochexPrism, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
-    
 
+    
     // Aktiverer vertex-arrayen for kuben:
     glBindVertexArray( hexPrismVAO );
        
@@ -907,18 +892,8 @@ void drawPyramid() {
     // Sender model-matrise til cube-shaderen:
     glUniformMatrix4fv( modelLoc, 1, GL_FALSE, glm::value_ptr( modeltriangleValue ) );
     
-    // Sender resten av lys-matrisene til shaderen:
-    // Lys 1:
-    glm::vec3 lightPositionOneValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
-    glUniform3f(lightPositionOneLoc, lightPositionOneValue.x, lightPositionOneValue.y, lightPositionOneValue.z);
-    glUniform3fv(lightColorOneLoc, 1, lightColorOneValue);
-    
-    // Lys 2:
-    glUniform3fv(lightPositionTwoLoc, 1, lightPositionTwoValue);
-    glUniform3fv(lightColorTwoLoc, 1, lightColorTwoValue);
-    
-    glUniform3f(viewPositionLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
 
+    setLightMatricesForCubeAndPyramide();
     
     // Aktiverer vertex-arrayen for kuben
     glBindVertexArray( pyramidVAO );
@@ -935,7 +910,7 @@ void drawSkybox() {
     skyboxShader.Use();
     
     // Henter inn og setter texture som sendes til shaderen
-    glBindTexture( GL_TEXTURE_CUBE_MAP, cubemapTextureValue );
+    glBindTexture( GL_TEXTURE_CUBE_MAP, skyBoxTextureValue );
     
     // Endrer depth-funksjonen. Sjekker at verdien er lik depth-buffer
     glDepthFunc( GL_LEQUAL );
@@ -957,6 +932,23 @@ void drawSkybox() {
     // Deaktiverer shaderprogram som brukes og vertexarray
     glUseProgram(0);
     glBindVertexArray(0);
+}
+
+void setLightMatricesForCubeAndPyramide() {
+    
+    float time = glfwGetTime();
+    
+    // Sender lys-matrisene til cube-shaderen:
+    //Lys 1:
+    glm::vec3 lightPositionOneValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
+    glUniform3f(lightPositionOneLoc, lightPositionOneValue.x, lightPositionOneValue.y, lightPositionOneValue.z);
+    glUniform3fv(lightColorOneLoc, 1, lightColorOneValue);
+    //Lys 2:
+    glUniform3fv(lightPositionTwoLoc, 1, lightPositionTwoValue);
+    glUniform3fv(lightColorTwoLoc, 1, lightColorTwoValue);
+    
+    glUniform3f(viewPositionLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
+
 }
 
 

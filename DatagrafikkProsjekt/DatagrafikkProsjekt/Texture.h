@@ -19,7 +19,7 @@ public:
         
         unsigned char *image = SOIL_load_image( path, &imageWidth, &imageHeight, 0, SOIL_LOAD_RGB );
         
-        // Assigne texture til ID
+        // Binder dette textures
         glBindTexture( GL_TEXTURE_2D, textureID );
         glTexImage2D( GL_TEXTURE_2D, 0, GL_RGB, imageWidth, imageHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, image );
         glGenerateMipmap( GL_TEXTURE_2D );
@@ -36,7 +36,7 @@ public:
         return textureID;
     }
     
-    static GLuint LoadCubemap( std::vector<const GLchar * > skyBoxTextureFaces)
+    static GLuint LoadSkyBox( std::vector<const GLchar * > skyBoxTextureFaces)
     {
         GLuint textureID;
         glGenTextures( 1, &textureID );

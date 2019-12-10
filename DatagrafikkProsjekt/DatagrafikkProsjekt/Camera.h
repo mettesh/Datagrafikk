@@ -106,11 +106,6 @@ public:
         this->updateCameraVectors( );
     }
     
-    GLfloat GetZoom( )
-    {
-        return this->zoom;
-    }
-    
     glm::vec3 GetPosition()
     {
         return this->position;

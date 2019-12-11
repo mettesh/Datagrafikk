@@ -463,13 +463,6 @@ void generateCubeVerticesAndSetArraysAndBuffers() {
         pos3 = positions[indices[face + 2]];
         pos4 = positions[indices[face + 3]];
         
-        // Tar kryssproduktet av sider av triangelen for å finne normalverdien
-        glm::vec3 normalFirstTriangel = normalize(cross(pos1 - pos2, pos1 - pos4));
-        glm::vec3 normalSecondTriangel = normalize(cross(pos2 - pos3, pos3 - pos4));
-        
-        // Legger sammen disse verdiene for å få normalverdi for firkanten
-        nm = normalize(normalFirstTriangel + normalSecondTriangel);
-        
         /* Kalkulerer verdier for 1. trekant til denne siden */
         glm::vec3 edge1 = pos2 - pos1;
         glm::vec3 edge2 = pos3 - pos1;
@@ -482,6 +475,9 @@ void generateCubeVerticesAndSetArraysAndBuffers() {
         tangent1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
         tangent1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
         tangent1 = glm::normalize(tangent1);
+        
+        // Tar kryssproduktet av kantene til triangelen for å finne normalverdien
+        glm::vec3 normalFirstTriangel = normalize(cross(edge1, edge2));
 
         /* Kalkulerer verdier for 2. trekant til denne siden */
         edge1 = pos3 - pos1;
@@ -495,6 +491,12 @@ void generateCubeVerticesAndSetArraysAndBuffers() {
         tangent2.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
         tangent2.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
         tangent2 = glm::normalize(tangent2);
+        
+        // Tar kryssproduktet av kantene til triangelen for å finne normalverdien
+        glm::vec3 normalSecondTriangel = normalize(cross(edge1, edge2));
+        
+        // Legger sammen disse verdiene for å få normalverdi for firkanten
+        nm = normalize(normalFirstTriangel + normalSecondTriangel);
 
         // Har nå alt for å bygge en side. Legger dette til i en midlertidig array
         std::vector<GLfloat> oneSideVertices = {
@@ -556,7 +558,6 @@ void generatePyramidVerticesAndSetArraysAndBuffers() {
     //               Venstre - Høyre  - Front  -  Bak  -  Bunn1  - Bunn2
     int indices[] = { 0,1,3,   0,4,2,   0,3,4,   0,2,1,   1,2,3,   4,3,2};
     
-    
     // Deklarerer en vector som skal holde på de ferdige verdiene til kuben
     std::vector<GLfloat> pyramidVertices;
     
@@ -578,9 +579,6 @@ void generatePyramidVerticesAndSetArraysAndBuffers() {
         pos2 = positions[indices[face + 1]];
         pos3 = positions[indices[face + 2]];
         
-        // Finner normalverdi for trekanten ved å ta kryssproduktet av kantene
-        glm::vec3 nm = normalize(cross(pos1 - pos2, pos1 - pos3));
-        
         // Om face er mer enn 11, vet jeg at bunnen nå skal bygges. Denne må få satt texture annerledes da det skal utgjøre en firkant
         if(face > 11){
             uv1 = glm::vec2(1.0f, 0.0f);
@@ -591,6 +589,9 @@ void generatePyramidVerticesAndSetArraysAndBuffers() {
         glm::vec3 edge2 = pos3 - pos1;
         glm::vec2 deltaUV1 = uv2 - uv1;
         glm::vec2 deltaUV2 = uv3 - uv1;
+        
+        // Tar kryssproduktet av kantene til triangelen for å finne normalverdien
+        nm = normalize(cross(edge1, edge2));
 
         GLfloat f = 1.0f / (deltaUV1.x * deltaUV2.y - deltaUV2.x * deltaUV1.y);
 
@@ -598,6 +599,7 @@ void generatePyramidVerticesAndSetArraysAndBuffers() {
         tangent1.y = f * (deltaUV2.y * edge1.y - deltaUV1.y * edge2.y);
         tangent1.z = f * (deltaUV2.y * edge1.z - deltaUV1.y * edge2.z);
         tangent1 = glm::normalize(tangent1);
+        
         
         // Har nå alt for å bygge en side. Legger dette til i en midlertidig array
         std::vector<GLfloat> onePyramidSideVertices = {
@@ -668,22 +670,22 @@ void generatehexPrismVerticesAndSetArraysAndBuffers() {
     
                             
     int indices[] = {
-        8,9,1,0,    // Bakerst
-        10,8,0,2,   // Bak venstre
-        9,11,3,1,   // Bak høyre
-        12,10,2,4,  // Venstre
-        11,13,5,3,  // Høyre
-        14,12,4,6,  // Frem venstre
-        13,15,7,5,  // Frem høyre
-        15,14,6,7,  // Front
+        9,1,0,8,    // Bakerst
+        8,0,2,10,   // Bak venstre
+        11,3,1,9,   // Bak høyre
+        10,2,4,12,  // Venstre
+        13,5,3,11,  // Høyre
+        12,4,6,14,  // Frem venstre
+        15,7,5,13,  // Frem høyre
+        14,6,7,15,  // Front
         // Topp:
         12,10,8,14,
         14,8,9,15,
         15,9,11,13,
         // Bunn:
-        7,6,4,5,
-        5,4,2,3,
-        3,2,0,1
+        4,2,0,6,
+        6,0,1,7,
+        7,1,3,5
     };
         
     // Deklarerer en vector som skal holde på de ferdige verdiene til prismen
@@ -704,10 +706,44 @@ void generatehexPrismVerticesAndSetArraysAndBuffers() {
         pos3 = positions[indices[face + 2]];
         pos4 = positions[indices[face + 3]];
         
-        // Tar kryssproduktet av sider av triangelen for å finne normalverdien
-        glm::vec3 normalFirstTriangel = normalize(cross(pos1 - pos2, pos1 - pos4));
-        glm::vec3 normalSecondTriangel = normalize(cross(pos2 - pos3, pos3 - pos4));
+        // Finner kantene for første triangel av firkant
+        glm::vec3 edge1 = pos2 - pos1;
+        glm::vec3 edge2 = pos3 - pos1;
+        
+        // Tar kryssproduktet av kantene til første triangelen for å finne normalverdien
+        glm::vec3 normalFirstTriangel = normalize(cross(edge1, edge2));
+
+        // Finner kantene for andre triangel av firkant
+        edge1 = pos3 - pos1;
+        edge2 = pos4 - pos1;
+        
+        // Tar kryssproduktet av kantene til denne triangelen for å finne normalverdien
+        glm::vec3 normalSecondTriangel = normalize(cross(edge1, edge2));
+
         nm = normalize(normalFirstTriangel + normalSecondTriangel);
+        
+        switch(face)
+        {
+            case 32:
+            case 44:
+                uv1 = glm::vec2(0.5f, 0.75f);
+                uv2 = glm::vec2(0.5f, 0.25f);
+                uv3 = glm::vec2(1.0f, 0.0f);
+                uv4 = glm::vec2(1.0f, 1.0f);
+            break;
+            case 40:
+            case 52:
+                uv1 = glm::vec2(0.0f, 1.0f);
+                uv2 = glm::vec2(0.0f, 0.0f);
+                uv3 = glm::vec2(0.5f, 0.25f);
+                uv4 = glm::vec2(0.5f, 0.75f);
+            break;
+           default :
+                uv1 = glm::vec2(0.0f, 1.0f);
+                uv2 = glm::vec2(0.0f, 0.0f);
+                uv3 = glm::vec2(1.0f, 0.0f);
+                uv4 = glm::vec2(1.0f, 1.0f);
+        }
         
         // Har nå alt for å bygge en side. Legger dette til i en midlertidig array
         std::vector<GLfloat> oneSideVertices = {

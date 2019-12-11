@@ -23,7 +23,7 @@ out vec4 FragColorResult;
 
 void main() {
     // Får endelig fragmentfarge med begge lysene
-    vec3 fragColorLightOne = getFragColor(lightOnePos, lightOneColor, 0.2, 0.9, 64.0);
+    vec3 fragColorLightOne = getFragColor(lightOnePos, lightOneColor, 0.2, 0.3, 256.0);
     vec3 fragColorLightTwo = getFragColor(lightTwoPos, lightTwoColor, 0.2, 0.3, 64.0);
     
     // Finner distansen fra begge lys og fragment

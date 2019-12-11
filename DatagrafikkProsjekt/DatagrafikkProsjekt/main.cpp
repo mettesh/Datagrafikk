@@ -98,6 +98,8 @@ GLfloat lightPositionTwoValue[] { -3.0f, 1.0f, -1.5f };
 GLfloat lightColorOneValue[] = {1.0f, 1.0f, 1.0f};
 GLfloat lightColorTwoValue[] = {0.976f, 0.282f, 0.376f}; // Rød
 
+glm::mat4 viewValue;
+
 // TEXTURES
 GLuint skyBoxTextureValue;
 GLuint cubeTextureValue;
@@ -109,7 +111,7 @@ GLuint pyramidNormalMapValue;
 GLuint pyramidDepthMapValue;
 
 
-/* PROGRAMSTART */
+/* Programstart */
 int main(void) {
     
     // Setter feilmelding
@@ -181,6 +183,9 @@ int main(void) {
         // Setter clear-farge og dybdebuffer
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
+        // Henter view-matrise utifra camera sine posisjoner. Brukes for alle objektene
+        viewValue = camera.GetViewMatrix();
+        
         drawHexPrism();
         
         drawSkybox();
@@ -216,7 +221,7 @@ int main(void) {
     
 }
 
-/* Initiliaserer OpenGL */
+/* Henter inn og kompilerer shadere, laster inn textures og henter Uniform-locations  */
 int initGL() {
     
     // Setter opp og kompilerer shaderne
@@ -285,7 +290,7 @@ int initGL() {
     lightColorTwoLochexPrism = glGetUniformLocation(hexPrismShader.Program, "lightTwoColor");
     lightPositionTwoLochexPrism = glGetUniformLocation( hexPrismShader.Program, "lightTwoPos" );
     
-    viewPositionLochexPrism = glGetUniformLocation( hexPrismShader.Program, "viewTwoPos" );
+    viewPositionLochexPrism = glGetUniformLocation( hexPrismShader.Program, "viewPos" );
     
     
     // Henter inn uniform-loactions fra skybox-shader
@@ -299,27 +304,118 @@ int initGL() {
     return 1;
 }
 
-/* Endrer størrelse og projectionmatriser ved endring av vindu */
-void resizeGL(int width, int height) {
+
+/* Generer vertices og setter til arrays og buffere */
+void generateSkyBoxVerticesAndSetArraysAndBuffers() {
     
-    // Feilhåndtering for å hindre at det blir deling på 0
-    if (height == 0)
-        height = 1;
+    // Punktene som tilsammen bygger kuben
+     glm::vec3 skyBoxPositions[8];
+     skyBoxPositions[0] = glm::vec3(-1.0f,  1.0f, -1.0f);  // Oppe bak venstre
+     skyBoxPositions[1] = glm::vec3(-1.0f, -1.0f, -1.0f);  // Nede bak venstre
+     skyBoxPositions[2] = glm::vec3( 1.0f, -1.0f, -1.0f);  // Nede bak høyre
+     skyBoxPositions[3] = glm::vec3( 1.0f,  1.0f, -1.0f);  // Oppe bak høyre
+     skyBoxPositions[4] = glm::vec3(-1.0f,  1.0f, 1.0f);   // Oppe frem venstre
+     skyBoxPositions[5] = glm::vec3(-1.0f, -1.0f, 1.0f);   // Nede frem venstre
+     skyBoxPositions[6] = glm::vec3( 1.0f, -1.0f, 1.0f);   // Nede frem høyre
+     skyBoxPositions[7] = glm::vec3( 1.0f,  1.0f, 1.0f);   // Oppe frem høyre
     
-    glm::mat4 projectionValue = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 100.0f);
+    // For å sette opp kantene i riktig rekkefølge!
+    //                 Bak   -  Bunn   - Venstre -  Front  -  Høyre  -  Topp
+    int indices[] = {0,3,2,1,  6,5,1,2,  1,5,4,0,  4,5,6,7,  3,7,6,2,  0,4,7,3};
+     
+    // Deklarerer en vector som skal holde på de ferdige verdiene til kuben
+    std::vector<GLfloat> skyBoxVertices;
+     
+     // Deklarer vec3 som skal holde på de 4 ulike posisjons-punktene til hver side
+     glm::vec3 pos1, pos2, pos3, pos4;
+      
+     // Løkka kjører 6 ganger - en gang for hver side.
+     for (int face = 0; face < 24; face = face + 4){
+         
+         // Henter ut de korrektene posisjons-koordinatene for denne siden
+         pos1 = skyBoxPositions[indices[face]];
+         pos2 = skyBoxPositions[indices[face + 1]];
+         pos3 = skyBoxPositions[indices[face + 2]];
+         pos4 = skyBoxPositions[indices[face + 3]];
+         
+         // Har nå alt for å bygge en side. Legger dette til i en midlertidig array
+         std::vector<GLfloat> oneSideVertices = {
+             // posisjoner
+             pos1.x, pos1.y, pos1.z,
+             pos2.x, pos2.y, pos2.z,
+             pos3.x, pos3.y, pos3.z,
+
+             pos1.x, pos1.y, pos1.z,
+             pos3.x, pos3.y, pos3.z,
+             pos4.x, pos4.y, pos4.z,
+         };
+         
+         // Appender den ferdige siden til cubeVertices
+         for (auto &vertex : oneSideVertices) skyBoxVertices.push_back(vertex);
+     }
     
-    cubeAndPyramidShader.Use();
-    glUniformMatrix4fv( projLoc, 1, GL_FALSE, glm::value_ptr( projectionValue ) );
+    /*  // Brukte tidligere denne men har videreutviklet!
+    GLfloat skyboxVertices[] =
+    {
+        // Posisjon
+        -1.0f,  1.0f, -1.0f,
+        -1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f, -1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+
+        -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,
+
+        -1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f, -1.0f,
+         1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,
+
+        -1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,
+        -1.0f, -1.0f,  1.0f,
+         1.0f, -1.0f,  1.0f
+     };
+     */
+
+    // Oppretter en vertex-array for skyBoxen og forteller bruker denne
+    glGenVertexArrays( 1, &skyboxVAO );
+    glBindVertexArray( skyboxVAO );
     
-    hexPrismShader.Use();
-    glUniformMatrix4fv( projLochexPrism, 1, GL_FALSE, glm::value_ptr( projectionValue ) );
+    // Oppretter en buffer for skyBoxen og forteller OpenGL at dette er bufferen som skal brukes
+    glGenBuffers( 1, &skyboxVBO );
+    glBindBuffer( GL_ARRAY_BUFFER, skyboxVBO );
     
-    skyboxShader.Use();
-    glUniformMatrix4fv( projLocSkybox, 1, GL_FALSE, glm::value_ptr( projectionValue ) );
-    
-    // Definerer viewport-dimensjonene
-    glViewport(0, 0, width, height); // 2.0
-    
+    //Fyller bufferen med data: Bufferen som skal brukes, størrelsen den på holde av, de vertices som skal lagres, og info at det skal tegnes.
+    glBufferData( GL_ARRAY_BUFFER, 108 * sizeof( GL_FLOAT ), skyBoxVertices.data(), GL_STATIC_DRAW );
+    // Spesifiserer attributtene (Slik at man vet hvilke vertices som er for de ulike attributtene)
+    glVertexAttribPointer( POSITION, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( GLfloat ), ( GLvoid * ) 0 );
+    // Aktivere attributten
+    glEnableVertexAttribArray(POSITION);
 }
 
 void generateCubeVerticesAndSetArraysAndBuffers() {
@@ -442,118 +538,6 @@ void generateCubeVerticesAndSetArraysAndBuffers() {
     glEnableVertexAttribArray(TANGENT);
 }
 
-void generatehexPrismVerticesAndSetArraysAndBuffers() {
- 
-    // Punktene som tilsammen bygger hexagon prismen
-    glm::vec3 positions[16];
-    positions[0]  = glm::vec3(-0.5f, -1.0f, -1.0f); // Bakerst venstre nede
-    positions[1]  = glm::vec3( 0.5f, -1.0f, -1.0f); // Bakerst høyre nede
-    positions[2]  = glm::vec3(-1.0f, -1.0f, -0.5f); // Bak venstre nede
-    positions[3]  = glm::vec3( 1.0f, -1.0f, -0.5f); // Bak høyre nede
-    
-    positions[4]  = glm::vec3(-1.0f, -1.0f,  0.5f); // Forann venstre nede
-    positions[5]  = glm::vec3( 1.0f, -1.0f,  0.5f); // Forann høyre nede
-    positions[6]  = glm::vec3(-0.5f, -1.0f,  1.0f); // Fremst venstre nede
-    positions[7]  = glm::vec3( 0.5f, -1.0f,  1.0f); // Fremst høyre nede
-    
-    positions[8]  = glm::vec3(-0.5f,  1.0f, -1.0f); // Bakerst venstre oppe
-    positions[9]  = glm::vec3( 0.5f,  1.0f, -1.0f); // Bakerst høyre oppe
-    positions[10] = glm::vec3(-1.0f,  1.0f, -0.5f); // Bak venstre oppe
-    positions[11] = glm::vec3( 1.0f,  1.0f, -0.5f); // Bak høyre oppe
-    
-    positions[12] = glm::vec3(-1.0f,  1.0f,  0.5f); // Forann venstre oppe
-    positions[13] = glm::vec3( 1.0f,  1.0f,  0.5f); // Forann høyre oppe
-    positions[14] = glm::vec3(-0.5f,  1.0f,  1.0f); // Fremst venstre oppe
-    positions[15] = glm::vec3( 0.5f,  1.0f,  1.0f); // Fremst høyre oppe
-    
-    // Texture-koordinater. Samme for hver side
-    glm::vec2 uv1(0.0f, 1.0f);
-    glm::vec2 uv2(0.0f, 0.0f);
-    glm::vec2 uv3(1.0f, 0.0f);
-    glm::vec2 uv4(1.0f, 1.0f);
-    
-                            
-    int indices[] = {
-        1,9,8,0,    // Bakerst
-        0,8,10,2,   // Bak venstre
-        3,11,9,1,   // Bak høyre
-        2,10,12,4,  // Venstre
-        5,13,11,3,  // Høyre
-        4,12,14,6,  // Frem venstre
-        7,15,13,5,  // Frem høyre
-        6,14,15,7,  // Front
-        // Topp:
-        8,10,12,14,
-        9,8,14,15,
-        11,9,15,13,
-        // Bunn:
-        4,6,7,5,
-        2,4,5,3,
-        0,2,3,1
-    };
-        
-    // Deklarerer en vector som skal holde på de ferdige verdiene til prismen
-    std::vector<GLfloat> hexPrismVertices;
-    
-    // Deklarer vec3 som skal holde på de 4 ulike posisjons-punktene til hver side
-    glm::vec3 pos1, pos2, pos3, pos4;
-    
-    // Deklarerer vec3 som skal holde på normalen til hver side
-    glm::vec3 nm;
-     
-    // Løkka kjører 14 ganger - Prismen blir bygget av totalt 14 firkanter
-    for (int face = 0; face < 56; face = face + 4){
-        
-        // Henter ut de korrektene posisjons-koordinatene for denne siden
-        pos1 = positions[indices[face]];
-        pos2 = positions[indices[face + 1]];
-        pos3 = positions[indices[face + 2]];
-        pos4 = positions[indices[face + 3]];
-        
-        // Tar kryssproduktet av sider av triangelen for å finne normalverdien
-        glm::vec3 normalFirstTriangel = normalize(cross(pos1 - pos2, pos1 - pos4));
-        glm::vec3 normalSecondTriangel = normalize(cross(pos2 - pos3, pos3 - pos4));
-        nm = normalize(normalFirstTriangel + normalSecondTriangel);
-        
-        // Har nå alt for å bygge en side. Legger dette til i en midlertidig array
-        std::vector<GLfloat> oneSideVertices = {
-            // positions            // normal         // texcoords
-            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y,
-            pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y,
-            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y,
-
-            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y,
-            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y,
-            pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y
-        };
-        
-        // Appender den ferdige siden til hexPrismVertices
-        for (auto &vertex : oneSideVertices) hexPrismVertices.push_back(vertex);
-    }
-    
-    // Oppretter en vertex-array for prismen
-    glGenVertexArrays( 1, &hexPrismVAO );
-    // Forteller OpenGL at denne vertex-array skal brukes.
-    glBindVertexArray( hexPrismVAO );
-    
-    // Oppretter en buffer for prismen
-    glGenBuffers( 1, &hexPrismVBO );
-    // Forteller OpenGL at dette er bufferen som skal brukes (Skal bufferen modifiseres senere er det denne som skal endres)
-    glBindBuffer( GL_ARRAY_BUFFER, hexPrismVBO );
-    
-    // Setter data til bufferen. Forteller hvor mye plass det tar
-    glBufferData( GL_ARRAY_BUFFER, 6 * 8 * 14 * sizeof( GL_FLOAT ), hexPrismVertices.data(), GL_STATIC_DRAW );
-    // Spesifiserer attributtene (Slik at man vet hvilke vertices som er for de ulike attributtene)
-    glVertexAttribPointer(POSITION, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (GLvoid*)0);
-    glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (GLvoid*)(3 * sizeof(GLfloat)));
-    glVertexAttribPointer(COLOR, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (const void*)(6 * sizeof(GLfloat)));
-    
-    // Aktivere attributtene
-    glEnableVertexAttribArray(POSITION);
-    glEnableVertexAttribArray(NORMAL);
-    glEnableVertexAttribArray(COLOR);
-}
-
 void generatePyramidVerticesAndSetArraysAndBuffers() {
     
     // Punktene som tilsammen bygger pyramiden
@@ -652,118 +636,148 @@ void generatePyramidVerticesAndSetArraysAndBuffers() {
     glEnableVertexAttribArray(TANGENT);
 }
 
-void generateSkyBoxVerticesAndSetArraysAndBuffers() {
+void generatehexPrismVerticesAndSetArraysAndBuffers() {
+ 
+    // Punktene som tilsammen bygger hexagon prismen
+    glm::vec3 positions[16];
+    positions[0]  = glm::vec3(-0.5f, -1.0f, -1.0f); // Bakerst venstre nede
+    positions[1]  = glm::vec3( 0.5f, -1.0f, -1.0f); // Bakerst høyre nede
+    positions[2]  = glm::vec3(-1.0f, -1.0f, -0.5f); // Bak venstre nede
+    positions[3]  = glm::vec3( 1.0f, -1.0f, -0.5f); // Bak høyre nede
     
-    // Punktene som tilsammen bygger kuben
-     glm::vec3 skyBoxPositions[8];
-     skyBoxPositions[0] = glm::vec3(-1.0f,  1.0f, -1.0f);  // Oppe bak venstre
-     skyBoxPositions[1] = glm::vec3(-1.0f, -1.0f, -1.0f);  // Nede bak venstre
-     skyBoxPositions[2] = glm::vec3( 1.0f, -1.0f, -1.0f);  // Nede bak høyre
-     skyBoxPositions[3] = glm::vec3( 1.0f,  1.0f, -1.0f);  // Oppe bak høyre
-     skyBoxPositions[4] = glm::vec3(-1.0f,  1.0f, 1.0f);   // Oppe frem venstre
-     skyBoxPositions[5] = glm::vec3(-1.0f, -1.0f, 1.0f);   // Nede frem venstre
-     skyBoxPositions[6] = glm::vec3( 1.0f, -1.0f, 1.0f);   // Nede frem høyre
-     skyBoxPositions[7] = glm::vec3( 1.0f,  1.0f, 1.0f);   // Oppe frem høyre
+    positions[4]  = glm::vec3(-1.0f, -1.0f,  0.5f); // Forann venstre nede
+    positions[5]  = glm::vec3( 1.0f, -1.0f,  0.5f); // Forann høyre nede
+    positions[6]  = glm::vec3(-0.5f, -1.0f,  1.0f); // Fremst venstre nede
+    positions[7]  = glm::vec3( 0.5f, -1.0f,  1.0f); // Fremst høyre nede
     
-    // For å sette opp kantene i riktig rekkefølge!
-    //                 Bak   -  Bunn   - Venstre -  Front  -  Høyre  -  Topp
-    int indices[] = {0,3,2,1,  6,5,1,2,  1,5,4,0,  4,5,6,7,  3,7,6,2,  0,4,7,3};
+    positions[8]  = glm::vec3(-0.5f,  1.0f, -1.0f); // Bakerst venstre oppe
+    positions[9]  = glm::vec3( 0.5f,  1.0f, -1.0f); // Bakerst høyre oppe
+    positions[10] = glm::vec3(-1.0f,  1.0f, -0.5f); // Bak venstre oppe
+    positions[11] = glm::vec3( 1.0f,  1.0f, -0.5f); // Bak høyre oppe
+    
+    positions[12] = glm::vec3(-1.0f,  1.0f,  0.5f); // Forann venstre oppe
+    positions[13] = glm::vec3( 1.0f,  1.0f,  0.5f); // Forann høyre oppe
+    positions[14] = glm::vec3(-0.5f,  1.0f,  1.0f); // Fremst venstre oppe
+    positions[15] = glm::vec3( 0.5f,  1.0f,  1.0f); // Fremst høyre oppe
+    
+    // Texture-koordinater. Samme for hver side
+    glm::vec2 uv1(0.0f, 1.0f);
+    glm::vec2 uv2(0.0f, 0.0f);
+    glm::vec2 uv3(1.0f, 0.0f);
+    glm::vec2 uv4(1.0f, 1.0f);
+    
+                            
+    int indices[] = {
+        8,9,1,0,    // Bakerst
+        10,8,0,2,   // Bak venstre
+        9,11,3,1,   // Bak høyre
+        12,10,2,4,  // Venstre
+        11,13,5,3,  // Høyre
+        14,12,4,6,  // Frem venstre
+        13,15,7,5,  // Frem høyre
+        15,14,6,7,  // Front
+        // Topp:
+        12,10,8,14,
+        14,8,9,15,
+        15,9,11,13,
+        // Bunn:
+        7,6,4,5,
+        5,4,2,3,
+        3,2,0,1
+    };
+        
+    // Deklarerer en vector som skal holde på de ferdige verdiene til prismen
+    std::vector<GLfloat> hexPrismVertices;
+    
+    // Deklarer vec3 som skal holde på de 4 ulike posisjons-punktene til hver side
+    glm::vec3 pos1, pos2, pos3, pos4;
+    
+    // Deklarerer vec3 som skal holde på normalen til hver side
+    glm::vec3 nm;
      
-    // Deklarerer en vector som skal holde på de ferdige verdiene til kuben
-    std::vector<GLfloat> skyBoxVertices;
-     
-     // Deklarer vec3 som skal holde på de 4 ulike posisjons-punktene til hver side
-     glm::vec3 pos1, pos2, pos3, pos4;
-      
-     // Løkka kjører 6 ganger - en gang for hver side.
-     for (int face = 0; face < 24; face = face + 4){
-         
-         // Henter ut de korrektene posisjons-koordinatene for denne siden
-         pos1 = skyBoxPositions[indices[face]];
-         pos2 = skyBoxPositions[indices[face + 1]];
-         pos3 = skyBoxPositions[indices[face + 2]];
-         pos4 = skyBoxPositions[indices[face + 3]];
-         
-         // Har nå alt for å bygge en side. Legger dette til i en midlertidig array
-         std::vector<GLfloat> oneSideVertices = {
-             // posisjoner
-             pos1.x, pos1.y, pos1.z,
-             pos2.x, pos2.y, pos2.z,
-             pos3.x, pos3.y, pos3.z,
+    // Løkka kjører 14 ganger - Prismen blir bygget av totalt 14 firkanter
+    for (int face = 0; face < 56; face = face + 4){
+        
+        // Henter ut de korrektene posisjons-koordinatene for denne siden
+        pos1 = positions[indices[face]];
+        pos2 = positions[indices[face + 1]];
+        pos3 = positions[indices[face + 2]];
+        pos4 = positions[indices[face + 3]];
+        
+        // Tar kryssproduktet av sider av triangelen for å finne normalverdien
+        glm::vec3 normalFirstTriangel = normalize(cross(pos1 - pos2, pos1 - pos4));
+        glm::vec3 normalSecondTriangel = normalize(cross(pos2 - pos3, pos3 - pos4));
+        nm = normalize(normalFirstTriangel + normalSecondTriangel);
+        
+        // Har nå alt for å bygge en side. Legger dette til i en midlertidig array
+        std::vector<GLfloat> oneSideVertices = {
+            // positions            // normal         // texcoords
+            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y,
+            pos2.x, pos2.y, pos2.z, nm.x, nm.y, nm.z, uv2.x, uv2.y,
+            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y,
 
-             pos1.x, pos1.y, pos1.z,
-             pos3.x, pos3.y, pos3.z,
-             pos4.x, pos4.y, pos4.z,
-         };
-         
-         // Appender den ferdige siden til cubeVertices
-         for (auto &vertex : oneSideVertices) skyBoxVertices.push_back(vertex);
-     }
+            pos1.x, pos1.y, pos1.z, nm.x, nm.y, nm.z, uv1.x, uv1.y,
+            pos3.x, pos3.y, pos3.z, nm.x, nm.y, nm.z, uv3.x, uv3.y,
+            pos4.x, pos4.y, pos4.z, nm.x, nm.y, nm.z, uv4.x, uv4.y
+        };
+        
+        // Appender den ferdige siden til hexPrismVertices
+        for (auto &vertex : oneSideVertices) hexPrismVertices.push_back(vertex);
+    }
     
-    /*  // Brukte tidligere denne men har videreutviklet!
-    GLfloat skyboxVertices[] =
-    {
-        // Posisjon
-        -1.0f,  1.0f, -1.0f,
-        -1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-         1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-
-        -1.0f, -1.0f,  1.0f,
-        -1.0f, -1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f, -1.0f,
-        -1.0f,  1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f,
-
-         1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-
-        -1.0f, -1.0f,  1.0f,
-        -1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f, -1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f,
-
-        -1.0f,  1.0f, -1.0f,
-         1.0f,  1.0f, -1.0f,
-         1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f,
-        -1.0f,  1.0f,  1.0f,
-        -1.0f,  1.0f, -1.0f,
-
-        -1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f,  1.0f,
-         1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,
-        -1.0f, -1.0f,  1.0f,
-         1.0f, -1.0f,  1.0f
-     };
-     */
-
-    // Oppretter en vertex-array for skyBoxen og forteller bruker denne
-    glGenVertexArrays( 1, &skyboxVAO );
-    glBindVertexArray( skyboxVAO );
+    // Oppretter en vertex-array for prismen
+    glGenVertexArrays( 1, &hexPrismVAO );
+    // Forteller OpenGL at denne vertex-array skal brukes.
+    glBindVertexArray( hexPrismVAO );
     
-    // Oppretter en buffer for skyBoxen og forteller OpenGL at dette er bufferen som skal brukes
-    glGenBuffers( 1, &skyboxVBO );
-    glBindBuffer( GL_ARRAY_BUFFER, skyboxVBO );
+    // Oppretter en buffer for prismen
+    glGenBuffers( 1, &hexPrismVBO );
+    // Forteller OpenGL at dette er bufferen som skal brukes (Skal bufferen modifiseres senere er det denne som skal endres)
+    glBindBuffer( GL_ARRAY_BUFFER, hexPrismVBO );
     
-    //Fyller bufferen med data: Bufferen som skal brukes, størrelsen den på holde av, de vertices som skal lagres, og info at det skal tegnes.
-    glBufferData( GL_ARRAY_BUFFER, 108 * sizeof( GL_FLOAT ), skyBoxVertices.data(), GL_STATIC_DRAW );
+    // Setter data til bufferen. Forteller hvor mye plass det tar
+    glBufferData( GL_ARRAY_BUFFER, 6 * 8 * 14 * sizeof( GL_FLOAT ), hexPrismVertices.data(), GL_STATIC_DRAW );
     // Spesifiserer attributtene (Slik at man vet hvilke vertices som er for de ulike attributtene)
-    glVertexAttribPointer( POSITION, 3, GL_FLOAT, GL_FALSE, 3 * sizeof( GLfloat ), ( GLvoid * ) 0 );
-    // Aktivere attributten
+    glVertexAttribPointer(POSITION, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (GLvoid*)0);
+    glVertexAttribPointer(NORMAL, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (GLvoid*)(3 * sizeof(GLfloat)));
+    glVertexAttribPointer(COLOR, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(GL_FLOAT), (const void*)(6 * sizeof(GLfloat)));
+    
+    // Aktivere attributtene
     glEnableVertexAttribArray(POSITION);
+    glEnableVertexAttribArray(NORMAL);
+    glEnableVertexAttribArray(COLOR);
 }
 
+
+/* Setter matriser og tegner objektene */
+void drawSkybox() {
+    
+    skyboxShader.Use();
+    
+    // Henter inn og setter texture som sendes til shaderen
+    glBindTexture( GL_TEXTURE_CUBE_MAP, skyBoxTextureValue );
+    
+    // Endrer depth-funksjonen. Sjekker at verdien er lik depth-buffer
+    glDepthFunc( GL_LEQUAL );
+
+    // Henter inn view-matrise og gjør denne over til en mat4 da dette er en skybox, og kuben skal wrappes rundt
+    glm::mat4 viewSkyboxValue = glm::mat3( viewValue );
+    // Sender view-matrise til shaderen:
+    glUniformMatrix4fv( viewLocSkybox, 1, GL_FALSE, glm::value_ptr( viewSkyboxValue ) );
+
+    // Aktiverer vertex-arrayen for skyBox:
+    glBindVertexArray( skyboxVAO );
+    
+    // Tegner trianglene som bygger kuben
+    glDrawArrays( GL_TRIANGLES, 0, 36 );
+    
+    // Setter dybdefunksjonen tilbake til default
+    glDepthFunc( GL_LESS );
+    
+    // Deaktiverer shaderprogram som brukes og vertexarray
+    glUseProgram(0);
+    glBindVertexArray(0);
+}
 
 void drawCube() {
         
@@ -783,11 +797,8 @@ void drawCube() {
     glUniform1i(depthMapLoc , 2);
     glBindTexture( GL_TEXTURE_2D, cubeDepthMapValue );
     
-    
-    // Setter view matrisen
-    glm::mat4 viewCubeValue = camera.GetViewMatrix();
     // Sender view-matrise til cube-shaderen:
-    glUniformMatrix4fv( viewLoc, 1, GL_FALSE, glm::value_ptr( viewCubeValue ) );
+    glUniformMatrix4fv( viewLoc, 1, GL_FALSE, glm::value_ptr( viewValue ) );
 
     // Setter model-matrise
     glm::mat4 modelCubeValue = glm::mat4(1.0f);
@@ -806,55 +817,6 @@ void drawCube() {
     // Deaktiverer shaderprogram og vertexarray som brukes
     glBindVertexArray(0);
     glUseProgram(0);
-}
-
-
-void drawHexPrism() {
-    
-    float time = glfwGetTime();
-    
-    // Aktiverer shader-programmet
-    hexPrismShader.Use();
-        
-    // Setter texture for prismen og sender til shader
-    glActiveTexture( GL_TEXTURE0 );
-    glUniform1i(textureLochexPrism , 0);
-    glBindTexture( GL_TEXTURE_2D, hexPrismTextureValue );
-
-    // Setter view matrisen
-    glm::mat4 viewhexPrismValue = camera.GetViewMatrix();
-    // Sender view-matrise til cube-shaderen:
-    glUniformMatrix4fv( viewLochexPrism, 1, GL_FALSE, glm::value_ptr( viewhexPrismValue ) );
-
-    // Setter model-matrise
-    glm::mat4 modelhexPrismValue = glm::mat4(1.0);
-    // Flytter kubens origo 4 punkter til høyre
-    modelhexPrismValue = glm::translate(modelhexPrismValue, glm::vec3(4.0, 0.0, 0.0));
-    // Sender model-matrise til cube-shaderen:
-    glUniformMatrix4fv( modelLochexPrism, 1, GL_FALSE, glm::value_ptr( modelhexPrismValue ) );
-    
-
-        // Sender lys-matrisene til cube-shaderen:
-    //Lys 1:
-    glm::vec3 lightPositionOneValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
-    glUniform3f(lightPositionOneLochexPrism, lightPositionOneValue.x, lightPositionOneValue.y, lightPositionOneValue.z);
-    glUniform3fv(lightColorOneLochexPrism, 1, lightColorOneValue);
-    //Lys 2:
-    glUniform3fv(lightPositionTwoLochexPrism, 1, lightPositionTwoValue);
-    glUniform3fv(lightColorTwoLochexPrism, 1, lightColorTwoValue);
-    
-    glUniform3f(viewPositionLochexPrism, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
-
-    
-    // Aktiverer vertex-arrayen for kuben:
-    glBindVertexArray( hexPrismVAO );
-       
-    // Deretter tegnes trianglene:
-    glDrawArrays( GL_TRIANGLES, 0, 84 ); // 22 trekanter a 3 punkter
-    
-    // Deaktiverer shaderprogram som brukes og vertexarray
-    glUseProgram(0);
-    glBindVertexArray(0);
 }
 
 void drawPyramid() {
@@ -880,9 +842,8 @@ void drawPyramid() {
     glBindTexture( GL_TEXTURE_2D, pyramidDepthMapValue );
     
 
-    // Setter view matrisen
-    glm::mat4 viewtriangleValue = camera.GetViewMatrix();
-    viewtriangleValue = glm::scale(viewtriangleValue, glm::vec3(2.0f, 2.0f, 2.0f));
+    // Skalerer slik at pyramiden blir dobbelt så stor. Deretter setter matrisen
+    glm::mat4 viewtriangleValue = glm::scale(viewValue, glm::vec3(2.0f, 2.0f, 2.0f));
     // Sender view-matrise til cube-shaderen:
     glUniformMatrix4fv( viewLoc, 1, GL_FALSE, glm::value_ptr( viewtriangleValue ) );
 
@@ -905,35 +866,76 @@ void drawPyramid() {
     glUseProgram(0);
 }
 
-void drawSkybox() {
+void drawHexPrism() {
     
-    skyboxShader.Use();
+    float time = glfwGetTime();
     
-    // Henter inn og setter texture som sendes til shaderen
-    glBindTexture( GL_TEXTURE_CUBE_MAP, skyBoxTextureValue );
-    
-    // Endrer depth-funksjonen. Sjekker at verdien er lik depth-buffer
-    glDepthFunc( GL_LEQUAL );
+    // Aktiverer shader-programmet
+    hexPrismShader.Use();
+        
+    // Setter texture for prismen og sender til shader
+    glActiveTexture( GL_TEXTURE0 );
+    glUniform1i(textureLochexPrism , 0);
+    glBindTexture( GL_TEXTURE_2D, hexPrismTextureValue );
+
+    // Sender view-matrise til shaderen:
+    glUniformMatrix4fv( viewLochexPrism, 1, GL_FALSE, glm::value_ptr( viewValue ) );
 
     // Setter model-matrise
-    glm::mat4 viewSkyboxValue = glm::mat3( camera.GetViewMatrix( ));
+    glm::mat4 modelhexPrismValue = glm::mat4(1.0);
+    // Flytter kubens origo 4 punkter til høyre
+    modelhexPrismValue = glm::translate(modelhexPrismValue, glm::vec3(4.0, 0.0, 0.0));
     // Sender model-matrise til shaderen:
-    glUniformMatrix4fv( viewLocSkybox, 1, GL_FALSE, glm::value_ptr( viewSkyboxValue ) );
+    glUniformMatrix4fv( modelLochexPrism, 1, GL_FALSE, glm::value_ptr( modelhexPrismValue ) );
+    
 
-    // Aktiverer vertex-arrayen for skyBox:
-    glBindVertexArray( skyboxVAO );
+    // Sender lys-matrisene til prisme-shaderen:
+    //Lys 1:
+    glm::vec3 lightPositionOneValue(sinf(time * 1.0f), cosf(time * 1.0f), 0.8f);
+    glUniform3f(lightPositionOneLochexPrism, lightPositionOneValue.x, lightPositionOneValue.y, lightPositionOneValue.z);
+    glUniform3fv(lightColorOneLochexPrism, 1, lightColorOneValue);
+    //Lys 2:
+    glUniform3fv(lightPositionTwoLochexPrism, 1, lightPositionTwoValue);
+    glUniform3fv(lightColorTwoLochexPrism, 1, lightColorTwoValue);
     
-    // Tegner trianglene som bygger kuben
-    glDrawArrays( GL_TRIANGLES, 0, 36 );
+    glUniform3f(viewPositionLochexPrism, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
     
-    // Setter dybdefunksjonen tilbake til default
-    glDepthFunc( GL_LESS );
+    // Aktiverer vertex-arrayen for kuben:
+    glBindVertexArray( hexPrismVAO );
+       
+    // Deretter tegnes trianglene:
+    glDrawArrays( GL_TRIANGLES, 0, 84 ); // 22 trekanter a 3 punkter
     
     // Deaktiverer shaderprogram som brukes og vertexarray
     glUseProgram(0);
     glBindVertexArray(0);
 }
 
+
+/* Endrer størrelse og projectionmatriser ved endring av vindu */
+void resizeGL(int width, int height) {
+    
+    // Feilhåndtering for å hindre at det blir deling på 0
+    if (height == 0)
+        height = 1;
+    
+    glm::mat4 projectionValue = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 100.0f);
+    
+    cubeAndPyramidShader.Use();
+    glUniformMatrix4fv( projLoc, 1, GL_FALSE, glm::value_ptr( projectionValue ) );
+    
+    hexPrismShader.Use();
+    glUniformMatrix4fv( projLochexPrism, 1, GL_FALSE, glm::value_ptr( projectionValue ) );
+    
+    skyboxShader.Use();
+    glUniformMatrix4fv( projLocSkybox, 1, GL_FALSE, glm::value_ptr( projectionValue ) );
+    
+    // Definerer viewport-dimensjonene
+    glViewport(0, 0, width, height); // 2.0
+    
+}
+
+/* Setter diverse lys-matriser for kube og pyramide */
 void setLightMatricesForCubeAndPyramide() {
     
     float time = glfwGetTime();

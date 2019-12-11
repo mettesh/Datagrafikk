@@ -36,7 +36,7 @@ int SCREEN_WIDTH, SCREEN_HEIGHT;
 
 // KAMERA OG BEVEGELSE
 // Setter startposisjon til kamera
-Camera camera( glm::vec3( 0.0f, 0.0f, 5.0f ) );
+Camera camera( glm::vec3( 0.0f, 0.0f, 7.0f ) );
 GLfloat lastX = SCREEN_WIDTH / 2.0f;
 GLfloat lastY = SCREEN_WIDTH / 2.0f;
 // Deklarer variabel for å holde på tastatur-keys
@@ -109,6 +109,8 @@ GLuint hexPrismTextureValue;
 GLuint pyramidTextureValue;
 GLuint pyramidNormalMapValue;
 GLuint pyramidDepthMapValue;
+
+GLfloat timer = 0.1f;
 
 
 /* Programstart */
@@ -186,6 +188,8 @@ int main(void) {
         // Henter view-matrise utifra camera sine posisjoner. Brukes for alle objektene
         viewValue = camera.getViewMatrix();
         
+        resizeGL(SCREEN_WIDTH, SCREEN_HEIGHT);
+        
         drawHexPrism();
         
         drawSkybox();
@@ -235,14 +239,14 @@ int initGL() {
     generatePyramidVerticesAndSetArraysAndBuffers();
     generateSkyBoxVerticesAndSetArraysAndBuffers();
     
-    //Laste inn diffuse, normal og depth-texture til kube og prisme. Kun diffse texture til pyramide:
-    cubeTextureValue = TextureLoading::loadTexture("resources/img/cube/wood.jpg");
-    cubeNormalMapValue = TextureLoading::loadTexture("resources/img/cube/wood_normal.jpg");
-    cubeDepthMapValue = TextureLoading::loadTexture("resources/img/cube/wood_disp.jpg");
-    hexPrismTextureValue = TextureLoading::loadTexture("resources/img/cube/bricks.jpg");
-    pyramidTextureValue = TextureLoading::loadTexture("resources/img/cube/bricks.jpg");
-    pyramidNormalMapValue = TextureLoading::loadTexture("resources/img/cube/bricks_normal.jpg");
-    pyramidDepthMapValue = TextureLoading::loadTexture("resources/img/cube/bricks_depth.jpg");
+    //Laste inn diffuse, normal og displacement-texture til kube og prisme. Kun diffse texture til pyramide:
+    cubeTextureValue = TextureLoading::loadTexture("resources/img/objects/wood.jpg");
+    cubeNormalMapValue = TextureLoading::loadTexture("resources/img/objects/wood_normal.jpg");
+    cubeDepthMapValue = TextureLoading::loadTexture("resources/img/objects/wood_disp.jpg");
+    hexPrismTextureValue = TextureLoading::loadTexture("resources/img/objects/bricks.jpg");
+    pyramidTextureValue = TextureLoading::loadTexture("resources/img/objects/bricks.jpg");
+    pyramidNormalMapValue = TextureLoading::loadTexture("resources/img/objects/bricks_normal.jpg");
+    pyramidDepthMapValue = TextureLoading::loadTexture("resources/img/objects/bricks_disp.jpg");
     
     //Laste inn texture til skyboxen:
     std::vector<const GLchar*> skyBoxTextureFaces;
@@ -800,6 +804,10 @@ void drawSkybox() {
     glm::mat4 viewSkyboxValue = glm::mat3( viewValue );
     // Sender view-matrise til shaderen:
     glUniformMatrix4fv( viewLocSkybox, 1, GL_FALSE, glm::value_ptr( viewSkyboxValue ) );
+    
+    
+    glm::mat4 projection = glm::perspective(camera.getZoom(), (GLfloat)SCREEN_WIDTH/(GLfloat)SCREEN_HEIGHT, 0.1f, 1000.0f);
+    glUniformMatrix4fv( projLocSkybox, 1, GL_FALSE, glm::value_ptr( projection ) );
 
     // Aktiverer vertex-arrayen for skyBox:
     glBindVertexArray( skyboxVAO );
@@ -963,8 +971,7 @@ void resizeGL(int width, int height) {
     hexPrismShader.use();
     glUniformMatrix4fv( projLochexPrism, 1, GL_FALSE, glm::value_ptr( projectionValue ) );
     
-    skyboxShader.use();
-    glUniformMatrix4fv( projLocSkybox, 1, GL_FALSE, glm::value_ptr( projectionValue ) );
+
     
     // Definerer viewport-dimensjonene
     glViewport(0, 0, width, height); // 2.0

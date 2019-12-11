@@ -21,7 +21,7 @@ const GLfloat YAW        = -90.0f; // Retning kamera skal peke
 const GLfloat PITCH      =  0.0f;   // Vinkel
 const GLfloat SPEED      =  6.0f;   // Hvor fort kameraet skal bevege seg
 const GLfloat SENSITIVTY =  0.25f;  // Hvor sensitiv bevegelsene skal være
-const GLfloat ZOOM       =  45.0f;  // Hvor inn-zoomet kamera skal starte
+const GLfloat ZOOM       =  46.0f;  // Hvor inn-zoomet kamera skal starte
 
 
 // Oppretter en kamera-klasse som skal motta input og regne ut vinkler, vectorer og matriser som skal brukes i OpenGL
@@ -52,11 +52,41 @@ public:
         if ( direction == FORWARD )
         {
             this->position += this->front * speed;
+            
+            
+            if ( this->zoom >= 1.0f && this->zoom <= 50.0f )
+            {
+                this->zoom -= 0.00015f;
+            }
+            
+            if ( this->zoom <= 1.0f )
+            {
+                this->zoom = 1.0f;
+            }
+            
+            if ( this->zoom >= 50.0f )
+            {
+                this->zoom = 50.0f;
+            }
         }
         
         if ( direction == BACKWARD )
         {
             this->position -= this->front * speed;
+            
+            if ( this->zoom >= 1.0f && this->zoom <= 50.0f )
+            {
+                this->zoom += 0.00015f;
+            }
+            if ( this->zoom <= 1.0f )
+            {
+                this->zoom = 1.0f;
+            }
+            
+            if ( this->zoom >= 50.0f )
+            {
+                this->zoom = 50.0f;
+            }
         }
         
         if ( direction == LEFT )
@@ -77,6 +107,12 @@ public:
         {
             this->position += this->up * speed;
         }
+        
+        
+        // Foor SkyBox for illusjon av at man går nærmere
+
+        
+        
     }
     
     // Prosesserer input den mottar fra mus. (Setter y og x-posisjon)
@@ -111,19 +147,22 @@ public:
         return this->position;
     }
     
+    GLfloat getZoom( )
+    {
+        return this->zoom;
+    }
+    
 private:
-    // Camera Attributes
+    // Kamera-attributter
     glm::vec3 position;
     glm::vec3 front;
     glm::vec3 up;
     glm::vec3 right;
     glm::vec3 worldUp;
     
-    // Eular Angles
     GLfloat yaw;
     GLfloat pitch;
     
-    // Camera options
     GLfloat movementSpeed;
     GLfloat mouseSensitivity;
     GLfloat zoom;

@@ -39,13 +39,13 @@ public:
     }
     
     // Returnerer matrise utregnet
-    glm::mat4 GetViewMatrix( )
+    glm::mat4 getViewMatrix( )
     {
         return glm::lookAt( this->position, this->position + this->front, this->up );
     }
     
     // Prosesserer input den mottar fra tastatur: (deltaTime brukes for å sørge for en jevn bevegelse)
-    void ProcessKeyboard( Camera_Movement direction, GLfloat deltaTime )
+    void processKeyboard( Camera_Movement direction, GLfloat deltaTime )
     {
         GLfloat speed = this->movementSpeed * deltaTime;
         
@@ -80,7 +80,7 @@ public:
     }
     
     // Prosesserer input den mottar fra mus. (Setter y og x-posisjon)
-    void ProcessMouseMovement( GLfloat xOffset, GLfloat yOffset, GLboolean constrainPitch = true )
+    void processMouseMovement( GLfloat xOffset, GLfloat yOffset, GLboolean constrainPitch = true )
     {
         xOffset *= this->mouseSensitivity;
         yOffset *= this->mouseSensitivity;
@@ -106,7 +106,7 @@ public:
         this->updateCameraVectors( );
     }
     
-    glm::vec3 GetPosition()
+    glm::vec3 getPosition()
     {
         return this->position;
     }

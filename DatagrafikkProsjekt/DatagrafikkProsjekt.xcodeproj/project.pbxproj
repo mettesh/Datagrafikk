@@ -439,7 +439,7 @@
 		094ED80C23572560007A9B65 /* projection.inl */ = {isa = PBXFileReference; lastKnownFileType = text; path = projection.inl; sourceTree = "<group>"; };
 		094ED80D23572560007A9B65 /* type_aligned.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = type_aligned.hpp; sourceTree = "<group>"; };
 		094ED80F23572B56007A9B65 /* resources */ = {isa = PBXFileReference; lastKnownFileType = folder; path = resources; sourceTree = "<group>"; };
-		094ED812235735E2007A9B65 /* Camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Camera.h; sourceTree = "<group>"; };
+		094ED812235735E2007A9B65 /* camera.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = camera.h; sourceTree = "<group>"; };
 		094ED813235735E3007A9B65 /* shader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = shader.h; sourceTree = "<group>"; };
 		094ED816235738F1007A9B65 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		096BE197238E9F3D006FAD6D /* libgio-2.0.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libgio-2.0.0.dylib"; path = "../../../../../../../usr/local/Cellar/glib/2.62.3/lib/libgio-2.0.0.dylib"; sourceTree = "<group>"; };
@@ -464,7 +464,7 @@
 		09E4D85323630CF800415536 /* stbi_pkm_c.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stbi_pkm_c.h; sourceTree = "<group>"; };
 		09E4D85423630CF800415536 /* stbi_DDS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stbi_DDS.h; sourceTree = "<group>"; };
 		09E4D85523630CF800415536 /* pvr_helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pvr_helper.h; sourceTree = "<group>"; };
-		09E4D85A23631E2A00415536 /* Texture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Texture.h; sourceTree = "<group>"; };
+		09E4D85A23631E2A00415536 /* texture.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = texture.h; sourceTree = "<group>"; };
 		09E4D85C23632A9100415536 /* libassimp.4.1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libassimp.4.1.0.dylib; path = ../../../../../../../usr/local/Cellar/assimp/4.1.0/lib/libassimp.4.1.0.dylib; sourceTree = "<group>"; };
 		09F75F60237C3842007E8916 /* libGLEW.2.1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libGLEW.2.1.0.dylib; path = ../../../../../../../usr/local/Cellar/glew/2.1.0/lib/libGLEW.2.1.0.dylib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -508,10 +508,10 @@
 			isa = PBXGroup;
 			children = (
 				094ED80F23572B56007A9B65 /* resources */,
-				094ED812235735E2007A9B65 /* Camera.h */,
+				094ED812235735E2007A9B65 /* camera.h */,
 				094ED813235735E3007A9B65 /* shader.h */,
 				094ED816235738F1007A9B65 /* main.cpp */,
-				09E4D85A23631E2A00415536 /* Texture.h */,
+				09E4D85A23631E2A00415536 /* texture.h */,
 			);
 			path = DatagrafikkProsjekt;
 			sourceTree = "<group>";

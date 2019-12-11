@@ -9,7 +9,7 @@
 class TextureLoading
 {
 public:
-    static GLuint LoadTexture( GLchar *path )
+    static GLuint loadTexture( GLchar *path )
     {
         // Generer texture-ID og laste texture-data
         GLuint textureID;
@@ -36,7 +36,7 @@ public:
         return textureID;
     }
     
-    static GLuint LoadSkyBox( std::vector<const GLchar * > skyBoxTextureFaces)
+    static GLuint loadSkyBox( std::vector<const GLchar * > skyBoxTextureFaces)
     {
         GLuint textureID;
         glGenTextures( 1, &textureID );

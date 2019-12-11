@@ -97,7 +97,7 @@ public:
         
     }
     // Metode for å bruke valgt program.
-    void Use( )
+    void use( )
     {
         glUseProgram( this->Program );
     }

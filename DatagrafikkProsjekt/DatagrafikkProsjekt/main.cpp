@@ -16,9 +16,9 @@ int initGL();
 static void glfwErrorCallback(int error, const char* description);
 void glfwWindowSizeCallback(GLFWwindow* window, int width, int height);
 void resizeGL(int width, int height);
-void KeyCallback( GLFWwindow *window, int key, int scancode, int action, int mode );
-void MouseCallback( GLFWwindow *window, double xPos, double yPos );
-void DoMovement();
+void keyCallback( GLFWwindow *window, int key, int scancode, int action, int mode );
+void mouseCallback( GLFWwindow *window, double xPos, double yPos );
+void doMovement();
 void generateSkyBoxVerticesAndSetArraysAndBuffers();
 void generateCubeVerticesAndSetArraysAndBuffers();
 void generatehexPrismVerticesAndSetArraysAndBuffers();
@@ -140,8 +140,8 @@ int main(void) {
     }
     
     // Setter callback-funksjoner som kalles om en tast er trykket ned, eller mus beveget på seg.
-    glfwSetKeyCallback( window, KeyCallback );
-    glfwSetCursorPosCallback( window, MouseCallback );
+    glfwSetKeyCallback( window, keyCallback );
+    glfwSetCursorPosCallback( window, mouseCallback );
     
     // Setter en input-mode for vinduet. I dette tilfellet settes musepeker til å ikke syntes (heller ikke utenfor vinduet)
     glfwSetInputMode( window, GLFW_CURSOR, GLFW_CURSOR_DISABLED );
@@ -184,7 +184,7 @@ int main(void) {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         
         // Henter view-matrise utifra camera sine posisjoner. Brukes for alle objektene
-        viewValue = camera.GetViewMatrix();
+        viewValue = camera.getViewMatrix();
         
         drawHexPrism();
         
@@ -208,7 +208,7 @@ int main(void) {
         deltaTime = currentFrame - lastFrame;
         lastFrame = currentFrame;
         // Kaller deretter den tilhørende responsfunksjonen.
-        DoMovement();
+        doMovement();
         
     }
     
@@ -236,13 +236,13 @@ int initGL() {
     generateSkyBoxVerticesAndSetArraysAndBuffers();
     
     //Laste inn diffuse, normal og depth-texture til kube og prisme. Kun diffse texture til pyramide:
-    cubeTextureValue = TextureLoading::LoadTexture("resources/img/cube/wood.jpg");
-    cubeNormalMapValue = TextureLoading::LoadTexture("resources/img/cube/wood_normal.jpg");
-    cubeDepthMapValue = TextureLoading::LoadTexture("resources/img/cube/wood_disp.jpg");
-    hexPrismTextureValue = TextureLoading::LoadTexture("resources/img/cube/bricks.jpg");
-    pyramidTextureValue = TextureLoading::LoadTexture("resources/img/cube/bricks.jpg");
-    pyramidNormalMapValue = TextureLoading::LoadTexture("resources/img/cube/bricks_normal.jpg");
-    pyramidDepthMapValue = TextureLoading::LoadTexture("resources/img/cube/bricks_depth.jpg");
+    cubeTextureValue = TextureLoading::loadTexture("resources/img/cube/wood.jpg");
+    cubeNormalMapValue = TextureLoading::loadTexture("resources/img/cube/wood_normal.jpg");
+    cubeDepthMapValue = TextureLoading::loadTexture("resources/img/cube/wood_disp.jpg");
+    hexPrismTextureValue = TextureLoading::loadTexture("resources/img/cube/bricks.jpg");
+    pyramidTextureValue = TextureLoading::loadTexture("resources/img/cube/bricks.jpg");
+    pyramidNormalMapValue = TextureLoading::loadTexture("resources/img/cube/bricks_normal.jpg");
+    pyramidDepthMapValue = TextureLoading::loadTexture("resources/img/cube/bricks_depth.jpg");
     
     //Laste inn texture til skyboxen:
     std::vector<const GLchar*> skyBoxTextureFaces;
@@ -252,10 +252,10 @@ int initGL() {
     skyBoxTextureFaces.push_back( "resources/img/skybox/iceflats_dn.tga" );
     skyBoxTextureFaces.push_back( "resources/img/skybox/iceflats_ft.tga" );
     skyBoxTextureFaces.push_back( "resources/img/skybox/iceflats_bk.tga" );
-    skyBoxTextureValue = TextureLoading::LoadSkyBox( skyBoxTextureFaces );
+    skyBoxTextureValue = TextureLoading::loadSkyBox( skyBoxTextureFaces );
     
     // Henter inn uniform-loactions fra kube- og pyramideshader
-    cubeAndPyramidShader.Use();
+    cubeAndPyramidShader.use();
     viewLoc = glGetUniformLocation( cubeAndPyramidShader.Program, "view" );
     projLoc = glGetUniformLocation( cubeAndPyramidShader.Program, "projection" );
     modelLoc = glGetUniformLocation( cubeAndPyramidShader.Program, "model" );
@@ -276,7 +276,7 @@ int initGL() {
     
     
     // Henter inn uniform-loactions fra hexagon prisme-shader
-    hexPrismShader.Use();
+    hexPrismShader.use();
     // Prismeplassering
     viewLochexPrism = glGetUniformLocation( hexPrismShader.Program, "view" );
     projLochexPrism = glGetUniformLocation( hexPrismShader.Program, "projection" );
@@ -294,7 +294,7 @@ int initGL() {
     
     
     // Henter inn uniform-loactions fra skybox-shader
-    skyboxShader.Use();
+    skyboxShader.use();
     projLocSkybox = glGetUniformLocation( skyboxShader.Program, "projection" );
     viewLocSkybox = glGetUniformLocation( skyboxShader.Program, "view" );
     
@@ -788,7 +788,7 @@ void generatehexPrismVerticesAndSetArraysAndBuffers() {
 /* Setter matriser og tegner objektene */
 void drawSkybox() {
     
-    skyboxShader.Use();
+    skyboxShader.use();
     
     // Henter inn og setter texture som sendes til shaderen
     glBindTexture( GL_TEXTURE_CUBE_MAP, skyBoxTextureValue );
@@ -818,7 +818,7 @@ void drawSkybox() {
 void drawCube() {
         
     // Aktiverer shader-programmet
-    cubeAndPyramidShader.Use();
+    cubeAndPyramidShader.use();
         
     // Henter og setter diffuse, normal og depth-texture som sendes til cube-fragshader
     glActiveTexture( GL_TEXTURE0 );
@@ -860,7 +860,7 @@ void drawPyramid() {
     float time = glfwGetTime();
     
     // Aktiverer programmet
-    cubeAndPyramidShader.Use();
+    cubeAndPyramidShader.use();
         
     // Henter og setter texture som sendes til cube-fragshader
     glActiveTexture( GL_TEXTURE0 );
@@ -907,7 +907,7 @@ void drawHexPrism() {
     float time = glfwGetTime();
     
     // Aktiverer shader-programmet
-    hexPrismShader.Use();
+    hexPrismShader.use();
         
     // Setter texture for prismen og sender til shader
     glActiveTexture( GL_TEXTURE0 );
@@ -934,7 +934,7 @@ void drawHexPrism() {
     glUniform3fv(lightPositionTwoLochexPrism, 1, lightPositionTwoValue);
     glUniform3fv(lightColorTwoLochexPrism, 1, lightColorTwoValue);
     
-    glUniform3f(viewPositionLochexPrism, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
+    glUniform3f(viewPositionLochexPrism, camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
     
     // Aktiverer vertex-arrayen for kuben:
     glBindVertexArray( hexPrismVAO );
@@ -957,13 +957,13 @@ void resizeGL(int width, int height) {
     
     glm::mat4 projectionValue = glm::perspective(3.14f/2.0f, (float)width/height, 0.1f, 100.0f);
     
-    cubeAndPyramidShader.Use();
+    cubeAndPyramidShader.use();
     glUniformMatrix4fv( projLoc, 1, GL_FALSE, glm::value_ptr( projectionValue ) );
     
-    hexPrismShader.Use();
+    hexPrismShader.use();
     glUniformMatrix4fv( projLochexPrism, 1, GL_FALSE, glm::value_ptr( projectionValue ) );
     
-    skyboxShader.Use();
+    skyboxShader.use();
     glUniformMatrix4fv( projLocSkybox, 1, GL_FALSE, glm::value_ptr( projectionValue ) );
     
     // Definerer viewport-dimensjonene
@@ -985,7 +985,7 @@ void setLightMatricesForCubeAndPyramide() {
     glUniform3fv(lightPositionTwoLoc, 1, lightPositionTwoValue);
     glUniform3fv(lightColorTwoLoc, 1, lightColorTwoValue);
     
-    glUniform3f(viewPositionLoc, camera.GetPosition().x, camera.GetPosition().y, camera.GetPosition().z);
+    glUniform3f(viewPositionLoc, camera.getPosition().x, camera.getPosition().y, camera.getPosition().z);
 
 }
 
@@ -1001,7 +1001,7 @@ void glfwWindowSizeCallback(GLFWwindow* window, int width, int height) {
 }
 
 // Funksjon som kalles hver gang en tast presses ned eller slippes opp
-void KeyCallback( GLFWwindow *window, int key, int scancode, int action, int mode) {
+void keyCallback( GLFWwindow *window, int key, int scancode, int action, int mode) {
     if ( GLFW_KEY_ESCAPE == key && GLFW_PRESS == action )
     {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
@@ -1022,7 +1022,7 @@ void KeyCallback( GLFWwindow *window, int key, int scancode, int action, int mod
 }
 
 // Funksjon som kalles hver gang musen beveger seg
-void MouseCallback( GLFWwindow *window, double xPos, double yPos ) {
+void mouseCallback( GLFWwindow *window, double xPos, double yPos ) {
     if ( firstMouse )
     {
         lastX = xPos;
@@ -1036,36 +1036,36 @@ void MouseCallback( GLFWwindow *window, double xPos, double yPos ) {
     lastX = xPos;
     lastY = yPos;
     
-    camera.ProcessMouseMovement( xOffset, yOffset );
+    camera.processMouseMovement( xOffset, yOffset );
 }
 
 // Funksjon som setter kamera riktig etter hvilke knapper som er presset ned
-void DoMovement( ) {
+void doMovement( ) {
     if ( keys[GLFW_KEY_W] || keys[GLFW_KEY_UP] )
     {
-        camera.ProcessKeyboard( FORWARD, deltaTime );
+        camera.processKeyboard( FORWARD, deltaTime );
     }
     
     if ( keys[GLFW_KEY_S] || keys[GLFW_KEY_DOWN] )
     {
-        camera.ProcessKeyboard( BACKWARD, deltaTime );
+        camera.processKeyboard( BACKWARD, deltaTime );
     }
     
     if ( keys[GLFW_KEY_A] || keys[GLFW_KEY_LEFT] )
     {
-        camera.ProcessKeyboard( LEFT, deltaTime );
+        camera.processKeyboard( LEFT, deltaTime );
     }
     
     if ( keys[GLFW_KEY_D] || keys[GLFW_KEY_RIGHT] )
     {
-        camera.ProcessKeyboard( RIGHT, deltaTime );
+        camera.processKeyboard( RIGHT, deltaTime );
     }
     if ( keys[GLFW_KEY_Z] )
     {
-        camera.ProcessKeyboard( DOWN, deltaTime );
+        camera.processKeyboard( DOWN, deltaTime );
     }
     if ( keys[GLFW_KEY_X] )
     {
-        camera.ProcessKeyboard( UP, deltaTime );
+        camera.processKeyboard( UP, deltaTime );
     }
 }

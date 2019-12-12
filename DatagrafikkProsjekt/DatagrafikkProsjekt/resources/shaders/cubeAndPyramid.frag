@@ -88,21 +88,18 @@ vec3 getFragColor(vec3 lightPos, vec3 lightColor, float ambientStrength, float s
 
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir) {
     
-    // number of depth layers
+    // Maks og min antall lag
     const float minLayers = 8;
-    const float maxLayers = 32;
+    const float maxLayers = 100;
     float numLayers = mix(maxLayers, minLayers, abs(dot(vec3(0.0, 0.0, 1.0), viewDir)));
     // Kalkulerer størrelsen til hvert lag
     float layerDepth = 1.0 / numLayers;
     // Dypbe til laget
     float currentLayerDepth = 0.0;
-    // the amount to shift the texture coordinates per layer (from vector P)
-    
-    //float heightScale = 0.2;
     vec2 P = viewDir.xy / viewDir.z * heightScale;
     vec2 deltaTexCoords = P / numLayers;
   
-    // get initial values
+    // Får de opprinnelige verdiene til texture og koordinater
     vec2  currentTexCoords     = texCoords;
     float currentDepthMapValue = texture(depthMap, currentTexCoords).r;
       
@@ -110,20 +107,18 @@ vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir) {
     {
         // shift texture coordinates along direction of P
         currentTexCoords -= deltaTexCoords;
-        // get depthmap value at current texture coordinates
+        // Få dybde-verdi for nåværende texture-koordinater
         currentDepthMapValue = texture(depthMap, currentTexCoords).r;
-        // get depth of next layer
+        // Få dybde til neste lag
         currentLayerDepth += layerDepth;
     }
     
-    // get texture coordinates before collision (reverse operations)
+    // Få textture-koordinater før og etter det snus for lineær interpolasjon.
     vec2 prevTexCoords = currentTexCoords + deltaTexCoords;
-
-    // get depth after and before collision for linear interpolation
     float afterDepth  = currentDepthMapValue - currentLayerDepth;
     float beforeDepth = texture(depthMap, prevTexCoords).r - currentLayerDepth + layerDepth;
  
-    // interpolation of texture coordinates
+    // Interpolasjon for texture-koordinater
     float weight = afterDepth / (afterDepth - beforeDepth);
     vec2 finalTexCoords = prevTexCoords * weight + currentTexCoords * (1.0 - weight);
 

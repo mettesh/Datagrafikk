@@ -28,5 +28,4 @@ void main()
     
     // Set the transformed normal
     normalCoordinates = mat3(transpose(inverse(model))) * aNormal;
-   
 }

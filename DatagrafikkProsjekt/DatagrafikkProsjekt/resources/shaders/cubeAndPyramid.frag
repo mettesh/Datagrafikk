@@ -20,6 +20,9 @@ uniform sampler2D depthMap;
 uniform vec3 lightOneColor;
 uniform vec3 lightTwoColor;
 
+// Får inn høydeskalering bestemt av brukeren
+uniform float heightScale;
+
 // Endelig resultat som sendes ut
 out vec4 FragColorResult;
 
@@ -84,6 +87,7 @@ vec3 getFragColor(vec3 lightPos, vec3 lightColor, float ambientStrength, float s
 }
 
 vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir) {
+    
     // number of depth layers
     const float minLayers = 8;
     const float maxLayers = 32;
@@ -93,7 +97,8 @@ vec2 ParallaxMapping(vec2 texCoords, vec3 viewDir) {
     // Dypbe til laget
     float currentLayerDepth = 0.0;
     // the amount to shift the texture coordinates per layer (from vector P)
-    float heightScale = 0.1;
+    
+    //float heightScale = 0.2;
     vec2 P = viewDir.xy / viewDir.z * heightScale;
     vec2 deltaTexCoords = P / numLayers;
   

@@ -5,7 +5,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-// Definerer alle mulige veier som kamera skal bevege seg. Bruker disse for å kunne forholde meg til navn isteden for tall
+// Definerer alle mulige veier som kamera skal bevege seg + Høyden på parallax scalering. Bruker disse for å kunne forholde meg til navn isteden for tall
 enum Camera_Movement
 {
     FORWARD,
@@ -13,15 +13,18 @@ enum Camera_Movement
     LEFT,
     RIGHT,
     UP,
-    DOWN
+    DOWN,
+    MORE,
+    LESS
 };
 
 // Forhåndsdefinerte kameraverdier.
-const GLfloat YAW        = -90.0f; // Retning kamera skal peke
-const GLfloat PITCH      =  0.0f;   // Vinkel
-const GLfloat SPEED      =  6.0f;   // Hvor fort kameraet skal bevege seg
-const GLfloat SENSITIVTY =  0.25f;  // Hvor sensitiv bevegelsene skal være
-const GLfloat ZOOM       =  46.0f;  // Hvor inn-zoomet kamera skal starte
+const GLfloat YAW           = -90.0f; // Retning kamera skal peke
+const GLfloat PITCH         =  0.0f;   // Vinkel
+const GLfloat SPEED         =  6.0f;   // Hvor fort kameraet skal bevege seg
+const GLfloat SENSITIVTY    =  0.25f;  // Hvor sensitiv bevegelsene skal være
+const GLfloat ZOOM          =  46.0f;  // Hvor inn-zoomet kamera skal starte
+const GLfloat HEIGHTSCALE   = 0.1;
 
 
 // Oppretter en kamera-klasse som skal motta input og regne ut vinkler, vectorer og matriser som skal brukes i OpenGL
@@ -29,7 +32,7 @@ class Camera
 {
 public:
     // Konstruktør for vektor-verdier (Retning og hastighet)
-    Camera( glm::vec3 position = glm::vec3( 0.0f, 0.0f, 0.0f ), glm::vec3 up = glm::vec3( 0.0f, 1.0f, 0.0f ), GLfloat yaw = YAW, GLfloat pitch = PITCH ) : front( glm::vec3( 0.0f, 0.0f, -1.0f ) ), movementSpeed( SPEED ), mouseSensitivity( SENSITIVTY ), zoom( ZOOM )
+    Camera( glm::vec3 position = glm::vec3( 0.0f, 0.0f, 0.0f ), glm::vec3 up = glm::vec3( 0.0f, 1.0f, 0.0f ), GLfloat yaw = YAW, GLfloat pitch = PITCH ) : front( glm::vec3( 0.0f, 0.0f, -1.0f ) ), movementSpeed( SPEED ), mouseSensitivity( SENSITIVTY ), zoom( ZOOM ), heighScale( HEIGHTSCALE )
     {
         this->position = position;
         this->worldUp = up;
@@ -53,7 +56,7 @@ public:
         {
             this->position += this->front * speed;
             
-            
+            // Minker zoom-verdien for å få en illusjon av at man nærmer seg "skybox-bilde"
             if ( this->zoom >= 1.0f && this->zoom <= 50.0f )
             {
                 this->zoom -= 0.00015f;
@@ -74,6 +77,7 @@ public:
         {
             this->position -= this->front * speed;
             
+            // Øker zoom-verdien for å få en illusjon av at man nærmer seg "skybox-bilde"
             if ( this->zoom >= 1.0f && this->zoom <= 50.0f )
             {
                 this->zoom += 0.00015f;
@@ -108,11 +112,20 @@ public:
             this->position += this->up * speed;
         }
         
-        
-        // Foor SkyBox for illusjon av at man går nærmere
 
-        
-        
+        if ( direction == MORE )
+        {
+            this->heighScale += 0.0001;
+        }
+        if ( direction == LESS )
+        {
+            // Sjekker slik at den ikke passerer 0 og går utover
+            if(this->heighScale <= 0.0){
+                this->heighScale = 0.0;
+            }
+            
+            this->heighScale -= 0.0001;
+        }
     }
     
     // Prosesserer input den mottar fra mus. (Setter y og x-posisjon)
@@ -152,6 +165,11 @@ public:
         return this->zoom;
     }
     
+    GLfloat getParallaxHeightScale( )
+    {
+        return this->heighScale;
+    }
+    
 private:
     // Kamera-attributter
     glm::vec3 position;
@@ -166,6 +184,8 @@ private:
     GLfloat movementSpeed;
     GLfloat mouseSensitivity;
     GLfloat zoom;
+    
+    GLfloat heighScale;
     
     // Kalkulerer front-vektoren fra kameraets (nye) vinkel.
     void updateCameraVectors( )

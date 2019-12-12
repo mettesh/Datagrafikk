@@ -1,7 +1,6 @@
 // BIBLIOTEK INCLUDES
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include "SOIL2.h"
 
@@ -82,6 +81,7 @@ GLint lightPositionTwoLoc;
 GLint lightColorOneLoc;
 GLint lightColorTwoLoc;
 GLint viewPositionLoc;
+GLint heightScaleLoc;
 
 // Prisme
 GLint viewLochexPrism;
@@ -224,7 +224,6 @@ int main(void) {
     
     // Exit
     exit(EXIT_SUCCESS);
-    
 }
 
 /* Henter inn og kompilerer shadere, laster inn textures og henter Uniform-locations  */
@@ -279,6 +278,8 @@ int initGL() {
     lightPositionTwoLoc = glGetUniformLocation( cubeAndPyramidShader.Program, "lightTwoPos" );
     // ViewPos for begge lys
     viewPositionLoc = glGetUniformLocation( cubeAndPyramidShader.Program, "viewPos" );
+    
+    heightScaleLoc = glGetUniformLocation( cubeAndPyramidShader.Program, "heightScale" );
     
     // Henter inn uniform-loactions fra hexagon prisme-shader
     hexPrismShader.use();
@@ -806,6 +807,10 @@ void drawCube() {
     // Setter og sender inn lysmatriser i egen metode (Brukes for både kube og pyramide)
     setLightMatricesForCubeAndPyramide();
     
+    // Få inn heightScale fra bruker
+    glUniform1f(heighScaleLoc, camera.getParallaxHeightScale());
+    
+    
     // Aktiverer vertex-arrayen for kuben:
     glBindVertexArray( cubeVAO );
     
@@ -1022,5 +1027,16 @@ void doMovement( ) {
     if ( keys[GLFW_KEY_X] )
     {
         camera.processKeyboard( UP, deltaTime );
+    }
+    
+    // For heighScale
+    if ( keys[GLFW_KEY_M] )
+    {
+        camera.processKeyboard( MORE, deltaTime );
+    }
+    
+    if ( keys[GLFW_KEY_L] )
+    {
+        camera.processKeyboard( LESS, deltaTime );
     }
 }
